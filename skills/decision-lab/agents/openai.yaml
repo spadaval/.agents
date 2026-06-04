@@ -1,0 +1,4 @@
+interface:
+  display_name: "Decision Lab"
+  short_description: "Adversarial human-gated decision workflow"
+  default_prompt: "Use $decision-lab to evaluate this architectural decision before we build."

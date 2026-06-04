@@ -24,6 +24,9 @@ subskills so agents operate from durable repository state, not private chat hist
 - [standards/repo-workflow.md](standards/repo-workflow.md): git/worktree start, checkpoint, and handoff.
 - Planning and execution are separate concerns. Do not reshape the bead graph
   while implementing unless graph management is the assigned subskill.
+- For unresolved high-leverage decisions with multiple plausible paths, use
+  `$decision-lab` before shaping beads or orchestration. The lab decides; the
+  factory builds.
 - Use the mapped repo docs for code, architecture, validation, product, and
   quality rules.
 

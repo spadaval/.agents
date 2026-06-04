@@ -1,0 +1,99 @@
+{
+  "version": 3,
+  "skills": {
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "c2f31172b6f256272305a5e6e7228b258446899f",
+      "installedAt": "2026-02-26T04:50:21.767Z",
+      "updatedAt": "2026-02-26T04:50:21.767Z"
+    },
+    "commit-and-push": {
+      "source": "a2f0/tearleads",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/a2f0/tearleads.git",
+      "skillPath": ".claude/skills/commit-and-push/SKILL.md",
+      "skillFolderHash": "26e49ac3c25fd68f70220688b97bfa82f9dbb349",
+      "installedAt": "2026-02-26T22:21:06.153Z",
+      "updatedAt": "2026-02-26T22:21:06.153Z"
+    },
+    "rebase": {
+      "source": "a2f0/tearleads",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/a2f0/tearleads.git",
+      "skillPath": ".claude/skills/rebase/SKILL.md",
+      "skillFolderHash": "388047f818e8f867971406e2a6df0e72e064d14a",
+      "installedAt": "2026-02-26T22:21:06.180Z",
+      "updatedAt": "2026-02-26T22:21:06.180Z"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/anthropics/skills.git",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "skillFolderHash": "928950704df8a8b885c03de5da626331e6f29cf8",
+      "pluginName": "example-skills",
+      "installedAt": "2026-03-08T05:03:31.530Z",
+      "updatedAt": "2026-03-08T05:03:31.530Z"
+    },
+    "grill-with-docs": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
+      "skillFolderHash": "2969a1224c70fe41b9dd2ddbe32c2ec62f2815bd",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-05-01T18:09:00.555Z",
+      "updatedAt": "2026-05-01T18:09:00.555Z"
+    },
+    "improve-codebase-architecture": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "skillFolderHash": "3ad8fa787b3b9b622d1f5a3d0afc27812ac782fa",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-05-01T18:09:00.562Z",
+      "updatedAt": "2026-05-01T18:09:00.562Z"
+    },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/pbakaus/impeccable.git",
+      "skillPath": ".agents/skills/impeccable/SKILL.md",
+      "skillFolderHash": "ea8a9f3bcf6025a511dcbd178c127479271ec331",
+      "installedAt": "2026-05-04T14:22:35.531Z",
+      "updatedAt": "2026-05-04T14:22:35.531Z"
+    },
+    "soultrace": {
+      "source": "soultrace-ai/soultrace-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/soultrace-ai/soultrace-skill.git",
+      "skillPath": "skills/soultrace/SKILL.md",
+      "skillFolderHash": "8e36f5a02579a973067fe5c1a662a8be4a1f55b6",
+      "installedAt": "2026-06-01T15:23:03.274Z",
+      "updatedAt": "2026-06-01T15:23:03.274Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  },
+  "lastSelectedAgents": [
+    "amp",
+    "antigravity",
+    "cline",
+    "codex",
+    "cursor",
+    "deepagents",
+    "dexto",
+    "firebender",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-cli",
+    "opencode",
+    "warp",
+    "zed"
+  ]
+}
