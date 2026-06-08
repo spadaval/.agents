@@ -1,7 +1,7 @@
 # Implement
 
-Use this subskill for ordinary executable beads where the goal is to change code,
-tests, or docs for one owned slice.
+Use this subskill for ordinary executable tracker items where the goal is to
+change code, tests, or docs for one owned slice.
 
 Do not use this subskill for graph planning, demolition, breaking migration,
 closeout work, independent validation, or read-only review.
@@ -9,38 +9,38 @@ closeout work, independent validation, or read-only review.
 ## Start Gate
 
 Follow [repository workflow](../standards/repo-workflow.md) for git worktree
-checks, and [beads.md](../standards/beads.md) for tracker mechanics and Dolt
-sync. Then verify the bead:
+checks, and [tracker.md](../standards/tracker.md) plus `AGENTFACTORY.md` for
+tracker mechanics and sync/check commands. Then verify the assigned item:
 
 ```bash
-bd show <id>
+atelier issue show <id>
 ```
 
-Claim only when the bead is the work you are about to do:
+Claim only when the item is the work you are about to do:
 
 ```bash
-bd update <id> --claim
+atelier issue update <id> --claim
 ```
 
 Do not scan the ready queue unless you are selecting work or coordinating the
-graph. `bd lint` is an orchestrator tracker-readiness check, not an ordinary
-worker start gate.
+graph. Full tracker lint is an orchestrator tracker-readiness check, not an
+ordinary worker start gate.
 
 ## Scope Check
 
 Before editing, verify:
 
-- the bead has no active blockers;
-- the request matches the bead scope;
+- the item has no active blockers;
+- the request matches the item scope;
 - the package, app, workflow, file, or owned area is clear enough to start;
 - acceptance criteria or intended behavior are discoverable;
 - the expected proof for the owned slice is clear;
 - the parent epic validation criterion advanced by the slice is clear, when
   applicable;
-- the bead is not really demolition, closeout, validation, review, or graph
+- the item is not really demolition, closeout, validation, review, or graph
   management work.
 
-If the bead is unclear, inspect only enough parent-epic, sibling-bead, ADR, or
+If the item is unclear, inspect only enough parent epic, sibling item, ADR, or
 doc context to name the ambiguity. Do not reshape the graph unless explicitly
 assigned planning work.
 
@@ -50,45 +50,48 @@ assigned planning work.
   contracts, runtime flow, architecture, or user-visible behavior.
 - During active rewrites, docs are the target design unless they are clearly
   stale, contradictory, or incomplete.
-- Legacy compatibility is not preserved unless the assigned bead explicitly
+- Legacy compatibility is not preserved unless the assigned item explicitly
   makes compatibility the deliverable. Do not add shims, deprecated wrappers,
   compatibility symlinks, transitional aliases, dual paths, or old-path
   re-exports.
 - Prefer one coherent owned slice over a narrow symptom patch.
 - Bias toward test-driven development for behavior changes, bug fixes, contract
   changes, and non-trivial refactors.
-- Skip tests only when the bead is pure deletion, mechanical rename, docs-only,
+- Skip tests only when the item is pure deletion, mechanical rename, docs-only,
   tracker-only, or the missing harness would add more noise than signal.
 
 ## Validation
 
 Use the mapped validation router for check ownership. Run the narrowest checks
-that prove the owned slice and satisfy the bead's acceptance criteria. Do not
-default to the whole suite unless the bead asks for it.
+that prove the owned slice and satisfy the item's acceptance criteria. Do not
+default to the whole suite unless the item asks for it.
 
 If a broader check fails because the repo is intentionally mid-migration,
-record the command, concrete failure shape, and bead expected to reconnect or
+record the command, concrete failure shape, and item expected to reconnect or
 close it out.
 
 ## Tracker Hygiene
 
-Create follow-up beads for bugs, missing validation, cleanup work, decision
-gaps, or newly discovered ordering constraints. Keep the current bead focused
-unless the user explicitly broadens scope.
+Create follow-up tracker items for bugs, missing validation, cleanup work,
+decision gaps, or newly discovered ordering constraints. Keep the current item
+focused unless the user explicitly broadens scope.
 
-Do not use `bd edit`; see [beads.md](../standards/beads.md) for tracker command conventions.
+Do not use interactive tracker commands; see [tracker.md](../standards/tracker.md)
+for command conventions and [beads.md](../standards/beads.md) only for legacy
+Beads-bound repositories.
 
 ## Handoff
 
 Before stopping, leave concise handoff context:
 
-- bead status;
+- tracker item status;
 - docs changed;
 - code/test files changed;
 - checks run and results;
 - parent epic validation criterion advanced, when applicable;
 - expected failures, if any;
-- follow-up bead IDs.
+- follow-up tracker item IDs.
 
 Follow [repository workflow](../standards/repo-workflow.md) for the handoff
-git check, and [beads.md](../standards/beads.md) for pushing tracker state.
+git check, and [tracker.md](../standards/tracker.md) for syncing or exporting
+tracker state.

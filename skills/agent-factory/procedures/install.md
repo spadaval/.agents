@@ -31,14 +31,13 @@ clearly. Missing equivalents are installation gaps, not harmless omissions.
 
 Inspect the repository before writing. Follow
 [repository workflow](../standards/repo-workflow.md) for git worktree checks,
-and the bound tracker workflow. For the default Beads tracker, see
-[beads.md](../standards/beads.md). Then run the repository discovery commands
-below:
+and [tracker.md](../standards/tracker.md) for the bound tracker workflow. Then
+run the repository discovery commands below:
 
 ```bash
 find . -maxdepth 3 -type f \( -name AGENTS.md -o -name AGENTFACTORY.md -o -name CONTEXT.md -o -name SPEC.md \)
 find docs -maxdepth 3 -type f 2>/dev/null
-find . -maxdepth 3 -type d \( -name adr -o -name .beads \)
+find . -maxdepth 3 -type d \( -name adr -o -name .atelier-state -o -name .beads \)
 ```
 
 If the worktree is dirty, preserve unrelated changes. If existing docs conflict
@@ -61,9 +60,10 @@ Create or verify these repository sources:
   `docs/architecture/quality/architecture-quality.md`.
 - Code standards: usually `docs/architecture/quality/standards.md`.
 - Validation router: usually `docs/architecture/quality/validation.md`.
-- Durable tracker available. Beads with Dolt sync is the default
-  agent-factory tracker.
-- Tracker backup/export binding, usually `.beads/issues.jsonl` for Beads.
+- Durable tracker available. The repository chooses a tracker in
+  `AGENTFACTORY.md`; Atelier is a supported first-class binding.
+- Tracker backup/export binding, such as `.atelier-state/` for Atelier or
+  `.beads/issues.jsonl` for legacy Beads.
 
 Use existing equivalent files when they already exist. Otherwise create concise
 starter files with useful headings and explicit TODO markers.
@@ -96,18 +96,33 @@ concrete files, commands, and product-specific skills.
 
 ## Tracker
 
-- Tracker: Beads
-- Tracker backup/export: `.beads/issues.jsonl`
-- Sync commands:
-  - `bd dolt pull`
-  - `bd dolt push`
-  - `bd dolt status`
+- Tracker: Atelier
+- Durable tracker state: committed `.atelier-state/`
+- Runtime tracker database: local `.atelier/state.db`, rebuilt from
+  `.atelier-state/`
+- Normal tracker commands:
+  - `atelier issue ready`
+  - `atelier issue list --status open`
+  - `atelier issue show <id>`
+  - `atelier issue create "Title" --issue-type task --parent <epic-id>`
+  - `atelier issue update <id> --claim`
+  - `atelier issue update <id> --append-notes "..."`
+  - `atelier issue block <blocked-id> <blocker-id>`
+  - `atelier issue unblock <blocked-id> <blocker-id>`
+  - `atelier issue close <id> --reason "..."`
+- Sync and state commands:
+  - `atelier export`
+  - `atelier export --check`
+- Tracker health commands:
+  - `atelier lint`
+  - `atelier lint <id>`
+  - `atelier doctor`
 
 ## Checks
 
 - Markdown formatting: `<command>`
 - Diff whitespace: `git diff --check`
-- Bead lint: `bd lint`
+- Tracker lint: `atelier lint`
 - Full repository check: `<command>`
 
 ## Product-Specific Skills
@@ -116,9 +131,9 @@ concrete files, commands, and product-specific skills.
 ```
 
 Delete entries only after recording a follow-up item to add the missing source.
-After tracker setup exists, that follow-up should be a bead. During initial
-bootstrap, it may be a concrete gap in the install handoff. A missing binding is
-a defect.
+After tracker setup exists, that follow-up should be a tracker item. During
+initial bootstrap, it may be a concrete gap in the install handoff. A missing
+binding is a defect.
 
 ## Starter Files
 
@@ -179,7 +194,7 @@ The validation router defines check ownership:
 | Command            | Owns                                                    |
 | ------------------ | ------------------------------------------------------- |
 | `git diff --check` | whitespace and patch hygiene                            |
-| `bd lint`          | Beads structure                                         |
+| `atelier lint`     | tracker record structure                               |
 | TODO               | project tests, type checks, build, lint, or docs checks |
 
 ## Result States
@@ -193,17 +208,19 @@ The validation router defines check ownership:
 
 ## Tracker Setup
 
-Verify the bound tracker is available. For the default Beads setup:
+Verify the bound tracker is available. For an Atelier setup:
 
 ```bash
-bd --version
-bd status
-bd dolt status
+atelier issue ready
+atelier export --check
+atelier lint
+atelier doctor
 ```
 
-If Beads is the bound tracker and is not initialized, run the
-repository-appropriate Beads setup command or stop with the exact missing
-command/tool. Do not invent a parallel tracker.
+If the bound tracker is not initialized, run the repository-appropriate setup
+command or stop with the exact missing command/tool. Do not invent a parallel
+tracker. If the repository explicitly binds to legacy Beads, use
+[beads.md](../standards/beads.md).
 
 After tracker setup, ensure the binding names the tracker backup/export path and
 that tracker changes are committed with related work.
@@ -212,11 +229,11 @@ that tracker changes are committed with related work.
 
 Ensure agent instructions say:
 
-- use the bound tracker for task tracking, usually Beads;
+- use the bound tracker for task tracking;
 - load `AGENTFACTORY.md` for agent-factory bindings;
 - use the `agent-factory` skill for coordinated agent work;
 - orchestrators assign one subskill per subagent;
-- do not use interactive tracker commands (see the agent-factory beads reference for conventions).
+- do not use interactive tracker commands (see the agent-factory tracker reference for conventions).
 
 Keep this short.
 
@@ -228,7 +245,7 @@ Before handoff:
 test -f AGENTFACTORY.md
 test -f CONTEXT.md
 test -d docs/adr
-bd lint
+<bound tracker lint>
 git diff --check
 <mapped markdown check, if available>
 ```
@@ -250,7 +267,7 @@ After creating or updating sources, spot-check against
 - No committed secrets or credentials.
 
 If a criterion fails, name the gap in the handoff report. Do not block
-installation on non-critical gaps, but do create a follow-up bead for any
+installation on non-critical gaps, but do create a follow-up tracker item for any
 gap that would mislead a fresh agent.
 
 ## Handoff
@@ -259,6 +276,6 @@ Report:
 
 - binding file created or updated;
 - required sources created, reused, or deferred;
-- tracker setup status, including Beads/Dolt when used;
+- tracker setup status, including Atelier export/check or Beads/Dolt when used;
 - checks run and failures;
-- readiness gaps found and follow-up bead IDs.
+- readiness gaps found and follow-up tracker item IDs.

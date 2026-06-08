@@ -12,8 +12,8 @@ Read the changed files and relevant:
 - the mapped code standards when code policy matters;
 - the mapped validation router when test or validation coverage is part of the
   review;
-- docs, ADRs, bead acceptance criteria, and expected migration breakage for the
-  changed area.
+- docs, ADRs, tracker item acceptance criteria, and expected migration breakage
+  for the changed area.
 
 ## Review Stance
 

@@ -133,9 +133,9 @@ Report conversationally with this structure:
 
 If the user asks to record findings, use the `plan` subskill conventions:
 
-- Create problem beads when the gap is clear and fixable.
-- Create spike beads when the solution space is unclear.
-- Create decision beads when a durable repo-shape choice is needed.
+- Create problem items when the gap is clear and fixable.
+- Create spike items when the solution space is unclear.
+- Create decision items when a durable repo-shape choice is needed.
 
 ## Handoff
 
@@ -144,4 +144,4 @@ Report:
 - overall score and category breakdown;
 - concrete gaps with evidence;
 - recommendations and which subskill should own each fix;
-- follow-up bead IDs if findings were recorded.
+- follow-up tracker item IDs if findings were recorded.

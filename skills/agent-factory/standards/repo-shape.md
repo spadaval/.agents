@@ -16,8 +16,8 @@ history:
 - **How do I prove work?** A validation router maps checks and proof methods to
   the behavior or quality they own.
 - **How is work tracked?** The bound tracker holds scope, acceptance criteria,
-  dependencies, status, and handoff. Beads with Dolt sync is the default
-  agent-factory tracker.
+  dependencies, status, and handoff. `AGENTFACTORY.md` names whether the
+  repository uses Atelier, Beads, or another explicit durable tracker.
 - **How does agent-factory bind to this repo?** `AGENTFACTORY.md` maps the
   generic operating model to concrete files, commands, checks, tracker backup,
   and product-specific skills.
@@ -45,7 +45,7 @@ The expected shape is:
 ├── .agents/
 │   └── skills/
 │       └── <repo-local product-specific skills>
-└── .beads/
+└── <tracker state named by AGENTFACTORY.md>
 ```
 
 Exact names differ only when `AGENTFACTORY.md` binds the equivalent source
@@ -144,18 +144,23 @@ clearly. Missing equivalents are gaps, not harmless omissions.
   not linked from the binding; copying global skills into the repository when a
   root/global installation is available.
 
-### `.beads/`
+### Tracker State
 
-- **Purpose**: Default Beads tracker state.
+- **Purpose**: Durable tracker state named by `AGENTFACTORY.md`, such as
+  `.atelier-state/` for Atelier or `.beads/` for legacy Beads repositories.
 - **Quality**:
-  - Tracker is initialized and syncable. Dolt remote is configured.
-  - `config.yaml` sets `dolt.shared-server: true`. The per-project server and
-    embedded mode are not used.
-  - `config.yaml` defines custom bead types (e.g., `types.custom:`) for
-    repository-specific workflows such as `validation` and `closeout`.
+  - Tracker is initialized, inspectable, and syncable or export-checkable using
+    the commands in `AGENTFACTORY.md`.
   - Tracker backup/export path is named in `AGENTFACTORY.md`.
-- **Anti-pattern**: Tracker not initialized; no sync; no backup path; missing
-  custom types; using per-project or embedded Dolt server.
+  - Repository-specific item types, labels, or templates exist when the tracker
+    supports them and the workflow needs them.
+- **Anti-pattern**: Tracker not initialized; no sync/check command; no backup
+  or export path; instructions that assume Beads when the binding names another
+  tracker.
+
+For legacy Beads repositories, `.beads/` remains valid tracker state. Keep Dolt
+setup and custom Beads type guidance in [beads.md](beads.md) instead of making
+it the default repository shape.
 
 ## Basic Hygiene
 

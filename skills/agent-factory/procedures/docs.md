@@ -1,14 +1,15 @@
 # Docs
 
-Use this subskill when documentation freshness is the task, or when a bead's main
-output is reconciling docs with target design, code, beads, or agent process.
+Use this subskill when documentation freshness is the task, or when a tracker
+item's main output is reconciling docs with target design, code, tracker state,
+or agent process.
 
 ## Source Map
 
 - Use `AGENTFACTORY.md` to find the docs map, domain context, product intent,
   architecture docs, quality docs, validation router, and ADR directory.
-- Beads: active work, sequencing, phase tags, handoff notes, and migration
-  intent.
+- Bound tracker: active work, sequencing, phase tags, handoff notes, and
+  migration intent.
 
 ## Staleness Rules
 
@@ -30,34 +31,34 @@ output is reconciling docs with target design, code, beads, or agent process.
 - Update ADRs only for decisions that are hard to reverse, surprising without
   context, and the result of a real trade-off.
 - Update the mapped domain context when vocabulary changes or a term is being
-  used inconsistently across docs, beads, and code.
+  used inconsistently across docs, tracker items, and code.
 - Update product docs when user-visible behavior, UX principles, or design
   language changes.
 - Update agent docs or skills when process changes. Keep role-specific
   procedure in subskill references. Keep design docs focused on principles and
   trade-offs, not step-by-step instructions.
-- Update bead descriptions, acceptance criteria, or notes when docs work
+- Update tracker item descriptions, acceptance criteria, or notes when docs work
   reveals tracker ambiguity that would mislead the next agent.
-- Keep Beads-native acceptance criteria as the executable contract for bead
+- Keep tracker-native acceptance criteria as the executable contract for
   done-ness.
 
 ## Start Gate
 
 Follow [repository workflow](../standards/repo-workflow.md) for git worktree
-checks, and [beads.md](../standards/beads.md) for tracker mechanics and Dolt
-sync.
+checks, and [tracker.md](../standards/tracker.md) plus `AGENTFACTORY.md` for
+tracker mechanics and sync/check commands.
 
 ## Reconciliation Workflow
 
 1. Identify the docs scope: domain, architecture, ADR, product, agent process,
-   operations, or bead tracker.
+   operations, or tracker process.
 2. Read the current authoritative docs for that scope before editing.
 3. Search for stale terms and competing claims with `rg`.
-4. Inspect code or beads only as needed to resolve whether docs or code are
-   stale.
+4. Inspect code or tracker items only as needed to resolve whether docs or code
+   are stale.
 5. Edit the smallest set of docs that removes ambiguity.
-6. If the work changes target design, update or create beads/decision records
-   as appropriate.
+6. If the work changes target design, update or create tracker items or
+   decision records as appropriate.
 7. Verify docs and targeted references.
 
 ## Verification
@@ -70,4 +71,4 @@ file-size-sensitive content.
 ## Handoff
 
 Report docs changed, stale claims removed, target-state source of truth, checks
-run, unresolved mismatches, and follow-up bead IDs.
+run, unresolved mismatches, and follow-up tracker item IDs.

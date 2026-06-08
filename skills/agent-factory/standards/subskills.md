@@ -8,44 +8,45 @@ Each subskill is a self-contained procedure loaded by a subagent when assigned w
 | Subskill      | Use For                                                                                   | Load                                                         |
 | ------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | `install`     | Installing agent-factory in a repository and creating required bindings/scaffolding       | [../procedures/install.md](../procedures/install.md)         |
-| `plan`        | Creating, splitting, sequencing, clarifying, or cleaning up beads                         | [../procedures/plan.md](../procedures/plan.md)               |
-| `orchestrate` | Running an epic or multi-bead workstream and assigning subagents                          | [../procedures/orchestrate.md](../procedures/orchestrate.md) |
-| `implement`   | Executing one ordinary assigned bead or owned slice                                       | [../procedures/implement.md](../procedures/implement.md)     |
+| `plan`        | Creating, splitting, sequencing, clarifying, or cleaning up tracker work                  | [../procedures/plan.md](../procedures/plan.md)               |
+| `orchestrate` | Running an epic or multi-item workstream and assigning subagents                          | [../procedures/orchestrate.md](../procedures/orchestrate.md) |
+| `implement`   | Executing one ordinary assigned tracker item or owned slice                               | [../procedures/implement.md](../procedures/implement.md)     |
 | `migrate`     | Demolition, reconnect, closeout, or other intentional temporary breakage                  | [../procedures/migrate.md](../procedures/migrate.md)         |
 | `review`      | Adversarial diff, code, design, architecture, security, or test-quality review            | [../procedures/review.md](../procedures/review.md)           |
 | `validate`    | Scenario-centered product, operator, browser, runtime, integration, or preservation proof | [../procedures/validate.md](../procedures/validate.md)       |
 | `docs`        | Documentation refresh, reconciliation, or docs/process drift cleanup                      | [../procedures/docs.md](../procedures/docs.md)               |
 | `audit`       | Evidence-backed architecture-quality findings without implementing fixes                  | [../procedures/audit.md](../procedures/audit.md)             |
 | `readiness`   | Assessing whether a repository is legible and operable by agents                          | [../procedures/readiness.md](../procedures/readiness.md)     |
-| `beads`       | Beads command mechanics, issue standards, dependency rules, and tracker sync              | [beads.md](beads.md)                                         |
+| `tracker`     | Bound tracker abstraction, command routing, item standards, dependencies, and sync/check  | [tracker.md](tracker.md)                                     |
+| `beads`       | Legacy Beads command mechanics for repositories still explicitly bound to Beads           | [beads.md](beads.md)                                         |
 
 ## Selection Rules
 
 1. If the first argument is a subskill, load that subskill reference and follow it.
 2. If no subskill is named and none of the rules below clearly applies, stop
    and ask for the assigned subskill.
-3. If the work is an epic or spans multiple beads, use `orchestrate`; the orchestrator may then assign subagents to other subskills.
+3. If the work is an epic or spans multiple tracker items, use `orchestrate`; the orchestrator may then assign subagents to other subskills.
 4. If the work starts from a diff, use `review`. If it starts from a scenario or behavior claim, use `validate`.
 5. If `AGENTFACTORY.md` is missing or the user asks to set up agent-factory, use `install`.
-6. If a bead intentionally permits breakage, closes out a migration, or asks for demolition/reconnect classification, use `migrate`.
+6. If a tracker item intentionally permits breakage, closes out a migration, or asks for demolition/reconnect classification, use `migrate`.
 
 ## Boundary Conditions
 
 ### Do not use `implement` for
 
-- Graph planning or bead management (use `plan`).
+- Graph planning or tracker item management (use `plan`).
 - Demolition, breaking migration, or closeout work (use `migrate`).
 - Independent validation or read-only review (use `validate` or `review`).
 
 ### Do not use `plan` for
 
-- Implementation of a named code bead (use `implement`).
+- Implementation of a named code item (use `implement`).
 - Reshaping the graph while implementing unless explicitly assigned planning work.
 
 ### Do not use `validate` for
 
 - Code review or diff analysis (use `review`).
-- Fixing defects unless the bead explicitly assigns implementation work.
+- Fixing defects unless the tracker item explicitly assigns implementation work.
 
 ### Do not use `review` for
 
@@ -54,11 +55,11 @@ Each subskill is a self-contained procedure loaded by a subagent when assigned w
 
 ### Do not use `migrate` for
 
-- Ordinary implementation beads without named temporary breakage (use `implement`).
+- Ordinary implementation items without named temporary breakage (use `implement`).
 
 ### Do not use `audit` for
 
-- Architecture-quality fixes (use `implement` or `migrate` after a bead describes the work).
+- Architecture-quality fixes (use `implement` or `migrate` after a tracker item describes the work).
 
 ### Do not use `readiness` for
 
@@ -66,4 +67,3 @@ Each subskill is a self-contained procedure loaded by a subagent when assigned w
 - Code review (use `review`).
 - Behavior validation (use `validate`).
 - CI/CD pipelines, PR workflows, or observability systems (out of scope).
-

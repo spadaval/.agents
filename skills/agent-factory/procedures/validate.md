@@ -1,21 +1,22 @@
 # Validate
 
-Use this subskill for validation beads, assigned validation scenarios, and
+Use this subskill for validation items, assigned validation scenarios, and
 scenario-centered closeout checks. Validation starts from the intended behavior,
 not from the diff.
 
 ## Start Gate
 
 Follow [repository workflow](../standards/repo-workflow.md) for git worktree
-checks, and [beads.md](../standards/beads.md) for tracker mechanics and Dolt
-sync. Then inspect the validation bead and parent epic:
+checks, and [tracker.md](../standards/tracker.md) plus `AGENTFACTORY.md` for
+tracker mechanics and sync/check commands. Then inspect the validation item and
+parent epic:
 
 ```bash
-bd show <validation-or-closeout-id>
-bd show <parent-epic-id>
+atelier issue show <validation-or-closeout-id>
+atelier issue show <parent-epic-id>
 ```
 
-Read only the docs and beads needed to understand the assigned scenario,
+Read only the docs and tracker items needed to understand the assigned scenario,
 expected behavior, test data, environment, and known breakage. Do not reshape
 the epic or reschedule validation unless explicitly assigned planning work.
 
@@ -27,12 +28,13 @@ Be adversarial about behavior:
 - Try to disprove that the scenario works.
 - Prefer observable behavior over internal assumptions.
 - Keep the pass/fail path reproducible.
-- Do not fix defects unless the bead explicitly assigns implementation work.
-- File or recommend follow-up beads for real discovered work.
+- Do not fix defects unless the tracker item explicitly assigns implementation
+  work.
+- File or recommend follow-up items for real discovered work.
 
 ## Choose The Proof
 
-Use the proof method named by the bead. If the bead leaves it open, choose the
+Use the proof method named by the tracker item. If the item leaves it open, choose the
 smallest proof that genuinely exercises the scenario:
 
 - **Integration test**: deterministic cross-package, persistence, lifecycle,
@@ -51,7 +53,7 @@ mobile when responsive behavior matters.
 
 ## Evidence
 
-Record concise evidence in bead notes:
+Record concise evidence in tracker item notes:
 
 - scenario name or criterion;
 - proof method;
@@ -60,7 +62,7 @@ Record concise evidence in bead notes:
 - result state: `pass`, `fail`, `blocked`, `deferred`, or `not-applicable`;
 - failure classification and first concrete failure, when relevant;
 - artifact paths, screenshots, run IDs, or logs only when useful and bounded;
-- follow-up bead IDs.
+- follow-up tracker item IDs.
 
 Do not paste raw prompts, generated source, full diffs, huge logs, raw stdout or
 stderr dumps, or secrets.
@@ -70,7 +72,7 @@ stderr dumps, or secrets.
 Classify every non-pass:
 
 - in-scope defect;
-- intentional migration breakage owned by a named bead;
+- intentional migration breakage owned by a named tracker item;
 - environment or tooling failure;
 - unrelated pre-existing failure;
 - deferred validation with a named owner;
@@ -78,14 +80,15 @@ Classify every non-pass:
 
 If validation is blocked, record the missing precondition and exact command or
 step that hit it. If behavior fails, state the user/operator-visible failure and
-recommend the next bead shape rather than silently broadening scope.
+recommend the next tracker item shape rather than silently broadening scope.
 
 ## Handoff
 
-Before closing a validation bead, confirm acceptance criteria are satisfied or
+Before closing a validation item, confirm acceptance criteria are satisfied or
 explicitly classified. Follow
 [repository workflow](../standards/repo-workflow.md) for the handoff git check,
-and [beads.md](../standards/beads.md) for pushing tracker state.
+and [tracker.md](../standards/tracker.md) for syncing or exporting tracker
+state.
 
 Handoff names the scenario result, evidence, checks or steps run,
-failures, follow-up beads, and deferred validation.
+failures, follow-up items, and deferred validation.

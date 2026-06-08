@@ -4,8 +4,8 @@ Use this subskill to inspect architecture quality, identify complexity-fit
 problems, and record evidence-backed findings without designing or implementing
 refactors.
 
-Use `implement` or `migrate` only after a bead already describes the problem and
-desired work.
+Use `implement` or `migrate` only after a tracker item already describes the
+problem and desired work.
 
 ## Read First
 
@@ -32,7 +32,7 @@ Audit mode identifies problems, not fixes. For each finding, report:
   what must be learned before shaping work.
 - **Confidence**: high, medium, or low.
 - **Next step**: no action, spike, decision, docs clarification, ordinary
-  implementation bead, demolition, reconnect, or closeout.
+  implementation item, demolition, reconnect, or closeout.
 
 Be specific.
 Recommend an implementation only if a solution is obvious.
@@ -40,7 +40,7 @@ Recommend an implementation only if a solution is obvious.
 ## Value Discipline
 
 Ignore implementation effort when deciding whether the architecture problem is
-worth caring about. Cost affects bead sequencing, not codebase value.
+worth caring about. Cost affects tracker sequencing, not codebase value.
 
 Reject candidates justified only by taste, symmetry, pattern completion,
 smaller files, or speculative future variation. Prefer findings that reduce
@@ -51,11 +51,11 @@ drag.
 
 When the user asks to record findings, use the `plan` subskill conventions:
 
-- create problem beads when the problem is clear enough;
-- create spike beads when evidence or solution space is incomplete;
-- create decision beads when a durable architecture choice is needed;
-- create demolition/reconnect/closeout beads only after the target direction is
+- create problem items when the problem is clear enough;
+- create spike items when evidence or solution space is incomplete;
+- create decision items when a durable architecture choice is needed;
+- create demolition/reconnect/closeout items only after the target direction is
   clear.
 
 Durable architecture decisions belong in ADRs or target-state docs, not only in
-bead notes.
+tracker notes.

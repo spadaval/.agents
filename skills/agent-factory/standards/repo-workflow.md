@@ -9,12 +9,13 @@ the current worktree state:
 git status --short --branch
 ```
 
-If tracker state also matters, follow [beads.md](beads.md) for the Dolt sync
-commands and tracker-specific start checks.
+If tracker state also matters, follow [tracker.md](tracker.md) and the
+repository's `AGENTFACTORY.md` binding for sync/check commands and
+tracker-specific start checks.
 
 ## Checkpoint Pattern
 
-For coherent slices or small bead groups:
+For coherent slices or small tracker item groups:
 
 ```bash
 git status --short
@@ -35,7 +36,5 @@ Before handoff, verify the worktree is clean:
 git status --short --branch
 ```
 
-If bead state changed, push tracker state according to [beads.md](beads.md)
-before handoff.
-
-
+If tracker state changed, sync or export it according to
+[tracker.md](tracker.md) and the repository binding before handoff.

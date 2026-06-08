@@ -1,8 +1,12 @@
-# Beads Reference
+# Legacy Beads Reference
 
-Beads is the default durable issue tracker for agent-factory repositories. Use
-it to preserve scope, acceptance criteria, status, follow-up work, dependencies,
-and handoff outside chat when `AGENTFACTORY.md` binds the repository to Beads.
+Beads is a legacy/fallback durable issue tracker for Agent Factory. Use it only
+when `AGENTFACTORY.md` explicitly binds the repository to Beads, or when archived
+Beads data must be inspected for recovery or audit. For normal tracker routing
+and Atelier examples, see [tracker.md](tracker.md).
+
+When Beads is bound, it preserves scope, acceptance criteria, status, follow-up
+work, dependencies, and handoff outside chat.
 
 ## Core Commands
 

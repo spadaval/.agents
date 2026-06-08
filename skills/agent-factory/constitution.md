@@ -20,7 +20,7 @@ cannot reliably define it.
 Work begins as durable intent before it becomes execution. The next agent must
 be able to continue without private chat history.
 
-Handoff lives in beads, docs, ADRs, tests, validation evidence, and commits.
+Handoff lives in tracker items, docs, ADRs, tests, validation evidence, and commits.
 Work is not complete until the next agent can continue safely.
 
 ### Execution And Proof
@@ -83,13 +83,13 @@ independent validation is expected.
 
 | Branch      | Role                      | Responsibility                                                                              |
 | ----------- | ------------------------- | ------------------------------------------------------------------------------------------- |
-| Manager     | Epic orchestrator         | Keeps multi-bead work coherent by scoping, delegating, unblocking, integrating, and closing |
-| Manager     | Bead manager              | Keeps the tracker graph executable                                                          |
+| Manager     | Epic orchestrator         | Keeps multi-item work coherent by scoping, delegating, unblocking, integrating, and closing |
+| Manager     | Tracker graph manager     | Keeps the tracker graph executable                                                          |
 | Worker      | Implementation worker     | Changes one owned slice and leaves proof and handoff                                        |
 | Worker      | Breaking migration worker | Removes interfaces or migrates with temporary breakage; names and owns breakage             |
 | Validator   | Code reviewer             | Challenges the diff for construction defects and unsupported claims                         |
 | Validator   | Behavior validator        | Proves whether a scenario works from the user, operator, or agent point of view             |
-| Stewardship | Docs refresher            | Keeps durable docs, ADRs, beads, and skills aligned                                         |
+| Stewardship | Docs refresher            | Keeps durable docs, ADRs, tracker items, and skills aligned                                 |
 | Stewardship | Architecture auditor      | Finds evidence-backed structure, ownership, or process-quality risks                        |
 
 ### Agent Scope
@@ -113,7 +113,7 @@ Gaps in these boundaries are system defects, not agent defects.
 
 Agents receive context through both push and pull.
 
-**Push** is what the agent is given: the assignment, bead state, specific task,
+**Push** is what the agent is given: the assignment, tracker state, specific task,
 and write scope.
 
 **Pull** is what the agent retrieves: docs, code, schemas, ADRs, and skills. The
@@ -123,5 +123,4 @@ whole repository.
 Skills are the primary pulled context for role procedure. In-repo sources are
 primary. External systems may provide coordination context, but they must not be
 the only place durable knowledge lives.
-
 

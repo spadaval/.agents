@@ -1,6 +1,6 @@
 # Orchestrate
 
-Use this subskill when you are the primary orchestrator for an epic or multi-bead
+Use this subskill when you are the primary orchestrator for an epic or multi-item
 workstream. You select, shape, assign, integrate, review, checkpoint, and steer.
 
 In this system, **one agent → one role**. As orchestrator, do not personally
@@ -16,17 +16,18 @@ At a high level, your orchestration lifecycle follows these phases:
 1. **Start Gate** — Verify the repo and tracker are clean and synced before any
    work begins. Fix sync issues or dirty worktrees before proceeding.
 2. **Shape & Plan** — Review the parent epic, open children, blockers, and
-   overlap. Ensure every validation criterion is owned, close stale beads, and
+   overlap. Ensure every validation criterion is owned, close stale items, and
    define acceptance criteria and proof methods.
 3. **Delegate** — Spawn subagents for each coherent slice of work. Assign one
-   skill per subagent, provide exact bead IDs, owned files, constraints, and
-   validation expectations.
+   skill per subagent, provide exact tracker item IDs, owned files, constraints,
+   and validation expectations.
 4. **Integrate & Checkpoint** — Commit approved subtask results, sync tracker
-   state with Dolt, and verify the worktree before assigning the next worker.
+   state using the bound sync/check commands, and verify the worktree before
+   assigning the next worker.
 5. **Review & Validate** — Route high-risk changes to the `review` subskill and
    scenario-centered proof to the `validate` subskill.
 6. **Closeout** — Run final validation, reconcile docs and ADRs, push tracker
-   state, and hand off the completed epic with commits, closed beads, and
+   state, and hand off the completed epic with commits, closed items, and
    follow-up items.
 
 The sections below provide detailed instructions for each phase.
@@ -35,36 +36,39 @@ The sections below provide detailed instructions for each phase.
 
 Before assigning work, prove the local repo and tracker can absorb a long run.
 Follow [repository workflow](../standards/repo-workflow.md) for git worktree
-checks, and [beads.md](../standards/beads.md) for tracker mechanics and Dolt
-sync. Then run the orchestrator-specific checks below:
+checks, and [tracker.md](../standards/tracker.md) plus `AGENTFACTORY.md` for
+tracker mechanics and sync/check commands. Then run the orchestrator-specific
+checks below using the bound tracker commands:
 
 ```bash
-bd ready
-bd lint
-bd show <epic-or-candidate>
+atelier issue ready
+atelier lint
+atelier issue show <epic-or-candidate>
 ```
 
-If Dolt pull or push fails, stop orchestration and fix tracker sync first. If
+If tracker sync/check fails, stop orchestration and fix tracker state first. If
 the worktree is dirty, classify each change before continuing and preserve
 unrelated user changes.
 
 ## Orchestration Checklist
 
-1. Pull and push Dolt before graph shaping or worker assignment.
+1. Run the bound tracker sync/check commands before graph shaping or worker
+   assignment.
 2. Review the parent epic, open children, blockers, sibling overlap, and
-   existing closeout or validation beads.
+   existing closeout or validation items.
 3. Ensure executable children name scope, out-of-scope work, acceptance
    criteria, and proof commands or proof method.
 4. Ensure every epic validation criterion is owned by child proof, a validation
-   bead, the closeout bead, or an explicit blocked/deferred/not-applicable
+   item, the closeout item, or an explicit blocked/deferred/not-applicable
    classification.
-5. Shape or close duplicate, vague, or stale beads before implementation starts.
+5. Shape or close duplicate, vague, or stale items before implementation starts.
 6. Commit coherent implementation slices with the mapped tracker backup when
    the tracker update records the same work.
-7. Use `bd close <id> --reason "..."` for bead completion; use `bd update` for
-   field edits and claiming.
+7. Use the bound close command, such as
+   `atelier issue close <id> --reason "..."`, for completion; use the bound
+   update command, such as `atelier issue update`, for field edits and claiming.
 8. Before closeout closes, run residue searches, reconcile docs, run broad
-   validation, push Dolt, and verify the worktree is clean.
+   validation, sync/export tracker state, and verify the worktree is clean.
 
 ## Subagent Delegation
 
@@ -77,13 +81,13 @@ directly. A good guideline is to keep work yourself when a subagent would
 require more than ~500 words of context to understand what to do. Hand off all
 complex or long-running implementation work to subagents.
 
-Assign one coherent owned slice per worker, usually one to three beads.
+Assign one coherent owned slice per worker, usually one to three tracker items.
 Be careful with parallel subagents. Use them only when readers are parallel or
 writers are clearly disjoint.
 
 Each worker prompt should include:
 
-- exact bead IDs and parent epic;
+- exact tracker item IDs and parent epic;
 - assigned agent-factory role/subskill;
 - owned files, modules, workflows, or architectural seam;
 - what not to change;
@@ -93,8 +97,8 @@ Each worker prompt should include:
 - epic validation criterion advanced by the slice, when applicable;
 - instruction that other agents may be editing the repo and unrelated work must
   not be reverted;
-- instruction to list changed files, checks run, bead state changes, risks, and
-  follow-up needs.
+- instruction to list changed files, checks run, tracker state changes, risks,
+  and follow-up needs.
 
 ## Review And Validation
 
@@ -108,7 +112,7 @@ understand expected behavior.
 
 ## Checkpoint Commits
 
-Commit after each approved subtask, bead, or small coherent bead group.
+Commit after each approved subtask, tracker item, or small coherent item group.
 Follow [repository workflow](../standards/repo-workflow.md) for the checkpoint
 pattern. When tracker changes update the mapped tracker backup, stage it
 explicitly. Before assigning the next worker, make sure the previous checkpoint
@@ -118,14 +122,15 @@ is either committed or deliberately reverted.
 
 Before closing an epic:
 
-- run the closeout validation named by the bead graph;
+- run the closeout validation named by the tracker graph;
 - prove or classify every parent epic validation criterion;
 - run targeted residue searches for removed terms, legacy imports, and old
   contracts;
-- reconcile docs, ADRs, glossary, and bead notes with the implemented state;
+- reconcile docs, ADRs, glossary, and tracker notes with the implemented state;
 - commit remaining tracker backup changes;
 - follow [repository workflow](../standards/repo-workflow.md) for the handoff
-  git check, and [beads.md](../standards/beads.md) for pushing tracker state.
+  git check, and [tracker.md](../standards/tracker.md) for syncing or exporting
+  tracker state.
 
-Final handoff names completed epic, commits, closed beads, validation
-commands, residual breakage, follow-up beads, and tracker/Dolt status.
+Final handoff names completed epic, commits, closed items, validation commands,
+residual breakage, follow-up items, and tracker sync/check status.
