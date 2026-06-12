@@ -8,16 +8,15 @@ history:
 - **What is this repository for?** Product intent names users, purpose, and
   observable target behaviors.
 - **What words mean what?** Domain context defines core nouns and records
-  ambiguity decisions.
+  resolved terminology/model choices.
 - **Where do I start reading?** A docs map routes agents to product,
   architecture, quality, validation, operations, and agent-process sources.
-- **What decisions are durable?** ADRs record choices that are costly,
+- **Which choices are durable?** ADRs record choices that are costly,
   surprising, or repeatedly relevant.
 - **How do I prove work?** A validation router maps checks and proof methods to
   the behavior or quality they own.
-- **How is work tracked?** The bound tracker holds scope, acceptance criteria,
-  dependencies, status, and handoff. `AGENTFACTORY.md` names whether the
-  repository uses Atelier, Beads, or another explicit durable tracker.
+- **How is work tracked?** The bound tracker holds scope, Outcome, Evidence,
+  dependencies, status, and handoff. `AGENTFACTORY.md` names the durable tracker.
 - **How does agent-factory bind to this repo?** `AGENTFACTORY.md` maps the
   generic operating model to concrete files, commands, checks, tracker backup,
   and product-specific skills.
@@ -76,9 +75,9 @@ clearly. Missing equivalents are gaps, not harmless omissions.
 ### `CONTEXT.md`
 
 - **Purpose**: Domain language. Defines the core nouns agents must use
-  consistently and records ambiguity decisions.
+  consistently and records resolved terminology/model choices.
 - **Quality**: Concrete domain terms with definitions, not placeholders.
-  Records real decisions that prevent repeated confusion.
+  Records real choices that prevent repeated confusion.
 - **Anti-pattern**: Generic terms that could apply to any repository; empty
   TODO lists that never get filled.
 
@@ -100,13 +99,13 @@ clearly. Missing equivalents are gaps, not harmless omissions.
 
 ### `docs/adr/`
 
-- **Purpose**: Durable decisions. Records choices that are costly, surprising,
-  or repeatedly relevant.
+- **Purpose**: Durable choices. Records choices that are costly, surprising, or
+  repeatedly relevant.
 - **Quality**: Each ADR explains the trade-off, not just the choice.
   Superseded ADRs are clearly marked, not deleted. Archive hygiene is
   maintained: current docs do not rely on historical text for target-state
   instructions.
-- **Anti-pattern**: Decisions without rationale; deleted old ADRs that remove
+- **Anti-pattern**: Choices without rationale; deleted old ADRs that remove
   important historical context; stale ADRs that contradict current code.
 
 ### `docs/architecture/index.md`
@@ -146,8 +145,7 @@ clearly. Missing equivalents are gaps, not harmless omissions.
 
 ### Tracker State
 
-- **Purpose**: Durable tracker state named by `AGENTFACTORY.md`, such as
-  `.atelier-state/` for Atelier or `.beads/` for legacy Beads repositories.
+- **Purpose**: Durable tracker state named by `AGENTFACTORY.md`.
 - **Quality**:
   - Tracker is initialized, inspectable, and syncable or export-checkable using
     the commands in `AGENTFACTORY.md`.
@@ -155,12 +153,7 @@ clearly. Missing equivalents are gaps, not harmless omissions.
   - Repository-specific item types, labels, or templates exist when the tracker
     supports them and the workflow needs them.
 - **Anti-pattern**: Tracker not initialized; no sync/check command; no backup
-  or export path; instructions that assume Beads when the binding names another
-  tracker.
-
-For legacy Beads repositories, `.beads/` remains valid tracker state. Keep Dolt
-setup and custom Beads type guidance in [beads.md](beads.md) instead of making
-it the default repository shape.
+  or export path; instructions that contradict the bound tracker.
 
 ## Basic Hygiene
 

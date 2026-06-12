@@ -15,15 +15,41 @@ Then inspect the tracker and graph using the bound commands.
 
 ```bash
 atelier issue list --status open
-atelier issue ready
+atelier issue list --ready
+atelier mission list
+atelier mission status <mission-id>
+atelier mission show <mission-id>
 atelier lint
 atelier lint <id>
 atelier issue search "<topic>"
 atelier issue show <id>
 ```
 
-Read parent epics, siblings, blockers, relevant ADRs, and existing decision
-items before changing meaning or sequencing.
+Read parent epics, siblings, blockers, relevant ADRs, and target-state docs
+before changing meaning or sequencing.
+
+## Human Choice Gate
+
+Important unresolved choices are not hidden implementation work. Mission
+creation and activation must distinguish ordinary local execution choices from
+autonomy-blocking product or architecture choices. If a choice needs durable
+resolution, create a task whose deliverable is an artifact update such as an
+ADR, spec, context file, or target-state document. Dependent implementation
+stays blocked on that task until the human resolves the choice and the artifact
+is updated.
+
+Use this gate when a choice is high-leverage, hard to reverse, changes product
+semantics, alters architecture, persistence, security, data-retention,
+migration policy, validation policy, or public contracts, or has multiple
+plausible approaches with meaningful tradeoffs. Resolve these choices before
+mission start and do not activate the mission while they remain open.
+If work can continue around the choice, split the independent slice and block
+only the dependent items.
+
+See [ready-work.md](../standards/ready-work.md) for ready epic and ready issue
+criteria, and [work-item-authoring.md](../standards/work-item-authoring.md) for
+writing mission, epic, executable issue, validation item, Outcome, Evidence,
+and Notes text.
 
 ## Planning Flow
 
@@ -34,7 +60,7 @@ Problem or Goal
 [ Understand ] -- Read docs, ADRs, existing tracker items, current system
       |
       v
-[ Shape ] -- Split, sequence, name scope and acceptance criteria
+[ Shape ] -- Split, sequence, name scope, Outcome, Evidence, and Notes
       |
       v
 [ Verify ready ] -- Can a future agent execute without hidden context?
@@ -44,7 +70,26 @@ Problem or Goal
 ```
 
 A ready item must answer what, why, in scope, out of scope, how to prove it, and
-which subskill to load when assignment is not obvious.
+which subskill to load when assignment is not obvious. When the tracker supports
+sectioned Markdown, executable work must include `Description`, `Outcome`,
+`Evidence`, and optional `Notes`. Shape the item around desired outcome and
+proof expectations; avoid prescribing exact implementation steps unless the
+path is a deliberate architecture or product decision.
+
+For Atelier mission work, ready selection starts from the active mission graph:
+
+```bash
+atelier mission status <mission-id>
+atelier mission show <mission-id>
+atelier issue show <candidate-id>
+```
+
+Use `atelier issue list --ready` to discover candidates or cross-check global
+readiness, then keep only work linked to the active mission or add genuinely
+mission-advancing work with `atelier mission add-work <mission-id> <issue-id>`.
+Mission status should leave clear options for the orchestrator: ready now,
+blocked by a named task, needs evidence, needs an explicit policy check, or
+deferred/not applicable with an owner.
 
 ## Bulk Work Creation
 
@@ -57,6 +102,7 @@ atelier issue create "Epic title" --issue-type epic
 atelier issue create "Implement focused slice" --issue-type task --parent <epic-id>
 atelier issue subissue <epic-id> "Validate integrated behavior" --issue-type validation
 atelier issue block <blocked-id> <blocker-id>
+atelier mission add-work <mission-id> <issue-id>
 atelier export
 atelier export --check
 ```
@@ -79,12 +125,15 @@ plans.
 
 ## Reshaping Existing Items
 
-Fix unclear scope, missing acceptance criteria, or stale blockers on any tracker
-item you edit. Preserve the item ID and human intent where possible.
+Fix unclear scope, missing outcome/evidence expectations, or stale blockers on
+any tracker item you edit. Preserve the item ID and human intent where possible.
+Create a new repair issue instead of reopening misleading closed work unless
+the old item was closed accidentally and no replacement would preserve the
+audit trail better.
 
 If meaning changes materially:
 
-- update the description or acceptance criteria;
+- update the Description, Outcome, Evidence, Notes, or relevant tracker fields;
 - add a note explaining why it changed;
 - adjust parent/blocker links;
 - create follow-up items for split-out work;
@@ -97,7 +146,7 @@ the area you are already managing.
 
 At handoff, the tracker graph must be clearer than when you started. Report
 items created or changed, dependency changes, validation or lint run, remaining
-ambiguity, and any follow-up decisions needed.
+ambiguity, and any follow-up artifact tasks needed.
 
 Follow [repository workflow](../standards/repo-workflow.md) for the handoff
 git check, and [tracker.md](../standards/tracker.md) for syncing or exporting

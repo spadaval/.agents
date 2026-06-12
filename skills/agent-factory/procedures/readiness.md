@@ -43,12 +43,12 @@ Criteria for how easily a fresh agent can enter the repository.
 - `AGENTS.md` does not duplicate subskill procedure.
 - `docs/index.md` exists and routes to durable sources.
 
-### Context and Decisions
+### Context And Architecture
 
-Criteria for domain language and durable decision records.
+Criteria for domain language and durable architecture records.
 
 - `CONTEXT.md` exists and defines concrete domain terms.
-- `CONTEXT.md` records real ambiguity decisions.
+- `CONTEXT.md` records resolved terminology and model choices.
 - `docs/adr/` exists.
 - ADRs explain trade-offs, not just state choices.
 - Superseded ADRs are marked, not deleted.
@@ -135,7 +135,8 @@ If the user asks to record findings, use the `plan` subskill conventions:
 
 - Create problem items when the gap is clear and fixable.
 - Create spike items when the solution space is unclear.
-- Create decision items when a durable repo-shape choice is needed.
+- Create tasks to write or update durable repo-shape artifacts when a choice
+  needs to be recorded.
 
 ## Handoff
 

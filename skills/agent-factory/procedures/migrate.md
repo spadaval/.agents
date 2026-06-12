@@ -25,7 +25,7 @@ Classify the work as one of:
 
 Do not guess. If the item does not clearly say which class it is, inspect the
 parent epic, current ADRs, and sibling items. If still unclear, update the
-tracker or ask for a decision.
+tracker or ask for an explicit human choice.
 
 ## Demolition Rules
 
@@ -41,7 +41,7 @@ For demolition items:
   renamed wrappers.
 - Do not write performative tests that only prove deleted code is still gone.
 - Record expected downstream breakage and the reconnect/closeout item that owns
-  it in tracker notes or acceptance criteria.
+  it in tracker Notes, Outcome, or Evidence.
 
 Broad checks may fail after a valid demolition only when the breakage is named
 and owned. Capture the exact failure and owning reconnect item instead of hiding
@@ -57,20 +57,25 @@ For reconnect items:
 - Remove nearby legacy references rather than preserving compatibility paths.
 - File follow-up items for adjacent breakage outside the owned slice.
 
-Focused validation proves the reconnected seam and satisfies the item's
-acceptance criteria, not the entire migration unless the item is a closeout.
+Focused validation proves the reconnected seam and satisfies the item's Outcome
+and Evidence, not the entire migration unless the item is a closeout.
 
 ## Closeout Rules
 
 For closeout items:
 
 - Inspect the parent epic and all open/closed child items.
+- Map every parent Outcome line to linked work and attached evidence before
+  claiming closeout.
 - Identify intentional temporary breakage recorded by demolition and reconnect
   items.
 - Confirm target docs and ADRs describe the implemented state.
 - Run broad command validation and scenario validation appropriate to the epic.
 - Prove or classify every parent epic validation criterion as passed, failed,
   blocked, deferred, or not applicable.
+- Attach first-class evidence for risky, broad, public-contract,
+  process-policy, parent-level, epic, migration, and mission closeout claims;
+  use independent validation or review where the tracker requires it.
 - Clean up migration debris: stale imports, deleted terminology in current
   docs, dead tests, obsolete notes, unused exports, package manifest drift, and
   temporary exceptions.

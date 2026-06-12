@@ -10,7 +10,7 @@ paths and commands; it does not negotiate the operating model.
 ## Target Repository Shape
 
 An agent-factory-ready repository has durable places for intent, scope,
-decisions, proof, and handoff. See [repo-shape.md](../standards/repo-shape.md) for the
+choices, proof, and handoff. See [repo-shape.md](../standards/repo-shape.md) for the
 complete intended shape, file expectations, and quality heuristics.
 
 A fresh agent must be able to answer these questions without private chat
@@ -19,7 +19,7 @@ history:
 - **What is this repository for?**
 - **What words mean what?**
 - **Where do I start reading?**
-- **What decisions are durable?**
+- **Which choices are durable?**
 - **How do I prove work?**
 - **How is work tracked?**
 - **How does agent-factory bind to this repo?**
@@ -37,7 +37,7 @@ run the repository discovery commands below:
 ```bash
 find . -maxdepth 3 -type f \( -name AGENTS.md -o -name AGENTFACTORY.md -o -name CONTEXT.md -o -name SPEC.md \)
 find docs -maxdepth 3 -type f 2>/dev/null
-find . -maxdepth 3 -type d \( -name adr -o -name .atelier-state -o -name .beads \)
+find . -maxdepth 3 -type d \( -name adr -o -name .atelier-state \)
 ```
 
 If the worktree is dirty, preserve unrelated changes. If existing docs conflict
@@ -62,8 +62,7 @@ Create or verify these repository sources:
 - Validation router: usually `docs/architecture/quality/validation.md`.
 - Durable tracker available. The repository chooses a tracker in
   `AGENTFACTORY.md`; Atelier is a supported first-class binding.
-- Tracker backup/export binding, such as `.atelier-state/` for Atelier or
-  `.beads/issues.jsonl` for legacy Beads.
+- Tracker backup/export binding.
 
 Use existing equivalent files when they already exist. Otherwise create concise
 starter files with useful headings and explicit TODO markers.
@@ -101,7 +100,7 @@ concrete files, commands, and product-specific skills.
 - Runtime tracker database: local `.atelier/state.db`, rebuilt from
   `.atelier-state/`
 - Normal tracker commands:
-  - `atelier issue ready`
+  - `atelier issue list --ready`
   - `atelier issue list --status open`
   - `atelier issue show <id>`
   - `atelier issue create "Title" --issue-type task --parent <epic-id>`
@@ -150,7 +149,7 @@ When creating starter files, keep them small and useful.
 
 ## Ambiguities
 
-- TODO: record terminology decisions that prevent repeated confusion.
+- TODO: record terminology/model choices that prevent repeated confusion.
 ```
 
 The product intent file defines purpose and user-visible target behavior:
@@ -179,7 +178,7 @@ The docs map routes agents to durable sources:
 - `AGENTFACTORY.md`: agent-factory bindings.
 - `CONTEXT.md`: domain language.
 - `SPEC.md`: product intent.
-- `docs/adr/`: durable decisions.
+- `docs/adr/`: durable choices.
 - `docs/architecture/`: architecture and ownership.
 - `docs/architecture/quality/`: quality, standards, and validation.
 ```
@@ -211,7 +210,7 @@ The validation router defines check ownership:
 Verify the bound tracker is available. For an Atelier setup:
 
 ```bash
-atelier issue ready
+atelier issue list --ready
 atelier export --check
 atelier lint
 atelier doctor
@@ -219,8 +218,7 @@ atelier doctor
 
 If the bound tracker is not initialized, run the repository-appropriate setup
 command or stop with the exact missing command/tool. Do not invent a parallel
-tracker. If the repository explicitly binds to legacy Beads, use
-[beads.md](../standards/beads.md).
+tracker.
 
 After tracker setup, ensure the binding names the tracker backup/export path and
 that tracker changes are committed with related work.
@@ -276,6 +274,6 @@ Report:
 
 - binding file created or updated;
 - required sources created, reused, or deferred;
-- tracker setup status, including Atelier export/check or Beads/Dolt when used;
+- tracker setup status and export/check command;
 - checks run and failures;
 - readiness gaps found and follow-up tracker item IDs.

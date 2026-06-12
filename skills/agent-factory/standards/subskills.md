@@ -18,7 +18,6 @@ Each subskill is a self-contained procedure loaded by a subagent when assigned w
 | `audit`       | Evidence-backed architecture-quality findings without implementing fixes                  | [../procedures/audit.md](../procedures/audit.md)             |
 | `readiness`   | Assessing whether a repository is legible and operable by agents                          | [../procedures/readiness.md](../procedures/readiness.md)     |
 | `tracker`     | Bound tracker abstraction, command routing, item standards, dependencies, and sync/check  | [tracker.md](tracker.md)                                     |
-| `beads`       | Legacy Beads command mechanics for repositories still explicitly bound to Beads           | [beads.md](beads.md)                                         |
 
 ## Selection Rules
 

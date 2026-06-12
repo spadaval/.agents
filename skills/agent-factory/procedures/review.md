@@ -12,8 +12,8 @@ Read the changed files and relevant:
 - the mapped code standards when code policy matters;
 - the mapped validation router when test or validation coverage is part of the
   review;
-- docs, ADRs, tracker item acceptance criteria, and expected migration breakage
-  for the changed area.
+- docs, ADRs, tracker item Description, Outcome, Evidence, Notes, and expected
+  migration breakage for the changed area.
 
 ## Review Stance
 
@@ -27,6 +27,11 @@ Lead with findings ordered by severity. Focus on:
 - security, data loss, persistence, concurrency, or lifecycle risk;
 - compatibility shims, deprecated wrappers, or legacy paths;
 - docs/code disagreement;
+- vague, missing, or unprovable Outcome text on touched tracker work;
+- missing Evidence, evidence that only names effort, or claims not backed by
+  attached proof;
+- stale, skipped, or ignored tests being used as proof without inspection;
+- public help, command behavior, docs, or Agent Factory guidance drifting apart;
 - validation claims unsupported by evidence.
 
 If no issues are found, say that clearly and mention residual risk or unrun

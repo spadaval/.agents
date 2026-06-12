@@ -28,19 +28,23 @@ or agent process.
 - Update architecture docs when ownership, package boundaries, contracts,
   runtime topology, security model, reliability model, or validation strategy
   changes.
-- Update ADRs only for decisions that are hard to reverse, surprising without
+- Update ADRs only for choices that are hard to reverse, surprising without
   context, and the result of a real trade-off.
 - Update the mapped domain context when vocabulary changes or a term is being
   used inconsistently across docs, tracker items, and code.
 - Update product docs when user-visible behavior, UX principles, or design
   language changes.
+- Update Agent Factory bindings, tracker command references, help examples, and
+  repository docs together when command surfaces or closeout proof behavior
+  change. Do not leave old commands as normal user-facing guidance unless the
+  product intentionally preserves them.
 - Update agent docs or skills when process changes. Keep role-specific
   procedure in subskill references. Keep design docs focused on principles and
   trade-offs, not step-by-step instructions.
-- Update tracker item descriptions, acceptance criteria, or notes when docs work
+- Update tracker item Description, Outcome, Evidence, or Notes when docs work
   reveals tracker ambiguity that would mislead the next agent.
-- Keep tracker-native acceptance criteria as the executable contract for
-  done-ness.
+- Keep tracker-native Outcome and Evidence sections as the executable contract
+  for done-ness.
 
 ## Start Gate
 
@@ -57,9 +61,10 @@ tracker mechanics and sync/check commands.
 4. Inspect code or tracker items only as needed to resolve whether docs or code
    are stale.
 5. Edit the smallest set of docs that removes ambiguity.
-6. If the work changes target design, update or create tracker items or
-   decision records as appropriate.
-7. Verify docs and targeted references.
+6. If the work changes target design, update or create tracker items for the
+   required artifact updates.
+7. Verify docs, help text, Agent Factory bindings, and targeted references
+   agree for the changed surface.
 
 ## Verification
 
@@ -68,7 +73,13 @@ run focused docs checks. Run additional checks only when the docs work also
 changes scripts, package entrypoints, file names, executable behavior, or
 file-size-sensitive content.
 
+For command-surface or process-policy docs, capture proof that the changed docs,
+help text, bindings, and Agent Factory guidance agree. Attach first-class
+evidence when the docs claim is broad, public-contract, parent-level, mission
+closeout, or process-policy work.
+
 ## Handoff
 
 Report docs changed, stale claims removed, target-state source of truth, checks
-run, unresolved mismatches, and follow-up tracker item IDs.
+run, evidence records or durable notes added, unresolved mismatches, and
+follow-up tracker item IDs.

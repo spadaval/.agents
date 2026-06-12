@@ -8,8 +8,9 @@ of correctness.
 
 ### Planning
 
-Work is deliberately planned before it is executed. Planning requires a person or assigned planning agent to shape scope,
-define acceptance criteria, and verify readiness before workers start.
+Work is deliberately planned before it is executed. Planning requires a person
+or assigned planning agent to shape scope, define Outcome and Evidence, and
+verify readiness before workers start.
 
 The system does not autonomously discover what to build. It executes what has
 been planned. Scope is the hardest problem. Workers with bounded attention
@@ -123,4 +124,3 @@ whole repository.
 Skills are the primary pulled context for role procedure. In-repo sources are
 primary. External systems may provide coordination context, but they must not be
 the only place durable knowledge lives.
-

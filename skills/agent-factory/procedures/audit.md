@@ -31,7 +31,7 @@ Audit mode identifies problems, not fixes. For each finding, report:
 - **Risk**: what assumption could make a refactor premature or harmful, and
   what must be learned before shaping work.
 - **Confidence**: high, medium, or low.
-- **Next step**: no action, spike, decision, docs clarification, ordinary
+- **Next step**: no action, spike, artifact update, docs clarification, ordinary
   implementation item, demolition, reconnect, or closeout.
 
 Be specific.
@@ -53,9 +53,10 @@ When the user asks to record findings, use the `plan` subskill conventions:
 
 - create problem items when the problem is clear enough;
 - create spike items when evidence or solution space is incomplete;
-- create decision items when a durable architecture choice is needed;
+- create tasks to write or update the durable architecture artifact when a
+  choice needs to be recorded;
 - create demolition/reconnect/closeout items only after the target direction is
   clear.
 
-Durable architecture decisions belong in ADRs or target-state docs, not only in
+Durable architecture choices belong in ADRs or target-state docs, not only in
 tracker notes.

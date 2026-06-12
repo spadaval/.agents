@@ -1,87 +1,109 @@
 # Tracker Reference
 
-Agent Factory uses a repository-bound tracker abstraction, not a hard-coded
-queue. Load `AGENTFACTORY.md` first and use the tracker, durable state path,
-runtime state path, sync/check commands, lint commands, and archival fallback it
-names.
+Load `AGENTFACTORY.md` first and use the bound tracker it names.
 
-The bound tracker preserves scope, acceptance criteria, status, follow-up work,
-dependencies, and handoff outside chat. Do not replace it with private notes or
-ad hoc TODO files.
+The tracker owns scope, outcomes, evidence expectations, status, dependencies,
+and handoff.
+Do not replace it with private notes or TODO files.
 
 ## Command Routing
 
-Use the bound tracker commands for these operations:
+Use bound tracker commands for:
 
 - planning: create, split, reparent, label, prioritize, and search work;
+- mission focus: inspect active mission status, linked work, blockers,
+  evidence, and readiness options;
 - ready: list executable items with no open blockers;
+- work lifecycle: create or locate the worktree, start tracked work, and finish
+  tracked work;
+- evidence: create concise validation records and attach them to issues,
+  missions, or other target records;
+- policy checks: evaluate issue or mission transition policy when the binding,
+  assignment, or closeout contract explicitly requires it;
 - update: claim work, edit fields, append durable notes, and record handoff;
 - dependency: add or remove real blocker relationships;
 - close: mark completed work with a reason;
 - lint: validate tracker records globally or for one item;
-- sync/check: export or verify committed tracker state and run tracker health.
+- sync/check: export, lint, and health.
 
 Do not use interactive tracker commands. Prefer explicit command flags that can
 run unattended.
 
 ## Atelier Binding
 
-Repositories can bind Agent Factory to Atelier. In that case, use `atelier`
-commands from `AGENTFACTORY.md`; if the CLI is not on `PATH`, use the repository
-path or setup command named by the binding.
+For Atelier repositories, use the concrete commands in `AGENTFACTORY.md`.
+Dependency direction is `atelier issue block <blocked-id> <blocker-id>`: the
+first item waits on the second. Commit durable tracker state with related work.
+Runtime state is rebuildable.
 
-Core Atelier examples:
+## Atelier Mission And Work Standard
+
+Use missions as the durable active-focus record. Select worker issues from the
+active mission graph. Use the global ready list only for discovery.
+
+Use `atelier mission status <mission-id>` for ready work, blockers, evidence
+gaps, policy-check gaps, deferred work, and closeout. Use `show`, `list`,
+`ready`, and `status` commands for normal planning and drill-down. Do not plan
+or validate by parsing command-result JSON, and do not treat raw workflow
+validator output as ordinary user-facing proof.
+
+Worker flow:
 
 ```bash
-atelier issue create "Implement focused slice" --issue-type task --parent <epic-id>
-atelier issue subissue <epic-id> "Validate integrated behavior" --issue-type validation
-atelier issue list --status open
-atelier issue ready
 atelier issue show <id>
-atelier issue search "<topic>"
+atelier mission show <mission-id>
+atelier worktree for <id>
 atelier issue update <id> --claim
-atelier issue update <id> --append-notes "..."
-atelier issue update <child-id> --parent <epic-id>
-atelier issue block <blocked-id> <blocker-id>
-atelier issue unblock <blocked-id> <blocker-id>
-atelier issue close <id> --reason "..."
-atelier export
-atelier export --check
-atelier lint
-atelier lint <id>
-atelier doctor
+atelier start <id>
+# implement owned slice and run proof
+atelier evidence add --kind <kind> --result <result> "summary"
+atelier evidence attach <evidence-id> issue <id>
+atelier finish <id>
 ```
 
-Atelier dependency direction is `atelier issue block <blocked-id> <blocker-id>`:
-the first item is waiting on the second. Use `atelier issue unblock` to remove
-that relationship.
+If work cannot finish, leave handoff notes, attach useful evidence, and keep the
+item open.
 
-Committed durable state is normally `.atelier-state/`. Local runtime state is
-normally `.atelier/state.db` and can be rebuilt according to the repository
-binding. Commit exported tracker state with related work or in a tracker-only
-commit.
+Run advanced workflow validators only when the repository binding, assignment,
+or parent closeout contract asks for them. A passing validator is a policy
+signal; it does not replace proof attached to the issue.
+
+Before mission closeout, run:
+
+```bash
+atelier mission status <mission-id>
+atelier lint
+atelier doctor
+atelier export --check
+```
+
+If the binding requires a mission workflow validator, run it as an explicit
+advanced policy check after the mission contract audit has mapped parent
+Outcome lines to linked work and attached evidence.
 
 ## Ready Item Standard
 
-A ready executable tracker item answers, without private context:
+A ready executable item answers:
 
-- what package, app, workflow, file area, interface, or owner is changing;
+- what is changing;
 - why the work exists;
 - what is in scope and out of scope;
-- what acceptance criteria define done and how to prove them;
-- which parent epic validation criterion the item advances, when applicable;
-- what docs or ADRs are relevant, when needed;
-- whether downstream breakage is expected;
-- which item owns later reconnect or closeout, when breakage is expected;
-- which agent-factory subskill is recommended, when assignment is non-obvious.
+- how to prove completion;
+- expected breakage and the owner for reconnect/closeout;
+- assigned subskill when not obvious.
 
-Do not leave vague executable items in the ready queue. If an item is too large,
-ambiguous, missing prerequisites, or hiding several deliverables, reshape it
-before treating it as executable.
+Write tracker items using
+[work-item-authoring.md](work-item-authoring.md): Outcome describes the desired
+finished world, Evidence describes proof an independent validator could use,
+and Notes carry context or non-goals. Do not encode a rigid implementation plan
+unless the exact implementation path is the decision being tracked.
 
-## Legacy Beads Fallback
+Ordinary work closes with proof on the owning issue. Risky, broad,
+public-contract, process-policy, parent-level, epic, and mission claims require
+first-class evidence and should name independent validation or review where the
+implementer should not be the sole validator.
 
-Use Beads commands only when `AGENTFACTORY.md` explicitly binds the repository to
-Beads, or when archived Beads data must be inspected for recovery or audit. See
-[beads.md](beads.md) for legacy command mechanics. Do not infer Beads as the
-default for new repositories.
+For mission readiness, unresolved high-consequence choices block mission start.
+Track durable resolution as artifact-update tasks.
+
+Do not assign vague, oversized, ambiguous, or multi-deliverable items.

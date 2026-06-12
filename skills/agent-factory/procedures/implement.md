@@ -10,16 +10,22 @@ closeout work, independent validation, or read-only review.
 
 Follow [repository workflow](../standards/repo-workflow.md) for git worktree
 checks, and [tracker.md](../standards/tracker.md) plus `AGENTFACTORY.md` for
-tracker mechanics and sync/check commands. Then verify the assigned item:
+tracker mechanics and sync/check commands. Then verify the assigned item and
+its mission or epic context:
 
 ```bash
 atelier issue show <id>
+atelier mission show <mission-id>
+atelier mission status <mission-id>
 ```
 
-Claim only when the item is the work you are about to do:
+Create or locate the worktree/branch and start tracked work only when the item
+is the work you are about to do:
 
 ```bash
+atelier worktree for <id>
 atelier issue update <id> --claim
+atelier start <id>
 ```
 
 Do not scan the ready queue unless you are selecting work or coordinating the
@@ -33,10 +39,15 @@ Before editing, verify:
 - the item has no active blockers;
 - the request matches the item scope;
 - the package, app, workflow, file, or owned area is clear enough to start;
-- acceptance criteria or intended behavior are discoverable;
+- Description, Outcome, Evidence, and Notes are discoverable when the tracker
+  supports sectioned Markdown;
 - the expected proof for the owned slice is clear;
+- whether the proof can be issue-local or requires first-class evidence and
+  independent validation or review;
 - the parent epic validation criterion advanced by the slice is clear, when
   applicable;
+- the item is linked to the assigned mission or epic graph, or the prompt
+  explains why this worker is operating outside an active mission;
 - the item is not really demolition, closeout, validation, review, or graph
   management work.
 
@@ -63,8 +74,25 @@ assigned planning work.
 ## Validation
 
 Use the mapped validation router for check ownership. Run the narrowest checks
-that prove the owned slice and satisfy the item's acceptance criteria. Do not
+that prove the owned slice and satisfy the item's Outcome and Evidence. Do not
 default to the whole suite unless the item asks for it.
+
+Before marking work complete, record exact proof in the tracker. Include the
+command names, relevant output lines, observed behavior, artifact paths, or
+evidence IDs that prove each Outcome claim. Use first-class evidence when the
+proof is more than a trivial note, a future worker must inspect it, or the item
+is risky, broad, public-contract, process-policy, parent-level, epic, mission,
+docs/help parity, stale-test, or migration work:
+
+```bash
+atelier evidence add --kind <kind> --result <pass|fail|blocked|deferred|not-applicable> "summary"
+atelier evidence attach <evidence-id> issue <id>
+atelier finish <id>
+```
+
+Run raw workflow validators only when the repository binding, assignment, or
+parent closeout contract explicitly requires an advanced policy check. A
+workflow validator does not replace issue-local proof or attached evidence.
 
 If a broader check fails because the repo is intentionally mid-migration,
 record the command, concrete failure shape, and item expected to reconnect or
@@ -73,12 +101,12 @@ close it out.
 ## Tracker Hygiene
 
 Create follow-up tracker items for bugs, missing validation, cleanup work,
-decision gaps, or newly discovered ordering constraints. Keep the current item
-focused unless the user explicitly broadens scope.
+artifact updates for unresolved choices, or newly discovered ordering
+constraints. Keep the current item focused unless the user explicitly broadens
+scope.
 
 Do not use interactive tracker commands; see [tracker.md](../standards/tracker.md)
-for command conventions and [beads.md](../standards/beads.md) only for legacy
-Beads-bound repositories.
+for command conventions.
 
 ## Handoff
 
@@ -88,6 +116,10 @@ Before stopping, leave concise handoff context:
 - docs changed;
 - code/test files changed;
 - checks run and results;
+- evidence records or durable notes added;
+- exact validation output or artifact proof captured before close;
+- advanced policy-check result, if one was required, and whether
+  `atelier finish <id>` was run;
 - parent epic validation criterion advanced, when applicable;
 - expected failures, if any;
 - follow-up tracker item IDs.
