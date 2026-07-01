@@ -33,7 +33,7 @@ conclusions.]
 supporting session/event evidence.]
 
 **Change:** [The smallest concrete change to code, tooling, guidance, skill,
-or orchestration.] 
+or orchestration.]
 
 **Payoff:** [How the change addresses the context and what it should improve.]
 
