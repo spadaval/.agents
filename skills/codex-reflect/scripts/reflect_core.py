@@ -7,11 +7,14 @@ import argparse
 import collections
 import contextlib
 import datetime as dt
+import html
 import io
 import json
 import os
 import re
+import shutil
 import sqlite3
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -24,6 +27,10 @@ TOKEN_FIELDS = [
     "reasoning_output_tokens",
     "total_tokens",
 ]
+
+EVIDENCE_SCHEMA_VERSION = 1
+REPORT_TEMPLATE_DIR = Path(__file__).resolve().parents[1] / "template"
+REPORT_VIEWER_SCRIPT = Path(__file__).resolve().with_name("report_viewer.py")
 
 
 def parse_time(value: Any) -> dt.datetime | None:
@@ -157,6 +164,66 @@ def write_text(path: Path, content: str) -> None:
     path.chmod(0o600)
 
 
+def write_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.chmod(0o600)
+
+
+def require_viewer_prerequisites() -> None:
+    """Fail explicitly: the viewer is a required part of a generated report."""
+    missing = [name for name in ("node", "npm") if shutil.which(name) is None]
+    if missing:
+        raise SystemExit(
+            "Codex Reflect viewer unavailable: install " + ", ".join(missing)
+            + " and rerun. No static HTML fallback is generated."
+        )
+    if not REPORT_TEMPLATE_DIR.is_dir() or not (REPORT_TEMPLATE_DIR / "package.json").is_file():
+        raise SystemExit(
+            f"Codex Reflect viewer unavailable: report template is missing at {REPORT_TEMPLATE_DIR}."
+        )
+    if not REPORT_VIEWER_SCRIPT.is_file():
+        raise SystemExit(
+            f"Codex Reflect viewer unavailable: helper command is missing at {REPORT_VIEWER_SCRIPT}."
+        )
+
+
+def immutable_tree(path: Path) -> None:
+    """Mark helper-owned extracted artifacts read-only without touching app/src/report."""
+    if not path.exists():
+        return
+    for item in sorted(path.rglob("*"), reverse=True):
+        if item.is_file():
+            item.chmod(0o400)
+        elif item.is_dir():
+            item.chmod(0o500)
+    path.chmod(0o500)
+
+
+def copy_report_template(pack_dir: Path) -> Path:
+    app_dir = pack_dir / "app"
+    shutil.copytree(REPORT_TEMPLATE_DIR, app_dir)
+    # The only agent-owned source area remains writable. Platform code and the
+    # app shell are copied as stable report infrastructure.
+    source_dir = app_dir / "src"
+    report_dir = app_dir / "src" / "report"
+    for item in sorted(source_dir.rglob("*"), reverse=True):
+        if report_dir == item or report_dir in item.parents:
+            continue
+        if item.is_file():
+            item.chmod(0o400)
+        elif item.is_dir():
+            item.chmod(0o500)
+    report_dir.chmod(0o700)
+    for item in report_dir.rglob("*"):
+        if item.is_file():
+            item.chmod(0o600)
+        elif item.is_dir():
+            item.chmod(0o700)
+    source_dir.chmod(0o500)
+    return app_dir
+
+
 def capture_markdown(renderer: Any, *args: Any) -> str:
     output = io.StringIO()
     with contextlib.redirect_stdout(output):
@@ -230,34 +297,48 @@ def archive_meta(path: Path) -> dict[str, Any]:
     return {"id": session_id, "timestamp": fmt_time(mtime), "cwd": None, "path": str(path)}
 
 
-def find_archive(codex_home: Path, session: str) -> Path:
-    candidate = Path(session).expanduser()
-    if candidate.exists():
-        return candidate
-    matches: list[Path] = []
-    for path in transcript_files(codex_home):
-        if session in path.name:
-            matches.append(path)
-            continue
-        meta = archive_meta(path)
-        if session == meta.get("id"):
-            matches.append(path)
-    if not matches:
-        raise SystemExit(f"No Codex rollout transcript matched {session!r}")
-    if len(matches) > 1:
-        choices = "\n".join(str(path) for path in matches[:20])
-        raise SystemExit(f"Multiple rollout transcripts matched {session!r}:\n{choices}")
-    return matches[0]
+def rollout_sort_key(path: Path) -> tuple[dt.datetime, str]:
+    meta = archive_meta(path)
+    timestamp = parse_time(meta.get("timestamp")) or dt.datetime.min.replace(tzinfo=dt.timezone.utc)
+    return (timestamp, str(path))
 
 
-def transcript_index(codex_home: Path) -> dict[str, Path]:
-    index: dict[str, Path] = {}
+def logical_session_index(codex_home: Path) -> dict[str, list[Path]]:
+    index: dict[str, list[Path]] = collections.defaultdict(list)
     for path in transcript_files(codex_home):
         meta = archive_meta(path)
         session_id = meta.get("id")
         if session_id:
-            index[str(session_id)] = path
-    return index
+            index[str(session_id)].append(path)
+    return {session_id: sorted(paths, key=rollout_sort_key) for session_id, paths in index.items()}
+
+
+def find_session_paths(codex_home: Path, session: str) -> list[Path]:
+    candidate = Path(session).expanduser()
+    index = logical_session_index(codex_home)
+    if candidate.exists():
+        session_id = str(archive_meta(candidate).get("id") or "")
+        if session_id and session_id in index:
+            return index[session_id]
+        return [candidate]
+
+    matches: list[Path] = []
+    for path in transcript_files(codex_home):
+        meta = archive_meta(path)
+        if session in path.name or session == meta.get("id"):
+            matches.append(path)
+    if not matches:
+        raise SystemExit(f"No Codex rollout transcript matched {session!r}")
+    session_ids = {str(archive_meta(path).get("id") or path.name) for path in matches}
+    if len(session_ids) != 1:
+        choices = "\n".join(str(path) for path in matches[:20])
+        raise SystemExit(f"Multiple logical sessions matched {session!r}:\n{choices}")
+    return index[next(iter(session_ids))]
+
+
+def find_archive(codex_home: Path, session: str) -> Path:
+    """Return the first rollout for legacy single-file callers."""
+    return find_session_paths(codex_home, session)[0]
 
 
 def normalized_cwd(value: Any) -> str | None:
@@ -510,18 +591,110 @@ def extract_spawned_subagent_ids(rows: list[dict[str, Any]], own_ids: set[str] |
     return spawned - own_ids
 
 
+def extract_source_thread_ids(rows: list[dict[str, Any]]) -> set[str]:
+    pattern = re.compile(r"<source_thread_id>\s*(019[0-9a-f-]{33,})\s*</source_thread_id>", re.IGNORECASE)
+    sources: set[str] = set()
+    for row in rows:
+        payload = row.get("payload")
+        if not isinstance(payload, dict):
+            continue
+        text = ""
+        if payload.get("type") in {"user_message", "agent_message"}:
+            text = str(payload.get("message") or "")
+        elif payload.get("type") == "message":
+            text = content_text(payload.get("content"))
+        sources.update(pattern.findall(text))
+    return sources
+
+
+def extract_created_thread_ids(rows: list[dict[str, Any]]) -> set[str]:
+    pattern = re.compile(r'"threadId"\s*:\s*"(019[0-9a-f-]{33,})"', re.IGNORECASE)
+    created: set[str] = set()
+    for row in rows:
+        payload = row.get("payload")
+        if not isinstance(payload, dict) or payload.get("type") not in {"function_call_output", "custom_tool_call_output"}:
+            continue
+        output = payload.get("output")
+        if isinstance(output, str):
+            created.update(pattern.findall(output))
+    return created
+
+
+def load_rollout_rows(paths: list[Path]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for rollout_path in sorted(paths, key=rollout_sort_key):
+        for row in load_jsonl(rollout_path):
+            row["_rollout_path"] = str(rollout_path)
+            rows.append(row)
+    rows.sort(key=lambda row: (
+        parse_time(row.get("timestamp")) or dt.datetime.min.replace(tzinfo=dt.timezone.utc),
+        str(row.get("_rollout_path") or ""),
+        int(row.get("_line") or 0),
+    ))
+    return rows
+
+
+def session_id_for_paths(paths: list[Path]) -> str:
+    if not paths:
+        raise ValueError("At least one rollout path is required")
+    return str(archive_meta(paths[0]).get("id") or paths[0].stem)
+
+
+def resolve_workstream(codex_home: Path, session: str) -> tuple[list[Path], dict[str, list[Path]], list[dict[str, str]]]:
+    index = logical_session_index(codex_home)
+    root_paths = find_session_paths(codex_home, session)
+    root_id = session_id_for_paths(root_paths)
+    seen_upstream: set[str] = set()
+    while True:
+        if root_id in seen_upstream:
+            raise SystemExit(f"Lineage cycle detected while resolving root session {root_id}")
+        seen_upstream.add(root_id)
+        sources = extract_source_thread_ids(load_rollout_rows(root_paths))
+        available_sources = sorted(source for source in sources if source in index)
+        if not available_sources:
+            break
+        if len(available_sources) > 1:
+            raise SystemExit(f"Multiple upstream source sessions found for {root_id}: {', '.join(available_sources)}")
+        root_id = available_sources[0]
+        root_paths = index[root_id]
+
+    sessions: dict[str, list[Path]] = {root_id: root_paths}
+    edges: list[dict[str, str]] = []
+    queue = [root_id]
+    while queue:
+        parent_id = queue.pop(0)
+        rows = load_rollout_rows(sessions[parent_id])
+        children = [(child_id, "create_thread") for child_id in extract_created_thread_ids(rows)]
+        children.extend((child_id, "spawned_subagent") for child_id in extract_spawned_subagent_ids(rows, {parent_id}))
+        for child_id, kind in children:
+            if child_id not in index or child_id == parent_id:
+                continue
+            edge = {"parent": parent_id, "child": child_id, "kind": kind}
+            if edge not in edges:
+                edges.append(edge)
+            if child_id not in sessions:
+                sessions[child_id] = index[child_id]
+                queue.append(child_id)
+    return root_paths, sessions, edges
+
+
 def summarize_archive(
-    path: Path,
+    path: Path | list[Path],
     since: dt.datetime | None = None,
     until: dt.datetime | None = None,
 ) -> dict[str, Any]:
-    raw_rows = load_jsonl(path)
+    paths = [path] if isinstance(path, Path) else list(path)
+    if not paths:
+        raise ValueError("At least one rollout path is required")
+    paths = sorted(paths, key=rollout_sort_key)
+    raw_rows = load_rollout_rows(paths)
     own_ids: set[str] = set()
-    meta: dict[str, Any] = {"path": str(path)}
+    meta: dict[str, Any] = {"path": str(paths[0])}
     for row in raw_rows:
         payload = row.get("payload")
         if row.get("type") == "session_meta" and isinstance(payload, dict):
-            meta.update(payload)
+            if len(meta) == 1:
+                meta.update(payload)
             if payload.get("id"):
                 own_ids.add(str(payload["id"]))
     rows = [row for row in raw_rows if in_time_window(row, since, until)]
@@ -779,7 +952,9 @@ def summarize_archive(
     spawned_subagent_ids = sorted(extract_spawned_subagent_ids(rows, own_ids))
     return {
         "meta": meta,
-        "path": str(path),
+        "path": str(paths[0]),
+        "rollout_paths": [str(item) for item in paths],
+        "rollout_count": len(paths),
         "start": fmt_time(min(timestamps) if timestamps else None),
         "end": fmt_time(max(timestamps) if timestamps else None),
         "duration_seconds": (max(timestamps) - min(timestamps)).total_seconds() if timestamps else None,
@@ -810,23 +985,23 @@ def summarize_archive(
     }
 
 
-def resolve_session_quiet(codex_home: Path, session: str, index: dict[str, Path] | None = None) -> Path | None:
+def resolve_session_quiet(codex_home: Path, session: str, index: dict[str, list[Path]] | None = None) -> list[Path] | None:
     if index and session in index:
         return index[session]
     try:
-        return find_archive(codex_home, session)
+        return find_session_paths(codex_home, session)
     except SystemExit:
         return None
 
 
 def token_usage_record(
-    path: Path,
+    paths: list[Path],
     role: str,
     source: str | None = None,
     since: dt.datetime | None = None,
     until: dt.datetime | None = None,
 ) -> dict[str, Any]:
-    summary = summarize_archive(path, since=since, until=until)
+    summary = summarize_archive(paths, since=since, until=until)
     meta = summary.get("meta") if isinstance(summary.get("meta"), dict) else {}
     token = summary.get("token_final") if isinstance(summary.get("token_final"), dict) else {}
     record = {
@@ -834,6 +1009,8 @@ def token_usage_record(
         "source": source,
         "id": meta.get("id") or Path(summary["path"]).stem,
         "path": summary["path"],
+        "rollout_paths": summary.get("rollout_paths") or [],
+        "rollout_count": int(summary.get("rollout_count") or 1),
         "start": summary.get("start"),
         "end": summary.get("end"),
         "duration_seconds": summary.get("duration_seconds"),
@@ -858,29 +1035,31 @@ def build_token_report(
     until: dt.datetime | None = None,
 ) -> dict[str, Any]:
     records: list[dict[str, Any]] = []
-    seen_paths: set[str] = set()
+    seen_sessions: set[str] = set()
     missing_linked: dict[str, list[str]] = {}
-    index = transcript_index(codex_home) if include_linked else {}
+    index = logical_session_index(codex_home) if include_linked else {}
 
     def add(
-        path: Path,
+        paths: list[Path],
         role: str,
         source: str | None = None,
         record_since: dt.datetime | None = None,
         record_until: dt.datetime | None = None,
     ) -> dict[str, Any]:
-        key = str(path.resolve())
-        if key in seen_paths:
+        summary = summarize_archive(paths, since=record_since, until=record_until)
+        meta = summary.get("meta") if isinstance(summary.get("meta"), dict) else {}
+        key = str(meta.get("id") or summary["path"])
+        if key in seen_sessions:
             return {}
-        seen_paths.add(key)
-        record = token_usage_record(path, role, source, since=record_since, until=record_until)
+        seen_sessions.add(key)
+        record = token_usage_record(paths, role, source, since=record_since, until=record_until)
         records.append(record)
         return record
 
     parents: list[dict[str, Any]] = []
     for session in sessions:
-        path = find_archive(codex_home, session)
-        record = add(path, "parent", record_since=since, record_until=until)
+        paths = find_session_paths(codex_home, session)
+        record = add(paths, "parent", record_since=since, record_until=until)
         if record:
             parents.append(record)
 
@@ -888,11 +1067,11 @@ def build_token_report(
         for parent in parents:
             missing: list[str] = []
             for linked_id in parent.get("linked_session_ids") or []:
-                path = resolve_session_quiet(codex_home, linked_id, index)
-                if path is None:
+                paths = resolve_session_quiet(codex_home, linked_id, index)
+                if paths is None:
                     missing.append(linked_id)
                     continue
-                add(path, "linked", str(parent.get("id")))
+                add(paths, "linked", str(parent.get("id")))
             if missing:
                 missing_linked[str(parent.get("id"))] = missing
 
@@ -1289,32 +1468,322 @@ def render_run_overview(summary: dict[str, Any], report: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def html_text(value: Any) -> str:
+    """Escape transcript-derived text before placing it in the static report."""
+    return html.escape(str(value if value is not None else ""), quote=True)
+
+
+def html_id(value: Any) -> str:
+    return re.sub(r"[^a-z0-9_-]+", "-", str(value).lower()).strip("-") or "item"
+
+
+def render_html_report(
+    summary: dict[str, Any],
+    report: dict[str, Any],
+    summaries: dict[str, dict[str, Any]] | None = None,
+    edges: list[dict[str, str]] | None = None,
+    relative_prefix: str = "",
+) -> str:
+    """Render a self-contained, dependency-free exploration view of a pack."""
+    summaries = summaries or {}
+    edges = edges or []
+    meta = summary.get("meta") if isinstance(summary.get("meta"), dict) else {}
+    session_id = str(meta.get("id") or "unknown")
+    metrics = summary.get("operational_metrics") or {}
+    totals = report.get("totals") or {}
+    parent_record = next((record for record in report.get("sessions") or [] if record.get("role") == "parent"), {})
+    linked_records = [record for record in report.get("sessions") or [] if record.get("role") == "linked"]
+    latest_request = compact((summary.get("user_messages") or [{}])[-1].get("message"), 420)
+
+    def card(label: str, value: Any, note: str = "") -> str:
+        return (
+            '<div class="metric"><span class="metric-label">' + html_text(label) + '</span>'
+            + '<strong>' + html_text(value) + '</strong>'
+            + (f'<small>{html_text(note)}</small>' if note else "") + '</div>'
+        )
+
+    metric_cards = "".join([
+        card("Logical sessions", len(summaries) if summaries else 1, "detected in this pack"),
+        card("Tool calls", metrics.get("tool_call_count", 0)),
+        card("Failure signals", metrics.get("failure_signal_count", 0), "parsed signals, not reviewed failures"),
+        card("Recoveries", f"{metrics.get('observed_recovery_count', 0)}/{metrics.get('recovery_candidate_count', 0)}", "observed follow-ups"),
+        card("Patches", metrics.get("patch_event_count", 0)),
+        card("Token total", f"{int(totals.get('total_tokens') or parent_record.get('total_tokens') or 0):,}", "qualified transcript snapshot"),
+    ])
+
+    failure_rows = []
+    for number, failure in enumerate(summary.get("failure_events") or [], 1):
+        label = failure.get("cmd") or failure.get("name") or failure.get("source") or "unknown"
+        context = failure.get("response_context") or {}
+        next_message = (context.get("next_agent_message") or {}).get("message")
+        next_action = context.get("next_action") or {}
+        action = next_action.get("cmd") or next_action.get("tool") or next_action.get("kind")
+        detail = []
+        if failure.get("output"):
+            detail.append(f"<p><b>Captured output:</b> {html_text(failure['output'])}</p>")
+        if failure.get("stderr"):
+            detail.append(f"<p><b>Captured stderr:</b> {html_text(failure['stderr'])}</p>")
+        if next_message:
+            detail.append(f"<p><b>Immediate agent response:</b> {html_text(next_message)}</p>")
+        if action:
+            detail.append(f"<p><b>Next action:</b> {html_text(action)}</p>")
+        detail.append(
+            f"<p><b>Follow-up:</b> {html_text(context.get('follow_up', 'unknown'))}; "
+            f"<b>outcome:</b> {html_text(context.get('follow_up_outcome', 'unobserved'))}.</p>"
+        )
+        search = " ".join([str(label), str(failure.get("failure_kinds")), str(next_message), str(action)]).lower()
+        failure_rows.append(
+            f'<tr data-search="{html_text(search)}"><td>{number}</td><td>{html_text(failure.get("timestamp", "unknown"))}</td>'
+            f'<td><code>{html_text(compact(label, 180))}</code></td>'
+            f'<td>{html_text(", ".join(failure.get("failure_kinds") or []))}</td>'
+            f'<td>{html_text(context.get("follow_up", "unknown"))}</td>'
+            f'<td><details><summary>Evidence</summary>{"".join(detail)}</details></td></tr>'
+        )
+    failure_table = "".join(failure_rows) or '<tr><td colspan="6">No failure signals detected.</td></tr>'
+
+    timeline = []
+    for turn in summary.get("turns") or []:
+        timeline.append({"time": turn.get("started"), "kind": "turn", "label": f"Turn {turn.get('turn_id')}", "detail": f"{turn.get('duration_ms', 'unknown')} ms"})
+    for gap in summary.get("long_gaps") or []:
+        timeline.append({"time": gap.get("from"), "kind": "long gap", "label": f"{fmt_duration(gap.get('seconds'))} without a logged event", "detail": f"before {gap.get('event')} at line {gap.get('line')}"})
+    for failure in summary.get("failure_events") or []:
+        timeline.append({"time": failure.get("timestamp"), "kind": "failure", "label": failure.get("cmd") or failure.get("name") or failure.get("source"), "detail": ", ".join(failure.get("failure_kinds") or [])})
+    for patch in summary.get("patches") or []:
+        timeline.append({"time": patch.get("timestamp"), "kind": "patch", "label": ", ".join(patch.get("changes") or []) or "patch event", "detail": f"success={patch.get('success')}"})
+    timeline.sort(key=lambda item: str(item.get("time") or ""))
+    timeline_rows = "".join(
+        f'<tr><td>{html_text(item.get("time", "unknown"))}</td><td><span class="tag {html_id(item.get("kind"))}">{html_text(item.get("kind"))}</span></td>'
+        f'<td>{html_text(compact(item.get("label"), 240))}</td><td>{html_text(compact(item.get("detail"), 220))}</td></tr>'
+        for item in timeline
+    ) or '<tr><td colspan="4">No timeline events were extracted.</td></tr>'
+
+    tool_counts = sorted((summary.get("tool_counts") or {}).items(), key=lambda item: (-item[1], item[0]))
+    max_tool_count = max((count for _, count in tool_counts), default=1)
+    tool_rows = "".join(
+        f'<tr><td><code>{html_text(name)}</code></td><td>{count:,}</td><td><div class="bar"><i style="width:{count / max_tool_count * 100:.1f}%"></i></div></td></tr>'
+        for name, count in tool_counts
+    ) or '<tr><td colspan="3">No parsed tool calls.</td></tr>'
+
+    session_rows = []
+    for item_id, item in summaries.items():
+        item_metrics = item.get("operational_metrics") or {}
+        token = item.get("token_final") or {}
+        session_rows.append(
+            f'<tr><td><a href="sessions/{html_text(item_id)}.html"><code>{html_text(item_id)}</code></a></td><td>{item.get("rollout_count", 1)}</td>'
+            f'<td>{html_text(item.get("start"))}<br>→ {html_text(item.get("end"))}</td>'
+            f'<td>{item_metrics.get("tool_call_count", 0):,}</td><td>{item_metrics.get("failure_signal_count", 0)}</td>'
+            f'<td>{int(token.get("total_tokens") or 0):,}</td></tr>'
+        )
+    if not session_rows:
+        session_rows.append(
+            f'<tr><td><code>{html_text(session_id)}</code></td><td>{summary.get("rollout_count", 1)}</td>'
+            f'<td>{html_text(summary.get("start"))}<br>→ {html_text(summary.get("end"))}</td>'
+            f'<td>{metrics.get("tool_call_count", 0):,}</td><td>{metrics.get("failure_signal_count", 0)}</td>'
+            f'<td>{int((summary.get("token_final") or {}).get("total_tokens") or 0):,}</td></tr>'
+        )
+    edge_list = "".join(
+        f'<li><code>{html_text(edge.get("parent"))}</code> <span aria-hidden="true">→</span> <code>{html_text(edge.get("child"))}</code> <small>{html_text(edge.get("kind"))}</small></li>'
+        for edge in edges
+    ) or "<li>No downstream session edges were resolved.</li>"
+
+    linked_rows = "".join(
+        f'<li><code>{html_text(item.get("id"))}</code> <span class="tag">{html_text(item.get("confidence"))}</span> '
+        f'{html_text(", ".join(item.get("sources") or []))}</li>'
+        for item in report.get("linked_session_evidence") or []
+    ) or "<li>No linked-session candidates were detected.</li>"
+    generated = fmt_time(dt.datetime.now(dt.timezone.utc))
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codex Reflect · {html_text(session_id)}</title>
+<style>
+:root {{ color-scheme: light dark; --bg:#10151c; --panel:#18212c; --line:#314052; --text:#e8edf3; --muted:#a9b6c7; --accent:#67d5ad; --warn:#ffbd66; --bad:#ff7f86; }}
+* {{ box-sizing:border-box }} body {{ margin:0; background:var(--bg); color:var(--text); font:14px/1.45 system-ui,sans-serif }}
+header {{ padding:32px max(24px, calc((100% - 1260px)/2)); background:linear-gradient(135deg,#172436,#102019); border-bottom:1px solid var(--line) }}
+h1 {{ margin:0 0 6px; font-size:clamp(1.5rem,3vw,2.35rem) }} h2 {{ margin:0 0 14px; font-size:1.25rem }} h3 {{ margin:18px 0 8px }}
+.muted, small {{ color:var(--muted) }} code {{ font:0.9em ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere }}
+nav {{ position:sticky; top:0; z-index:2; background:color-mix(in srgb,var(--bg) 92%,transparent); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); padding:10px max(24px, calc((100% - 1260px)/2)); overflow:auto; white-space:nowrap }}
+nav a {{ color:var(--text); text-decoration:none; margin-right:18px }} nav a:hover {{ color:var(--accent) }} main {{ max-width:1260px; margin:auto; padding:24px }}
+.grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px }} .metric, section {{ background:var(--panel); border:1px solid var(--line); border-radius:10px }} .metric {{ padding:15px }} .metric-label {{ display:block; color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.06em }} .metric strong {{ display:block; margin:4px 0; font-size:1.42rem }} section {{ margin:20px 0; padding:20px; scroll-margin-top:52px }}
+.notice {{ border-left:4px solid var(--warn); padding:10px 14px; background:#49391e44 }} .controls {{ display:flex; gap:10px; align-items:center; margin:0 0 12px }} input {{ width:min(520px,100%); padding:9px; color:var(--text); background:var(--bg); border:1px solid var(--line); border-radius:6px }}
+.table-wrap {{ overflow:auto; max-height:680px; border:1px solid var(--line); border-radius:7px }} table {{ border-collapse:collapse; width:100%; min-width:720px }} th,td {{ padding:9px 11px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line) }} th {{ position:sticky; top:0; background:#202b38; z-index:1 }} tr:hover td {{ background:#ffffff08 }} details {{ min-width:230px }} summary {{ cursor:pointer; color:var(--accent) }} p {{ overflow-wrap:anywhere }}
+.tag {{ display:inline-block; padding:2px 7px; border-radius:99px; background:#33475e; font-size:.8rem; white-space:nowrap }} .tag.failure {{ background:#6e3037 }} .tag.long-gap {{ background:#705228 }} .tag.patch {{ background:#285b48 }} .tag.turn {{ background:#33475e }}
+.bar {{ width:180px; height:8px; background:#0d1218; border-radius:99px; overflow:hidden }} .bar i {{ display:block; height:100%; background:var(--accent) }} ul {{ padding-left:20px }} li {{ margin:6px 0 }}
+@media (max-width:600px) {{ main {{ padding:14px }} section {{ padding:14px }} header {{ padding:24px 14px }} nav {{ padding:10px 14px }} }}
+</style></head><body>
+<header><h1>Codex Reflect</h1><div class="muted">Interactive transcript evidence · logical session <code>{html_text(session_id)}</code></div>
+<p class="muted">Window: {html_text(summary.get('start'))} → {html_text(summary.get('end'))} ({html_text(fmt_duration(summary.get('duration_seconds')))}) · Generated {html_text(generated)}</p></header>
+<nav><a href="#overview">Overview</a><a href="#timeline">Timeline</a><a href="#failures">Failures</a><a href="#delegation">Delegation</a><a href="#tools">Tools</a><a href="#evidence">Evidence</a></nav>
+<main><section id="overview"><h2>At a glance</h2><div class="grid">{metric_cards}</div><p class="notice">This report exposes transcript-derived signals for exploration. Detected links are candidates, elapsed time is logged-event time, and failure signals are not automatically reviewed failures.</p><h3>Latest recorded request</h3><p>{html_text(latest_request or 'No user request recorded.')}</p></section>
+<section id="timeline"><h2>Timeline</h2><p class="muted">Turns, long logged-event gaps, failure signals, and patch events. A gap does not prove idleness or active work.</p><div class="table-wrap"><table><thead><tr><th>Time</th><th>Kind</th><th>Event</th><th>Detail</th></tr></thead><tbody>{timeline_rows}</tbody></table></div></section>
+<section id="failures"><h2>Failure explorer</h2><p class="muted">Search commands, signal kinds, immediate responses, or follow-up behavior. Expand evidence before judging diagnosis quality.</p><div class="controls"><label for="failure-filter">Filter</label><input id="failure-filter" type="search" placeholder="e.g. cargo, nonzero_exit, modified_retry"></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>Command/tool</th><th>Signal</th><th>Follow-up</th><th>Context</th></tr></thead><tbody id="failure-rows">{failure_table}</tbody></table></div></section>
+<section id="delegation"><h2>Delegation and workstream</h2><p class="muted">Use lineage and handoffs to verify roles before describing a candidate as a subagent.</p><h3>Logical session groups</h3><div class="table-wrap"><table><thead><tr><th>Session</th><th>Rollouts</th><th>Window</th><th>Tools</th><th>Failure signals</th><th>Token snapshot</th></tr></thead><tbody>{''.join(session_rows)}</tbody></table></div><h3>Resolved edges</h3><ul>{edge_list}</ul><h3>Detected link evidence</h3><ul>{linked_rows}</ul></section>
+<section id="tools"><h2>Tool activity</h2><div class="table-wrap"><table><thead><tr><th>Tool</th><th>Calls</th><th>Relative volume</th></tr></thead><tbody>{tool_rows}</tbody></table></div></section>
+<section id="evidence"><h2>Evidence and companion files</h2><ul><li><a href="{html_text(relative_prefix)}index.md">Pack index</a></li><li><a href="{html_text(relative_prefix)}run-overview.md">Run overview</a></li><li><a href="{html_text(relative_prefix)}failures.md">Failure review</a></li><li><a href="{html_text(relative_prefix)}timeline.md">Timeline details</a></li><li><a href="{html_text(relative_prefix)}delegation.md">Delegation evidence</a></li><li><a href="{html_text(relative_prefix)}metrics.md">Metrics</a></li></ul><p class="muted">Raw rollout JSONL remains authoritative. This HTML report is a navigational, transcript-derived view and does not make causal conclusions.</p></section></main>
+<script>
+const input=document.getElementById('failure-filter'); const rows=[...document.querySelectorAll('#failure-rows tr')];
+input?.addEventListener('input',()=>{{const q=input.value.trim().toLowerCase(); rows.forEach(row=>row.hidden=!!q&&!row.dataset.search.includes(q));}});
+</script></body></html>"""
+
+
+def single_session_report(summary: dict[str, Any]) -> dict[str, Any]:
+    """Provide report-shaped metrics for a drill-down without traversing links."""
+    token = summary.get("token_final") if isinstance(summary.get("token_final"), dict) else {}
+    totals = {field: int(token.get(field) or 0) for field in TOKEN_FIELDS}
+    totals["uncached_input_tokens"] = max(0, totals["input_tokens"] - totals["cached_input_tokens"])
+    meta = summary.get("meta") if isinstance(summary.get("meta"), dict) else {}
+    return {
+        "sessions": [{"role": "parent", "id": meta.get("id"), **totals}],
+        "totals": totals,
+        "linked_session_evidence": summary.get("linked_session_evidence") or [],
+    }
+
+
+def evidence_id(kind: str, session_id: str, suffix: Any) -> str:
+    """Stable evidence handles are deliberately independent of UI order."""
+    safe = re.sub(r"[^a-zA-Z0-9._-]+", "-", str(suffix)).strip("-") or "item"
+    return f"{kind}:{session_id}:{safe}"
+
+
+def normalized_evidence_pack(
+    root_id: str,
+    summaries: dict[str, dict[str, Any]],
+    edges: list[dict[str, str]],
+    report: dict[str, Any],
+) -> dict[str, Any]:
+    """Create the small, UI-safe evidence API; raw JSONL stays authoritative."""
+    evidence: list[dict[str, Any]] = []
+    sessions: list[dict[str, Any]] = []
+    for session_id, summary in summaries.items():
+        meta = summary.get("meta") if isinstance(summary.get("meta"), dict) else {}
+        metrics = summary.get("operational_metrics") or {}
+        session = {
+            "id": session_id,
+            "rolloutCount": summary.get("rollout_count", 1),
+            "window": {"start": summary.get("start"), "end": summary.get("end"), "durationSeconds": summary.get("duration_seconds")},
+            "metrics": metrics,
+            "sourceRollouts": summary.get("rollout_paths") or [summary.get("path")],
+            "cwd": meta.get("cwd"),
+        }
+        sessions.append(session)
+        evidence.append({
+            "id": evidence_id("session", session_id, "summary"), "kind": "session_summary", "sessionId": session_id,
+            "timestamp": summary.get("start"), "source": {"paths": session["sourceRollouts"]},
+            "excerpt": f"Logical session with {session['rolloutCount']} rollout(s), {metrics.get('tool_call_count', 0)} tool calls, and {metrics.get('failure_signal_count', 0)} failure signals.",
+            "data": session,
+        })
+        for failure in summary.get("failure_events") or []:
+            line = failure.get("line", "unknown")
+            evidence.append({
+                "id": evidence_id("failure", session_id, line), "kind": "failure", "sessionId": session_id,
+                "timestamp": failure.get("timestamp"), "source": {"path": summary.get("path"), "line": line},
+                "excerpt": compact(failure.get("output") or failure.get("stderr") or failure.get("cmd") or failure.get("name"), 700),
+                "data": failure,
+            })
+        for patch in summary.get("patches") or []:
+            line = patch.get("line", "unknown")
+            evidence.append({
+                "id": evidence_id("patch", session_id, line), "kind": "patch", "sessionId": session_id,
+                "timestamp": patch.get("timestamp"), "source": {"path": summary.get("path"), "line": line},
+                "excerpt": ", ".join(patch.get("changes") or []) or "Patch event with no changed paths recorded.", "data": patch,
+            })
+        for gap in summary.get("long_gaps") or []:
+            line = gap.get("line", "unknown")
+            evidence.append({
+                "id": evidence_id("gap", session_id, line), "kind": "long_gap", "sessionId": session_id,
+                "timestamp": gap.get("from"), "source": {"path": summary.get("path"), "line": line},
+                "excerpt": f"{fmt_duration(gap.get('seconds'))} before {gap.get('event')}", "data": gap,
+            })
+        for turn in summary.get("turns") or []:
+            turn_id = turn.get("turn_id", "unknown")
+            evidence.append({
+                "id": evidence_id("turn", session_id, turn_id), "kind": "turn", "sessionId": session_id,
+                "timestamp": turn.get("started"), "source": {"paths": session["sourceRollouts"]},
+                "excerpt": f"Turn {turn_id}: {turn.get('duration_ms', 'unknown')} ms.", "data": turn,
+            })
+        for name, count in (summary.get("tool_counts") or {}).items():
+            evidence.append({
+                "id": evidence_id("tool", session_id, name), "kind": "tool_count", "sessionId": session_id,
+                "timestamp": summary.get("end"), "source": {"paths": session["sourceRollouts"]},
+                "excerpt": f"{name}: {count} parsed tool call(s).", "data": {"tool": name, "count": count},
+            })
+    for edge in edges:
+        evidence.append({
+            "id": evidence_id("edge", edge["parent"], edge["child"]), "kind": "delegation_edge", "sessionId": edge["parent"],
+            "timestamp": None, "source": {"sessionIds": [edge["parent"], edge["child"]]},
+            "excerpt": f"{edge['parent']} → {edge['child']} via {edge['kind']}.", "data": edge,
+        })
+    evidence.sort(key=lambda item: (str(item.get("timestamp") or ""), item["id"]))
+    return {
+        "schemaVersion": EVIDENCE_SCHEMA_VERSION,
+        "rootSessionId": root_id,
+        "generatedAt": fmt_time(dt.datetime.now(dt.timezone.utc)),
+        "report": {"totals": report.get("totals") or {}, "linkedSessionEvidence": report.get("linked_session_evidence") or []},
+        "sessions": sessions,
+        "edges": edges,
+        "evidence": evidence,
+    }
+
+
+def write_report_workspace(
+    pack_dir: Path,
+    root_id: str,
+    summaries: dict[str, dict[str, Any]],
+    edges: list[dict[str, str]],
+    report: dict[str, Any],
+) -> None:
+    api = normalized_evidence_pack(root_id, summaries, edges, report)
+    write_json(pack_dir / "evidence" / "evidence.json", api)
+    manifest = {
+        "schemaVersion": EVIDENCE_SCHEMA_VERSION,
+        "kind": "codex-reflect-report-workspace",
+        "rootSessionId": root_id,
+        "sourceRollouts": sorted({path for summary in summaries.values() for path in (summary.get("rollout_paths") or [summary.get("path")]) if path}),
+        "logicalSessions": [{"id": item["id"], "rolloutCount": item["rolloutCount"]} for item in api["sessions"]],
+        "evidenceApi": "app/public/data/evidence.json",
+        "markdown": "markdown/index.md",
+        "agentWritable": ["app/src/report/"],
+        "appCreated": False,
+    }
+    write_json(pack_dir / "manifest.json", manifest)
+    write_text(pack_dir / "AGENTS.md", "# Codex Reflect report workspace\n\nEvidence and Markdown are helper-owned and immutable. Analyze `markdown/` and `evidence/` directly. By default, edit only `app/src/report/`; do not duplicate platform routes for mission-specific presentation.\n")
+    immutable_tree(pack_dir / "evidence")
+    (pack_dir / "manifest.json").chmod(0o400)
+
+
 def write_analysis_pack(
     codex_home: Path,
-    path: Path,
+    paths: list[Path],
     summary: dict[str, Any],
     since: dt.datetime | None,
     until: dt.datetime | None,
     output_dir: str | None,
+    workspace_summaries: dict[str, dict[str, Any]] | None = None,
+    workspace_edges: list[dict[str, str]] | None = None,
+    workspace_report: dict[str, Any] | None = None,
 ) -> Path:
     meta = summary.get("meta") if isinstance(summary.get("meta"), dict) else {}
-    session_id = str(meta.get("id") or path.stem)
+    session_id = str(meta.get("id") or paths[0].stem)
     pack_dir = create_analysis_dir(codex_home, session_id, output_dir)
-    sessions_dir = pack_dir / "sessions"
-    sessions_dir.mkdir(mode=0o700)
-    report = build_token_report(codex_home, [str(path)], include_linked=True, since=since, until=until)
+    markdown_dir = pack_dir / "markdown"
+    sessions_dir = markdown_dir / "sessions"
+    sessions_dir.mkdir(parents=True, mode=0o700)
+    report = build_token_report(codex_home, [session_id], include_linked=True, since=since, until=until)
+    workspace_summaries = workspace_summaries or {session_id: summary}
 
-    write_text(pack_dir / "run-overview.md", render_run_overview(summary, report))
-    write_text(pack_dir / "parent-session.md", capture_markdown(print_markdown, summary))
-    write_text(pack_dir / "failures.md", render_failure_review(summary))
-    write_text(pack_dir / "timeline.md", render_timeline(summary))
-    write_text(pack_dir / "delegation.md", render_delegation(summary, report))
-    write_text(pack_dir / "metrics.md", capture_markdown(print_token_report, report))
+    write_text(markdown_dir / "run-overview.md", render_run_overview(summary, report))
+    write_text(markdown_dir / "parent-session.md", capture_markdown(print_markdown, summary))
+    write_text(markdown_dir / "failures.md", render_failure_review(summary))
+    write_text(markdown_dir / "timeline.md", render_timeline(summary))
+    write_text(markdown_dir / "delegation.md", render_delegation(summary, report))
+    write_text(markdown_dir / "metrics.md", capture_markdown(print_token_report, report))
 
     linked_records = [record for record in report.get("sessions") or [] if record.get("role") == "linked"]
     for record in linked_records:
-        child_summary = summarize_archive(Path(record["path"]))
+        child_summary = summarize_archive(find_session_paths(codex_home, str(record["id"])))
         write_text(sessions_dir / f"{record['id']}.md", capture_markdown(print_markdown, child_summary))
+    for child_id, child_summary in workspace_summaries.items():
+        if child_id != session_id:
+            write_text(sessions_dir / f"{child_id}.md", capture_markdown(print_markdown, child_summary))
 
     requests = summary.get("user_messages") or []
     latest_request = compact(requests[-1].get("message"), 500) if requests else "No user request recorded."
@@ -1322,7 +1791,7 @@ def write_analysis_pack(
         "# Codex Reflect Analysis Pack",
         "",
         f"- Parent session: `{session_id}`",
-        f"- Source transcript: `{path}`",
+        f"- Source rollouts: {len(summary.get('rollout_paths') or [])}",
         f"- Generated: {fmt_time(dt.datetime.now(dt.timezone.utc))}",
         f"- Analysis window: {summary['start']} to {summary['end']}",
         f"- Latest request: {latest_request}",
@@ -1342,22 +1811,114 @@ def write_analysis_pack(
         lines.extend(["", "## Detected Linked Session Briefs", ""])
         for record in linked_records:
             lines.append(f"- [Session `{record['id']}`](sessions/{record['id']}.md)")
+    if workspace_edges:
+        lines.extend([
+            "", "## Workstream Analysis", "",
+            "- [Workstream map](workstreams.md)",
+            "- [Workstream metrics](workstream-metrics.md)",
+            "- Session briefs in [sessions/](sessions/) are grouped by logical session and merge their rollouts.",
+        ])
     lines.extend([
+        "",
+        "## Live viewer",
+        "",
+        "The Svelte viewer is user-facing. First run `python3 /root/.codex/skills/codex-reflect/scripts/create_report_app.py ..`, then `python3 /root/.codex/skills/codex-reflect/scripts/report_viewer.py start ../app`. Analyze this Markdown/evidence pack directly before authoring `app/src/report/`.",
         "",
         "Raw rollout JSONL remains authoritative. These files are bounded summaries and evidence guides, not final conclusions.",
     ])
-    write_text(pack_dir / "index.md", "\n".join(lines))
+    if workspace_edges:
+        write_text(markdown_dir / "workstreams.md", render_workstream_map(session_id, workspace_summaries, workspace_edges))
+        write_text(markdown_dir / "workstream-metrics.md", capture_markdown(print_token_report, workspace_report or report))
+    write_text(markdown_dir / "index.md", "\n".join(lines))
+    write_report_workspace(pack_dir, session_id, workspace_summaries, workspace_edges or [], workspace_report or report)
+    immutable_tree(markdown_dir)
     return pack_dir
 
 
+def render_workstream_map(
+    root_id: str,
+    summaries: dict[str, dict[str, Any]],
+    edges: list[dict[str, str]],
+) -> str:
+    lines = [
+        "# Workstream Map",
+        "",
+        f"- Root logical session: `{root_id}`",
+        f"- Logical sessions: {len(summaries)}",
+        "",
+        "## Session Groups",
+        "",
+        "| Session | Rollouts | Window | Spawned agents | Failure signals |",
+        "| --- | ---: | --- | ---: | ---: |",
+    ]
+    for session_id, summary in summaries.items():
+        metrics = summary.get("operational_metrics") or {}
+        lines.append(
+            f"| `{session_id}` | {summary.get('rollout_count', 1)} | "
+            f"{summary.get('start')} to {summary.get('end')} | "
+            f"{summary.get('detected_spawned_subagent_count', 0)} | "
+            f"{metrics.get('failure_signal_count', 0)} |"
+        )
+    lines.extend(["", "## Lineage Edges", ""])
+    if not edges:
+        lines.append("- No downstream session edges were resolved.")
+    for edge in edges:
+        lines.append(f"- `{edge['parent']}` → `{edge['child']}` via `{edge['kind']}`")
+    return "\n".join(lines)
+
+
+def write_workstream_pack(
+    codex_home: Path,
+    root_paths: list[Path],
+    sessions: dict[str, list[Path]],
+    edges: list[dict[str, str]],
+    since: dt.datetime | None,
+    until: dt.datetime | None,
+    output_dir: str | None,
+) -> Path:
+    root_summary = summarize_archive(root_paths, since=since, until=until)
+    root_id = session_id_for_paths(root_paths)
+    summaries = {
+        session_id: summarize_archive(paths, since=since if session_id == root_id else None, until=until if session_id == root_id else None)
+        for session_id, paths in sessions.items()
+    }
+    report = build_token_report(codex_home, list(sessions), include_linked=False)
+    pack_dir = write_analysis_pack(
+        codex_home, root_paths, root_summary, since, until, output_dir,
+        workspace_summaries=summaries, workspace_edges=edges, workspace_report=report,
+    )
+    return pack_dir
+
+
+def start_report_viewer(pack_dir: Path) -> str:
+    result = subprocess.run(
+        [sys.executable, str(REPORT_VIEWER_SCRIPT), "start", str(pack_dir / "app")],
+        text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    if result.returncode:
+        raise SystemExit(result.stdout.strip() or "Codex Reflect viewer unavailable.")
+    for line in result.stdout.splitlines():
+        if line.startswith("Viewer URL: "):
+            return line.removeprefix("Viewer URL: ").strip()
+    raise SystemExit("Codex Reflect viewer unavailable: helper did not return a loopback URL.")
+
+
 def main() -> int:
+    print(
+        "summarize_codex_run.py is now an internal extraction library. Use "
+        "discover_sessions.py, extract_evidence.py, create_report_app.py, "
+        "and report_viewer.py instead.",
+        file=sys.stderr,
+    )
+    return 2
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--codex-home", default=None, help="Codex home directory, default ${CODEX_HOME:-~/.codex}")
     parser.add_argument("--list", action="store_true", help="List recent known sessions")
     parser.add_argument("--find", metavar="QUERY", help="Search session index, history, and transcript messages")
     parser.add_argument("--projects", action="store_true", help="List projects with known session working directories")
     parser.add_argument("--project", metavar="PATH", help="Filter --list and --find to an exact normalized session working directory")
-    parser.add_argument("--session", metavar="ID_OR_PATH", help="Build a Markdown analysis pack for a rollout transcript by id substring or path")
+    parser.add_argument("--session", metavar="ID_OR_PATH", help="Build a Markdown analysis pack for every rollout in one logical session")
+    parser.add_argument("--workstream", metavar="ID_OR_PATH", help="Build a root-session pack with all resolved descendant logical sessions")
     parser.add_argument("--output-dir", metavar="PATH", help="Write a session analysis pack to this new directory instead of ${CODEX_HOME:-~/.codex}/tmp/codex-reflect")
     parser.add_argument("--token-report", nargs="+", metavar="ID_OR_PATH", help="Report token usage for one or more rollout transcripts")
     parser.add_argument("--no-linked", action="store_true", help="Do not include linked subagent sessions in --token-report")
@@ -1369,6 +1930,7 @@ def main() -> int:
     parser.add_argument("--target", metavar="TEXT", help="Filter SQLite diagnostics by target substring")
     parser.add_argument("--recent", type=int, default=20, help="Number of list/find results")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
+    parser.add_argument("--no-viewer", action="store_true", help="Generate the workspace without starting Vite (for automation only)")
     args = parser.parse_args()
 
     codex_home = codex_home_arg(args.codex_home)
@@ -1376,10 +1938,14 @@ def main() -> int:
     until = parse_boundary(args.until)
     if since and until and since > until:
         raise SystemExit("--since must be before --until")
-    if args.output_dir and not args.session:
-        raise SystemExit("--output-dir requires --session")
+    if args.output_dir and not (args.session or args.workstream):
+        raise SystemExit("--output-dir requires --session or --workstream")
     if args.output_dir and args.json:
         raise SystemExit("--output-dir cannot be combined with --json")
+    if args.no_viewer and not (args.session or args.workstream):
+        raise SystemExit("--no-viewer requires --session or --workstream")
+    if args.session and args.workstream:
+        raise SystemExit("--session and --workstream are mutually exclusive")
     if args.project and not (args.list or args.find):
         raise SystemExit("--project requires --list or --find")
     if args.projects and (args.project or args.list or args.find):
@@ -1413,13 +1979,33 @@ def main() -> int:
             print_projects(projects)
         return 0
     if args.session:
-        path = find_archive(codex_home, args.session)
-        summary = summarize_archive(path, since=since, until=until)
+        paths = find_session_paths(codex_home, args.session)
+        summary = summarize_archive(paths, since=since, until=until)
         if args.json:
             print(json.dumps(summary, indent=2, sort_keys=True))
         else:
-            pack_dir = write_analysis_pack(codex_home, path, summary, since, until, args.output_dir)
-            print(f"Analysis pack: {pack_dir / 'index.md'}")
+            require_viewer_prerequisites()
+            pack_dir = write_analysis_pack(codex_home, paths, summary, since, until, args.output_dir)
+            print(f"Analysis pack: {pack_dir / 'markdown' / 'index.md'}")
+            if not args.no_viewer:
+                print(f"Viewer URL: {start_report_viewer(pack_dir)}")
+        return 0
+    if args.workstream:
+        root_paths, sessions, edges = resolve_workstream(codex_home, args.workstream)
+        if args.json:
+            summary = summarize_archive(root_paths, since=since, until=until)
+            print(json.dumps({
+                "root_session_id": session_id_for_paths(root_paths),
+                "root_summary": summary,
+                "logical_sessions": {session_id: [str(path) for path in paths] for session_id, paths in sessions.items()},
+                "edges": edges,
+            }, indent=2, sort_keys=True))
+        else:
+            require_viewer_prerequisites()
+            pack_dir = write_workstream_pack(codex_home, root_paths, sessions, edges, since, until, args.output_dir)
+            print(f"Workstream analysis pack: {pack_dir / 'markdown' / 'index.md'}")
+            if not args.no_viewer:
+                print(f"Viewer URL: {start_report_viewer(pack_dir)}")
         return 0
     if args.sqlite_logs:
         rows = search_sqlite_logs(codex_home, args.contains, args.level, args.target, args.recent)

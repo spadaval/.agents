@@ -8,6 +8,21 @@ window. Detected linked-child sessions are reported as whole-session totals;
 they are not automatically bounded to the parent window. State this difference
 before presenting a combined total as mission-wide.
 
+## Logical Sessions and Workstreams
+
+A logical session is all rollout JSONL files whose `session_meta.id` is the
+same. The helper merges their ordered events before it calculates a timeline,
+tool/failure counts, patches, or the final token snapshot. It does not add token
+snapshots from resumed files: the latest snapshot in the merged logical session
+is the reported total.
+
+A `--workstream` starts from the resolved root logical session and follows
+recorded downstream `create_thread`, direct spawn, and handoff evidence. Its
+session count and aggregate tokens cover only the logical sessions present in
+that discovered graph. They are useful mission-level evidence, but remain
+incomplete if a transcript or link is absent, and should be described as a
+“detected workstream total,” not an exact account-wide cost.
+
 ## Detected Linked Sessions
 
 `linked_session_ids` is the legacy ID-only list. `linked_session_evidence`

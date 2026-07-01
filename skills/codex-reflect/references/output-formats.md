@@ -28,15 +28,19 @@ conclusions.]
 
 ## Improvements
 
-### Preserve
-[Effective behavior worth retaining or encoding in code, tooling, guidance, or
-a skill.]
+### [Short improvement title]
+**Context:** [The observed problem or effective behavior, its impact, and the
+supporting session/event evidence.]
 
-### Fix
-[Evidence-backed problem, its impact, and its likely cause or uncertainty.]
+**Change:** [The smallest concrete change to code, tooling, guidance, skill,
+or orchestration.] 
 
-### Change
-[Specific improvement, target surface, and validation for the change.]
+**Payoff:** [How the change addresses the context and what it should improve.]
+
+Add a `**Validation:**` line only when there is a material, testable check for
+the change. Group several cards under `### Code`, `### Tooling`, `### Guidance`,
+`### Skills`, or `### Orchestration` only when that makes a long retrospective
+easier to scan. Do not turn every observation into a card.
 ```
 
 For a narrow question, retain `Situation` and include only the relevant later
@@ -51,6 +55,19 @@ Every included finding must name a session ID or path and a timestamp, line,
 command, patch, or event that supports it. Label missing, ambiguous, or
 inferred evidence explicitly. Treat detected linked sessions as candidates
 until the parent delegation and child handoff establish the relationship.
+
+## Interactive Artifact
+
+The helper writes `report.html` beside this Markdown pack. It is a
+self-contained, dependency-free exploration view: summary metrics, a grouped
+timeline, a filterable failure table with immediate-response evidence, session
+groups/lineage, and tool activity. Treat it as a navigation and evidence
+surface, not an editorial report. Keep causal interpretation and
+Context/Change/Payoff cards in the user-facing retrospective.
+
+In the chat response, give the reviewed outcome, the few findings that matter,
+material caveats, and a link to `report.html`; do not replace the response with
+an artifact receipt unless the user asks for artifact-only output.
 
 ## Multi-Agent Runs: Hierarchical STAR-I
 
@@ -74,9 +91,9 @@ workstreams must be compared:
 | --- | --- | --- | --- | --- |
 ```
 
-Keep `Improvements` systemic: group recommendations by code, tooling,
-guidance, skills, or orchestration rather than assigning one recommendation to
-every child session.
+Keep `Improvements` systemic: group compact Context/Change/Payoff cards by
+code, tooling, guidance, skills, or orchestration rather than assigning one
+recommendation to every child session.
 
 Create a child-level mini STAR-I only when it materially affected the mission:
 it changed direction, found a defect, failed to recover, supplied critical

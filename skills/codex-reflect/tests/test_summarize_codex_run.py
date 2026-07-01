@@ -1,12 +1,16 @@
 import importlib.util
 import json
+import subprocess
+import sys
+import stat
 import tempfile
 import unittest
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).parents[1] / "scripts" / "summarize_codex_run.py"
-SPEC = importlib.util.spec_from_file_location("summarize_codex_run", SCRIPT)
+SCRIPT = Path(__file__).parents[1] / "scripts" / "reflect_core.py"
+CREATE_APP = Path(__file__).parents[1] / "scripts" / "create_report_app.py"
+SPEC = importlib.util.spec_from_file_location("reflect_core", SCRIPT)
 assert SPEC and SPEC.loader
 RUNS = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(RUNS)
@@ -152,7 +156,7 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
         confidence = {item["id"]: item["confidence"] for item in report["linked_session_evidence"]}
         self.assertEqual(confidence, {STRONG: "strong", WEAK: "weak"})
 
-    def test_analysis_pack_writes_bounded_markdown_artifacts(self):
+    def test_analysis_pack_writes_immutable_evidence_and_report_local_app(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             parent_path = write_rollout(home, "parent", [
@@ -165,18 +169,36 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
             ])
 
             summary = RUNS.summarize_archive(parent_path)
-            pack = RUNS.write_analysis_pack(home, parent_path, summary, None, None, None)
+            pack = RUNS.write_analysis_pack(home, [parent_path], summary, None, None, None)
 
             self.assertTrue(pack.is_dir())
-            self.assertTrue((pack / "index.md").is_file())
-            self.assertTrue((pack / "run-overview.md").is_file())
-            self.assertTrue((pack / "parent-session.md").is_file())
-            self.assertTrue((pack / "failures.md").is_file())
-            self.assertTrue((pack / "timeline.md").is_file())
-            self.assertTrue((pack / "delegation.md").is_file())
-            self.assertTrue((pack / "metrics.md").is_file())
-            self.assertTrue((pack / "sessions" / f"{STRONG}.md").is_file())
-            self.assertIn("Detected Linked Session Briefs", (pack / "index.md").read_text(encoding="utf-8"))
+            markdown = pack / "markdown"
+            self.assertTrue((markdown / "index.md").is_file())
+            self.assertTrue((markdown / "run-overview.md").is_file())
+            self.assertTrue((markdown / "parent-session.md").is_file())
+            self.assertTrue((markdown / "failures.md").is_file())
+            self.assertTrue((markdown / "timeline.md").is_file())
+            self.assertTrue((markdown / "delegation.md").is_file())
+            self.assertTrue((markdown / "metrics.md").is_file())
+            self.assertTrue((markdown / "sessions" / f"{STRONG}.md").is_file())
+            self.assertFalse((pack / "app").exists())
+            subprocess.run([sys.executable, str(CREATE_APP), str(pack)], check=True, capture_output=True, text=True)
+            self.assertTrue((pack / "app" / "package.json").is_file())
+            self.assertTrue((pack / "app" / "src" / "platform" / "PlatformPage.svelte").is_file())
+            self.assertTrue((pack / "app" / "src" / "report" / "ReportLanding.svelte").is_file())
+            self.assertFalse((pack / "app" / "src" / "platform" / "PlatformPage.svelte").stat().st_mode & stat.S_IWUSR)
+            self.assertTrue((pack / "app" / "src" / "report" / "ReportLanding.svelte").stat().st_mode & stat.S_IWUSR)
+            self.assertTrue((pack / "manifest.json").is_file())
+            api = json.loads((pack / "evidence" / "evidence.json").read_text(encoding="utf-8"))
+            public_api = json.loads((pack / "app" / "public" / "data" / "evidence.json").read_text(encoding="utf-8"))
+            self.assertEqual(api["schemaVersion"], RUNS.EVIDENCE_SCHEMA_VERSION)
+            self.assertEqual(api, public_api)
+            self.assertTrue(all(item["id"] for item in api["evidence"]))
+            self.assertIn("Live viewer", (markdown / "index.md").read_text(encoding="utf-8"))
+            landing = (pack / "app" / "src" / "report" / "ReportLanding.svelte").read_text(encoding="utf-8")
+            self.assertIn("EvidenceLink", landing)
+            app = (pack / "app" / "src" / "App.svelte").read_text(encoding="utf-8")
+            self.assertIn("let route = $state('overview')", app)
 
     def test_project_listing_and_filtering_use_exact_normalized_cwd(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -202,6 +224,64 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
             (str(project_b.resolve()), 1),
             (str(project_a.resolve()), 1),
         ])
+
+    def test_logical_session_merges_rollouts_and_uses_latest_token_snapshot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            first = write_rollout(home, "first", [
+                row("2026-01-01T00:00:00Z", {"id": PARENT}, "session_meta"),
+                row("2026-01-01T00:01:00Z", {"type": "token_count", "info": {"total_token_usage": {"total_tokens": 10}}}),
+            ])
+            second = write_rollout(home, "second", [
+                row("2026-01-01T00:02:00Z", {"id": PARENT}, "session_meta"),
+                row("2026-01-01T00:03:00Z", {"type": "token_count", "info": {"total_token_usage": {"total_tokens": 20}}}),
+            ])
+
+            paths = RUNS.find_session_paths(home, str(second))
+            summary = RUNS.summarize_archive(paths)
+            report = RUNS.build_token_report(home, [PARENT], include_linked=False)
+
+        self.assertEqual(paths, [first, second])
+        self.assertEqual(summary["rollout_count"], 2)
+        self.assertEqual(summary["token_final"]["total_tokens"], 20)
+        self.assertEqual(report["totals"]["total_tokens"], 20)
+
+    def test_workstream_resolution_follows_create_thread_edges(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            root = write_rollout(home, "root", [
+                row("2026-01-01T00:00:00Z", {"id": PARENT}, "session_meta"),
+                row("2026-01-01T00:01:00Z", {"type": "function_call_output", "output": f'{{"threadId":"{STRONG}"}}'}),
+            ])
+            child = write_rollout(home, "child", [
+                row("2026-01-01T00:02:00Z", {"id": STRONG}, "session_meta"),
+                row("2026-01-01T00:03:00Z", {"type": "user_message", "message": f"<codex_delegation><source_thread_id>{PARENT}</source_thread_id></codex_delegation>"}),
+            ])
+
+            root_paths, sessions, edges = RUNS.resolve_workstream(home, PARENT)
+
+        self.assertEqual(root_paths, [root])
+        self.assertEqual(sessions[STRONG], [child])
+        self.assertIn({"parent": PARENT, "child": STRONG, "kind": "create_thread"}, edges)
+
+    def test_workstream_pack_exposes_descendant_briefs_and_edge_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            root = write_rollout(home, "root", [
+                row("2026-01-01T00:00:00Z", {"id": PARENT}, "session_meta"),
+                row("2026-01-01T00:01:00Z", {"type": "function_call_output", "output": f'{{"threadId":"{STRONG}"}}'}),
+            ])
+            child = write_rollout(home, "child", [
+                row("2026-01-01T00:02:00Z", {"id": STRONG}, "session_meta"),
+                row("2026-01-01T00:03:00Z", {"type": "user_message", "message": f"<codex_delegation><source_thread_id>{PARENT}</source_thread_id></codex_delegation>"}),
+            ])
+            pack = RUNS.write_workstream_pack(home, [root], {PARENT: [root], STRONG: [child]}, [{"parent": PARENT, "child": STRONG, "kind": "create_thread"}], None, None, None)
+
+            self.assertTrue((pack / "markdown" / "workstreams.md").is_file())
+            self.assertTrue((pack / "markdown" / "sessions" / f"{STRONG}.md").is_file())
+            api = json.loads((pack / "evidence" / "evidence.json").read_text(encoding="utf-8"))
+            self.assertEqual(api["rootSessionId"], PARENT)
+            self.assertTrue(any(item["kind"] == "delegation_edge" for item in api["evidence"]))
 
 
 if __name__ == "__main__":
