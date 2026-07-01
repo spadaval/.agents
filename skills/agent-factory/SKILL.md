@@ -1,73 +1,67 @@
 ---
 name: agent-factory
-description: "Use for coordinated agent work: installing bindings, planning tracker and mission work, orchestrating execution, implementing slices, migration, review, validation, docs, audit, and tracker hygiene. The orchestrator assigns one role/subskill per subagent."
+description: "Use for coordinated agent work: subskill routing, mission orchestration, implementation, review, validation, docs, audit, readiness, and bounded delegation. The orchestrator assigns exactly one subskill to each subagent."
 argument-hint: "[subskill] [target]"
 user-invocable: true
 ---
 
 # Agent Factory
 
-Agent Factory assigns subskills for coordinated work from durable repository
-state.
+Agent Factory is the portable coordination layer. It assigns bounded agent roles
+from durable repository state; it is not the repository command manual.
 
-## General Guidelines
+For Atelier repositories, tactical workflow lives in Atelier's executable
+surfaces: `atelier man <role>`, `atelier status`, focused `atelier issue show <objective-id>`, and focused `show`/`list`/`transition` commands. Use those
+surfaces for current command names, readiness, proof, recovery, and closeout
+detail. Do not encode repository-specific review, branch, provider, merge, or
+completion policy in this skill; follow the process guidance emitted by Atelier
+for the current checkout and work item.
 
-- Load `AGENTFACTORY.md` first.
-- For delegated work, the orchestrator explicitly assigns one subskill to each
-  subagent. A subagent loads only the assigned subskill reference unless the
-  assignment says otherwise.
-- Spawn role-specific subagents with explicit task context: repository path,
-  assigned subskill, tracker item or mission identifiers, relevant files, and
-  required validation. Include expected proof and whether independent review or
-  validation is required. Do not use fork-context for role-specific subagents.
-- Use the tracker bound in `AGENTFACTORY.md`. For Atelier, select executable
-  issues from the active mission or epic graph unless doing planning or triage.
-  See [standards/tracker.md](standards/tracker.md) for commands.
-- Write missions, epics, issues, validation items, and follow-up work using
-  [standards/work-item-authoring.md](standards/work-item-authoring.md):
-  describe the desired world and expected proof without scripting the
-  implementation path.
-- Use the proof rule from
-  [standards/work-item-authoring.md](standards/work-item-authoring.md):
-  ordinary work closes with proof on the issue, while risky, broad,
-  public-contract, process-policy, parent-level, epic, and mission claims need
-  first-class evidence and independent validation or review where appropriate.
-- [standards/repo-workflow.md](standards/repo-workflow.md): git/worktree start, checkpoint, and handoff.
-- Planning and execution are separate concerns. Do not reshape tracker scope
-  while implementing unless graph management is the assigned subskill.
-- High-leverage choices must be resolved before dependent implementation. If the
-  outcome must be durable, create an artifact-update task.
-- Use the mapped repo docs for code, architecture, validation, product, and
-  quality rules.
+## Coordination Rules
+
+- Use repository instructions to locate the tracker, product docs, architecture
+  docs, validation policy, and code standards.
+- Assign exactly one subskill to each role-specific subagent.
+- A subagent loads only the assigned subskill reference unless the assignment
+  explicitly names additional sources.
+- Delegated assignments must include repository path, mission or issue IDs,
+  branch/workspace context, assigned subskill, owned files or workflows,
+  expected proof, evidence destination, and independence requirements.
+- Planning and execution are separate. Do not reshape tracker scope while
+  implementing unless graph management is the assigned work.
+- Important product, architecture, persistence, security, migration, or
+  public-contract choices must be resolved durably before dependent
+  implementation proceeds.
+- Do not preserve obsolete commands, compatibility aliases, shims, or fallback
+  behavior unless a human explicitly asks for that compatibility window.
 
 ## Subskills
 
 | Subskill | Use For | Load |
 | --- | --- | --- |
-| `install` | Set up bindings/scaffolding | [procedures/install.md](procedures/install.md) |
-| `plan` | Shape missions and tracker work | [procedures/plan.md](procedures/plan.md) |
-| `orchestrate` | Run a mission/epic/workstream | [procedures/orchestrate.md](procedures/orchestrate.md) |
-| `implement` | Execute one assigned slice | [procedures/implement.md](procedures/implement.md) |
-| `migrate` | Demolition, reconnect, closeout, temporary breakage | [procedures/migrate.md](procedures/migrate.md) |
-| `review` | Diff/design/security/test review | [procedures/review.md](procedures/review.md) |
-| `validate` | Scenario proof | [procedures/validate.md](procedures/validate.md) |
-| `docs` | Docs drift cleanup | [procedures/docs.md](procedures/docs.md) |
-| `audit` | Evidence-backed architecture findings | [procedures/audit.md](procedures/audit.md) |
+| `install` | Connect Agent Factory to a repository's durable sources | [procedures/install.md](procedures/install.md) |
+| `plan` | Shape missions, epics, issues, dependencies, and artifact-update work | [procedures/plan.md](procedures/plan.md) |
+| `orchestrate` | Run a mission, epic, or multi-item workstream | [procedures/orchestrate.md](procedures/orchestrate.md) |
+| `implement` | Execute one assigned implementation slice | [procedures/implement.md](procedures/implement.md) |
+| `migrate` | Demolition, reconnect, intentional temporary breakage, or migration closeout | [procedures/migrate.md](procedures/migrate.md) |
+| `review` | Independent diff, design, security, test, or proof review | [procedures/review.md](procedures/review.md) |
+| `validate` | Scenario proof and independent claim classification | [procedures/validate.md](procedures/validate.md) |
+| `docs` | Documentation and guidance drift cleanup | [procedures/docs.md](procedures/docs.md) |
+| `audit` | Evidence-backed architecture or process-quality findings | [procedures/audit.md](procedures/audit.md) |
 | `readiness` | Agent operability assessment | [procedures/readiness.md](procedures/readiness.md) |
-| `tracker` | Tracker commands and item standards | [standards/tracker.md](standards/tracker.md) |
-| `authoring` | Mission, epic, issue, and evidence wording | [standards/work-item-authoring.md](standards/work-item-authoring.md) |
 
-## Subskill Rules
+## Selection Rules
 
-1. If the first argument is a subskill, load that subskill reference and follow it.
-2. If no subskill is named and none of the rules below clearly applies, stop
-   and ask for the assigned subskill.
-3. If the work is a mission, epic, or spans multiple tracker items, use
-   `orchestrate`; the orchestrator may then assign subagents to other
-   subskills.
-4. If the work starts from a diff, use `review`. If it starts from a scenario or
-   behavior claim, use `validate`.
-5. If `AGENTFACTORY.md` is missing or the user asks to set up agent-factory,
-   use `install`.
-6. If a tracker item intentionally permits breakage, closes out a migration, or
-   asks for demolition/reconnect classification, use `migrate`.
+1. If the first argument is a subskill, load that subskill reference and follow
+   it.
+2. If no subskill is named and none of the rules below clearly applies, ask for
+   the assigned subskill.
+3. If work spans a mission, epic, or multiple tracker items, use `orchestrate`.
+4. If the work creates, splits, sequences, clarifies, or repairs tracker scope,
+   use `plan`.
+5. If the work starts from a diff, use `review`.
+6. If the work starts from a scenario, behavior claim, or completion claim, use
+   `validate`.
+7. If the work intentionally permits breakage, closes a migration, or asks for
+   demolition/reconnect classification, use `migrate`.
+8. If the user asks to set up Agent Factory bindings, use `install`.

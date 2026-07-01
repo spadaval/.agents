@@ -1,85 +1,29 @@
 # Docs
 
-Use this subskill when documentation freshness is the task, or when a tracker
-item's main output is reconciling docs with target design, code, tracker state,
-or agent process.
+Use this subskill when documentation or guidance freshness is the main output.
 
-## Source Map
+## Stance
 
-- Use `AGENTFACTORY.md` to find the docs map, domain context, product intent,
-  architecture docs, quality docs, validation router, and ADR directory.
-- Bound tracker: active work, sequencing, phase tags, handoff notes, and
-  migration intent.
-
-## Staleness Rules
-
-- During active rewrites, docs and current ADRs describe the target design.
-- When docs and code disagree, identify whether code is behind target design or
-  docs are stale before editing.
-- Do not leave two competing target states. Update, delete, or clearly mark
-  superseded language.
-- Historical ADRs may preserve old rationale, but current docs should not rely
-  on historical text for target-state instructions.
-- Migration notes may mention old names, but target-state docs should use
-  current vocabulary.
-
-## Update Rules
-
-- Update architecture docs when ownership, package boundaries, contracts,
-  runtime topology, security model, reliability model, or validation strategy
-  changes.
-- Update ADRs only for choices that are hard to reverse, surprising without
-  context, and the result of a real trade-off.
-- Update the mapped domain context when vocabulary changes or a term is being
-  used inconsistently across docs, tracker items, and code.
-- Update product docs when user-visible behavior, UX principles, or design
-  language changes.
-- Update Agent Factory bindings, tracker command references, help examples, and
-  repository docs together when command surfaces or closeout proof behavior
-  change. Do not leave old commands as normal user-facing guidance unless the
-  product intentionally preserves them.
-- Update agent docs or skills when process changes. Keep role-specific
-  procedure in subskill references. Keep design docs focused on principles and
-  trade-offs, not step-by-step instructions.
-- Update tracker item Description, Outcome, Evidence, or Notes when docs work
-  reveals tracker ambiguity that would mislead the next agent.
-- Keep tracker-native Outcome and Evidence sections as the executable contract
-  for done-ness.
-
-## Start Gate
-
-Follow [repository workflow](../standards/repo-workflow.md) for git worktree
-checks, and [tracker.md](../standards/tracker.md) plus `AGENTFACTORY.md` for
-tracker mechanics and sync/check commands.
-
-## Reconciliation Workflow
-
-1. Identify the docs scope: domain, architecture, ADR, product, agent process,
-   operations, or tracker process.
-2. Read the current authoritative docs for that scope before editing.
-3. Search for stale terms and competing claims with `rg`.
-4. Inspect code or tracker items only as needed to resolve whether docs or code
-   are stale.
-5. Edit the smallest set of docs that removes ambiguity.
-6. If the work changes target design, update or create tracker items for the
-   required artifact updates.
-7. Verify docs, help text, Agent Factory bindings, and targeted references
-   agree for the changed surface.
+- Use repository instructions and docs indexes to find authoritative product,
+  architecture, validation, ADR, and process sources.
+- In Atelier repositories, product docs, command help, `atelier man`, workflow
+  policy, and validation docs own tactical operator guidance.
+- Remove competing target states. Update, delete, or clearly mark superseded
+  language.
+- Update docs and Agent Factory guidance together only when the changed topic
+  genuinely belongs in both layers. Agent Factory should route repo-specific
+  command detail to Atelier-owned surfaces.
+- Update tracker work when docs discovery exposes ambiguous scope, stale proof
+  expectations, or unresolved artifact decisions.
 
 ## Verification
 
-Use the mapped validation router for check ownership. For docs-only changes,
-run focused docs checks. Run additional checks only when the docs work also
-changes scripts, package entrypoints, file names, executable behavior, or
-file-size-sensitive content.
-
-For command-surface or process-policy docs, capture proof that the changed docs,
-help text, bindings, and Agent Factory guidance agree. Attach first-class
-evidence when the docs claim is broad, public-contract, parent-level, mission
-closeout, or process-policy work.
+Run focused docs, lint, help, or validation checks that prove the changed
+surface. For command-surface or process-policy docs, capture proof that docs,
+help text, repository instructions, and Agent Factory guidance agree.
 
 ## Handoff
 
-Report docs changed, stale claims removed, target-state source of truth, checks
-run, evidence records or durable notes added, unresolved mismatches, and
-follow-up tracker item IDs.
+Report changed docs, stale claims removed, source of truth, checks run,
+evidence records or notes added, unresolved mismatches, and follow-up tracker
+IDs.

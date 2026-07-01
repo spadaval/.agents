@@ -1,20 +1,20 @@
 ---
 name: decision-lab
-description: Use for human-in-the-loop decision workflows, architecture decisions, adversarial option analysis, biased reasoning checks, bad framing recovery, and pre-implementation tradeoff analysis before agents build or plan execution.
-argument-hint: "[decision or problem]"
+description: Use for human-in-the-loop choice analysis, architecture option review, adversarial option analysis, biased reasoning checks, bad framing recovery, and pre-implementation tradeoff analysis before agents build or plan execution.
+argument-hint: "[choice or problem]"
 user-invocable: true
 ---
 
-# Decision Lab
+# Choice Lab
 
-Decision Lab is a human-gated decision workflow. The lab explores and evaluates;
+Choice Lab is a human-gated choice-analysis workflow. The lab explores and evaluates;
 the factory builds. Use this skill when a high-leverage technical, product, or
-architecture decision has multiple plausible paths and premature convergence
+architecture choice has multiple plausible paths and premature convergence
 would be costly.
 
-Do not use this skill to implement the decision. If the work becomes execution,
+Do not use this skill to implement the choice. If the work becomes execution,
 handoff to the appropriate build, planning, or orchestration skill only after
-the human approves or selects a decision.
+the human approves or selects a path.
 
 ## Operating Rules
 
@@ -27,20 +27,20 @@ the human approves or selects a decision.
   false tradeoffs.
 - Preserve dissent. Do not smooth over material disagreement just to create a
   clean recommendation.
-- Stop after the decision brief. Do not create beads, write ADRs, edit files,
+- Stop after the choice brief. Do not create tracker items, write ADRs, edit files,
   plan implementation, or hand off to `agent-factory` until the human approves
-  or selects the decision.
+  or selects the path.
 
 If subagents are unavailable, run the roles as clearly separated passes and
 state that the result did not use independent subagents.
 
 ## Workflow
 
-1. **Frame** - Assign a Framer to restate the decision, stakes, constraints,
-   non-goals, uncertainty, and what would make the decision reversible or hard
+1. **Frame** - Assign a Framer to restate the choice, stakes, constraints,
+   non-goals, uncertainty, and what would make the choice reversible or hard
    to reverse.
 2. **Research** - Assign a Researcher to gather evidence from the codebase,
-   docs, web, external documentation, prior decisions, and user-provided
+   docs, web, external documentation, prior artifacts, and user-provided
    context as applicable.
 3. **Propose Options** - Assign independent Option Proposers to generate
    viable options. Each option must name assumptions, expected benefits,
@@ -49,13 +49,13 @@ state that the result did not use independent subagents.
    one Critic. The Advocate makes the strongest case for the option. The Critic
    makes the strongest case against it.
 5. **Judge** - Assign a Judge to synthesize the framing, evidence, advocacy,
-   criticism, and dissent into a decision brief. The Judge may recommend, but
+   criticism, and dissent into a choice brief. The Judge may recommend, but
    must not execute.
 6. **Human Gate** - Stop and ask the human to approve the recommendation,
    choose a different option, request more evidence, or reject the framing.
 7. **Record After Approval Only** - If the human approves or selects a path,
-   a Recorder may translate the decision into an ADR draft, bead plan, spec, or
-   `agent-factory` handoff.
+   a Recorder may draft or request a task that writes the durable artifact:
+   ADR, spec, context update, target-state doc, or `agent-factory` handoff.
 
 ## Role Outputs
 
@@ -63,8 +63,8 @@ state that the result did not use independent subagents.
 
 Report:
 
-- decision statement;
-- why the decision matters;
+- choice statement;
+- why the choice matters;
 - explicit constraints and non-goals;
 - assumptions and unknowns;
 - candidate success criteria;
@@ -76,7 +76,7 @@ Report:
 
 - evidence gathered, with sources;
 - current implementation or process facts, when repo-bound;
-- prior decisions or constraints that should not be relitigated;
+- prior artifacts or constraints that should not be relitigated;
 - missing evidence and how costly it would be to obtain.
 
 ### Option Proposer
@@ -104,17 +104,17 @@ look good for the wrong reasons.
 
 ### Judge
 
-Produce the decision brief and stop at the human gate.
+Produce the choice brief and stop at the human gate.
 
 ### Recorder
 
-Use only after human approval. Translate the chosen direction into the requested
-durable artifact without reopening the decision unless new evidence appears.
+Use only after human approval. Translate the chosen direction into a requested
+durable artifact or a task to write that artifact.
 
-## Decision Brief Format
+## Choice Brief Format
 
 ```text
-Decision Brief
+Choice Brief
 
 Problem Framing
 - ...
@@ -136,24 +136,24 @@ Recommendation
 Dissent And Uncertainty
 - ...
 
-Required Human Decision
+Required Human Choice
 - Approve recommendation, choose another option, request more evidence, or reject the framing.
 
-Suggested Next Artifact After Approval
-- ADR draft, bead plan, spec, agent-factory handoff, or no action.
+Suggested Next Artifact Task After Approval
+- ADR draft, spec, context update, target-state doc, agent-factory handoff, or no action.
 ```
 
 ## Agent Factory Compatibility
 
-When operating inside an `agent-factory` repository, Decision Lab may inform
-future beads, ADRs, audits, reviews, or orchestration. It is not a substitute
+When operating inside an `agent-factory` repository, Choice Lab may inform
+future artifact-writing tasks, ADRs, audits, reviews, or orchestration. It is not a substitute
 for `agent-factory plan` or `agent-factory orchestrate`.
 
 After human approval:
 
-- use `agent-factory plan` to create or reshape beads;
-- use `agent-factory orchestrate` for multi-bead execution;
-- use `agent-factory audit` when the decision brief reveals architecture
+- use `agent-factory plan` to create or reshape artifact-writing or implementation tasks;
+- use `agent-factory orchestrate` for multi-task execution;
+- use `agent-factory audit` when the choice brief reveals architecture
   quality findings but no solution is approved;
 - use `agent-factory docs` when the approved choice only needs durable
   documentation.

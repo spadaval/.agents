@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Reflect"
+  short_description: "Learn from prior Codex runs"
+  default_prompt: "Use $codex-reflect to analyze my recent Codex session, identify what worked and failed, and recommend improvements."

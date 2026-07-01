@@ -1,279 +1,38 @@
 # Install
 
-Use this subskill to install agent-factory in a repository. Installation creates
-the concrete repository binding and the minimum durable sources that agents need
-to plan, execute, review, validate, and hand off work.
-
-Do not make the operating model optional. The install subskill binds it to concrete
-paths and commands; it does not negotiate the operating model.
-
-## Target Repository Shape
-
-An agent-factory-ready repository has durable places for intent, scope,
-choices, proof, and handoff. See [repo-shape.md](../standards/repo-shape.md) for the
-complete intended shape, file expectations, and quality heuristics.
-
-A fresh agent must be able to answer these questions without private chat
-history:
-
-- **What is this repository for?**
-- **What words mean what?**
-- **Where do I start reading?**
-- **Which choices are durable?**
-- **How do I prove work?**
-- **How is work tracked?**
-- **How does agent-factory bind to this repo?**
-
-Exact names differ only when `AGENTFACTORY.md` binds the equivalent source
-clearly. Missing equivalents are installation gaps, not harmless omissions.
-
-## Start Gate
-
-Inspect the repository before writing. Follow
-[repository workflow](../standards/repo-workflow.md) for git worktree checks,
-and [tracker.md](../standards/tracker.md) for the bound tracker workflow. Then
-run the repository discovery commands below:
-
-```bash
-find . -maxdepth 3 -type f \( -name AGENTS.md -o -name AGENTFACTORY.md -o -name CONTEXT.md -o -name SPEC.md \)
-find docs -maxdepth 3 -type f 2>/dev/null
-find . -maxdepth 3 -type d \( -name adr -o -name .atelier-state \)
-```
-
-If the worktree is dirty, preserve unrelated changes. If existing docs conflict
-with the expected scaffolding, adapt the binding to the existing structure
-rather than duplicating sources.
-
-## Required Outputs
-
-Create or verify these repository sources:
-
-- `AGENTFACTORY.md`: concrete binding for this repository.
-- Agent instructions file: usually `AGENTS.md`.
-- Docs map: usually `docs/index.md`.
-- Domain context: usually `CONTEXT.md`.
-- Product intent: usually `SPEC.md` or a clearly named equivalent.
-- ADR directory: usually `docs/adr/`.
-- Architecture index: usually `docs/architecture/index.md`.
-- Quality index: usually `docs/architecture/quality/index.md`.
-- Architecture quality vocabulary: usually
-  `docs/architecture/quality/architecture-quality.md`.
-- Code standards: usually `docs/architecture/quality/standards.md`.
-- Validation router: usually `docs/architecture/quality/validation.md`.
-- Durable tracker available. The repository chooses a tracker in
-  `AGENTFACTORY.md`; Atelier is a supported first-class binding.
-- Tracker backup/export binding.
-
-Use existing equivalent files when they already exist. Otherwise create concise
-starter files with useful headings and explicit TODO markers.
-
-## Binding File
-
-`AGENTFACTORY.md` must be an abstract-to-concrete binding, not a policy override
-file. It maps the operating model to repository paths and commands.
-
-Use this shape:
-
-```md
-# Agent Factory Binding
-
-This file binds the generic agent-factory operating model to this repository's
-concrete files, commands, and product-specific skills.
-
-## Sources
-
-- Agent instructions: `AGENTS.md`
-- Docs map: `docs/index.md`
-- Domain context: `CONTEXT.md`
-- Product intent: `SPEC.md`
-- ADR directory: `docs/adr/`
-- Architecture index: `docs/architecture/index.md`
-- Quality index: `docs/architecture/quality/index.md`
-- Architecture quality vocabulary: `docs/architecture/quality/architecture-quality.md`
-- Code standards: `docs/architecture/quality/standards.md`
-- Validation router: `docs/architecture/quality/validation.md`
-
-## Tracker
-
-- Tracker: Atelier
-- Durable tracker state: committed `.atelier-state/`
-- Runtime tracker database: local `.atelier/state.db`, rebuilt from
-  `.atelier-state/`
-- Normal tracker commands:
-  - `atelier issue list --ready`
-  - `atelier issue list --status open`
-  - `atelier issue show <id>`
-  - `atelier issue create "Title" --issue-type task --parent <epic-id>`
-  - `atelier issue update <id> --claim`
-  - `atelier issue update <id> --append-notes "..."`
-  - `atelier issue block <blocked-id> <blocker-id>`
-  - `atelier issue unblock <blocked-id> <blocker-id>`
-  - `atelier issue close <id> --reason "..."`
-- Sync and state commands:
-  - `atelier export`
-  - `atelier export --check`
-- Tracker health commands:
-  - `atelier lint`
-  - `atelier lint <id>`
-  - `atelier doctor`
-
-## Checks
-
-- Markdown formatting: `<command>`
-- Diff whitespace: `git diff --check`
-- Tracker lint: `atelier lint`
-- Full repository check: `<command>`
-
-## Product-Specific Skills
-
-- `<name>`: `<path>`
-```
-
-Delete entries only after recording a follow-up item to add the missing source.
-After tracker setup exists, that follow-up should be a tracker item. During
-initial bootstrap, it may be a concrete gap in the install handoff. A missing
-binding is a defect.
-
-## Starter Files
-
-When creating starter files, keep them small and useful.
-
-`CONTEXT.md` defines domain language:
-
-```md
-# Context
-
-## Domain Terms
-
-- TODO: define the core nouns agents must use consistently.
-
-## Ambiguities
-
-- TODO: record terminology/model choices that prevent repeated confusion.
-```
-
-The product intent file defines purpose and user-visible target behavior:
-
-```md
-# Product Intent
-
-## Purpose
-
-TODO: state what this repository is for.
-
-## Users
-
-TODO: name the users or operators.
-
-## Target Behaviors
-
-- TODO: list observable behaviors the product must support.
-```
-
-The docs map routes agents to durable sources:
-
-```md
-# Documentation Map
-
-- `AGENTFACTORY.md`: agent-factory bindings.
-- `CONTEXT.md`: domain language.
-- `SPEC.md`: product intent.
-- `docs/adr/`: durable choices.
-- `docs/architecture/`: architecture and ownership.
-- `docs/architecture/quality/`: quality, standards, and validation.
-```
-
-The validation router defines check ownership:
-
-```md
-# Validation
-
-## Commands
-
-| Command            | Owns                                                    |
-| ------------------ | ------------------------------------------------------- |
-| `git diff --check` | whitespace and patch hygiene                            |
-| `atelier lint`     | tracker record structure                               |
-| TODO               | project tests, type checks, build, lint, or docs checks |
-
-## Result States
-
-- `pass`
-- `fail`
-- `blocked`
-- `deferred`
-- `not-applicable`
-```
-
-## Tracker Setup
-
-Verify the bound tracker is available. For an Atelier setup:
-
-```bash
-atelier issue list --ready
-atelier export --check
-atelier lint
-atelier doctor
-```
-
-If the bound tracker is not initialized, run the repository-appropriate setup
-command or stop with the exact missing command/tool. Do not invent a parallel
-tracker.
-
-After tracker setup, ensure the binding names the tracker backup/export path and
-that tracker changes are committed with related work.
-
-## AGENTS.md Update
-
-Ensure agent instructions say:
-
-- use the bound tracker for task tracking;
-- load `AGENTFACTORY.md` for agent-factory bindings;
-- use the `agent-factory` skill for coordinated agent work;
-- orchestrators assign one subskill per subagent;
-- do not use interactive tracker commands (see the agent-factory tracker reference for conventions).
-
-Keep this short.
-
-## Verification
-
-Before handoff:
-
-```bash
-test -f AGENTFACTORY.md
-test -f CONTEXT.md
-test -d docs/adr
-<bound tracker lint>
-git diff --check
-<mapped markdown check, if available>
-```
-
-If any required source is intentionally deferred, create a follow-up item that
-names the missing source, why it matters, and which subskill creates it. Once
-the tracker is available, record that follow-up in the tracker.
-
-## Readiness Verification
-
-After creating or updating sources, spot-check against
-[repo-shape.md](../standards/repo-shape.md):
-
-- `AGENTS.md` exists and is ≤150 lines.
-- Every source listed in `AGENTFACTORY.md` points to an existing file.
-- Every check listed in `AGENTFACTORY.md` is runnable.
-- `docs/index.md` routes to all primary durable sources.
-- At least one validation gate runs without error.
-- No committed secrets or credentials.
-
-If a criterion fails, name the gap in the handoff report. Do not block
-installation on non-critical gaps, but do create a follow-up tracker item for any
-gap that would mislead a fresh agent.
+Use this subskill to connect Agent Factory to a repository. Installation should
+identify durable sources and tracker entry points; it should not copy a second
+workflow manual into the skill.
+
+## Scope
+
+Verify or create concise repository instructions that name:
+
+- the tracker and its normal help/status entry points;
+- durable product intent, domain language, architecture docs, ADRs, validation
+  policy, and code standards;
+- which local runtime/cache state is ignored and rebuildable, and which admin
+  repair command owns it;
+- any repository-specific constraints that an agent must know before invoking
+  the tracker.
+
+For Atelier repositories, `AGENTS.md` and `docs/index.md` are the map, while
+`atelier man`, `atelier status`, focused `atelier issue show <objective-id>`,
+command help, product docs, workflow policy, and validation docs own tactical
+operation.
+
+## Rules
+
+- Keep `AGENTS.md` short. It is a table of contents and repository-specific
+  constraint list, not a command cookbook.
+- Prefer existing equivalent docs over new files.
+- When a missing source matters, create tracker work for the artifact update
+  instead of hiding the gap in private notes.
+- Do not install compatibility shims or old command aliases unless explicitly
+  requested by a human.
 
 ## Handoff
 
-Report:
-
-- binding file created or updated;
-- required sources created, reused, or deferred;
-- tracker setup status and export/check command;
-- checks run and failures;
-- readiness gaps found and follow-up tracker item IDs.
+Report the sources found or created, admin setup/repair checks used, remaining
+gaps, follow-up tracker IDs, and the commands or docs an agent should use to
+orient in the repository.

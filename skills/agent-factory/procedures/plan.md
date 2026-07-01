@@ -1,153 +1,150 @@
 # Plan
 
-Use this subskill when creating, splitting, reparenting, sequencing, clarifying,
-or cleaning up tracker work. Planning decides what work exists, what is ready,
-and how work is sequenced. It is not the implementation procedure for a named
-code item.
+Use this subskill to create, split, sequence, clarify, or repair durable work.
+Planning decides what work exists, why it exists, and what finished should look
+like. It is not the implementation procedure for a named code item, and it does
+not prewrite validation transcripts for later agents.
 
-## Inspect Before Mutating
+## Stance
 
-Start with enough read-only context to prevent duplicate or contradictory graph
-changes. Follow [repository workflow](../standards/repo-workflow.md) for git
-worktree checks, and [tracker.md](../standards/tracker.md) plus
-`AGENTFACTORY.md` for tracker mechanics, sync/check, and command conventions.
-Then inspect the tracker and graph using the bound commands.
+- Start from repository instructions, the tracker's current status surfaces, and
+  the relevant product, architecture, ADR, and validation docs.
+- In Atelier repositories, use `atelier man manager` for current command
+  routing and focused `atelier issue show <objective-id>` or focused
+  `show`/`list` commands for drill-down.
+- Write the desired finished state first. Avoid replacing the target state with
+  broad process language, private implementation steps, or boilerplate proof
+  systems unless that exact path is the decision being tracked.
+- High-leverage product, architecture, persistence, security, migration,
+  validation, or public-contract choices need durable artifact-update work.
+  Block dependent implementation on those tasks.
+- When planning work, include scoped cleanup or refactoring when adjacent code
+  makes the intended change harder to understand or trust. Cleanup should be
+  purposeful and bounded, not drive-by churn.
+- Keep graph edits focused. Do not rewrite unrelated tracker areas while
+  clarifying one workstream.
 
-```bash
-atelier issue list --status open
-atelier issue list --ready
-atelier mission list
-atelier mission status <mission-id>
-atelier mission show <mission-id>
-atelier lint
-atelier lint <id>
-atelier issue search "<topic>"
-atelier issue show <id>
-```
+## Record Shape
 
-Read parent epics, siblings, blockers, relevant ADRs, and target-state docs
-before changing meaning or sequencing.
+An assignable item must be understandable without private chat history. It
+names target state, scope, non-scope, dependencies, and the subskill when that
+is not obvious. If the tracker has canonical sections or templates, use them
+instead of inventing parallel formatting.
 
-## Human Choice Gate
+Use the smallest record shape that makes accountability clear:
 
-Important unresolved choices are not hidden implementation work. Mission
-creation and activation must distinguish ordinary local execution choices from
-autonomy-blocking product or architecture choices. If a choice needs durable
-resolution, create a task whose deliverable is an artifact update such as an
-ADR, spec, context file, or target-state document. Dependent implementation
-stays blocked on that task until the human resolves the choice and the artifact
-is updated.
+- Mission: a target state and scope boundary for work large enough to need at
+  least one epic or equivalent root work item. Mission scope is the direct
+  `advances` links plus the descendants of those roots.
+- Epic: a coherent branch, review, or integration package under a mission.
+- Ordinary issue: one accountable implementation, docs, migration, or artifact
+  update slice with a local Outcome.
+- Validation issue: independent judgment derived from the target Outcome or
+  explicit product contract being validated.
+- Evidence record: a receipt from a check that actually ran. It records the
+  claim checked, action taken, result, and transcript or artifact.
 
-Use this gate when a choice is high-leverage, hard to reverse, changes product
-semantics, alters architecture, persistence, security, data-retention,
-migration policy, validation policy, or public contracts, or has multiple
-plausible approaches with meaningful tradeoffs. Resolve these choices before
-mission start and do not activate the mission while they remain open.
-If work can continue around the choice, split the independent slice and block
-only the dependent items.
+Do not add `Evidence` or `Validation` prose as default paperwork for every new
+mission or ordinary issue. Workers and validators choose and record proof while
+doing the work; planners write the target state and only call out proof when a
+specific contract, risk, or workflow gate requires it.
 
-See [ready-work.md](../standards/ready-work.md) for ready epic and ready issue
-criteria, and [work-item-authoring.md](../standards/work-item-authoring.md) for
-writing mission, epic, executable issue, validation item, Outcome, Evidence,
-and Notes text.
+## Mission Creation
 
-## Planning Flow
+Create a mission only when the objective is larger than a single accountable
+issue and needs at least one epic or equivalent workstream beneath it. Smaller
+objectives should remain ordinary issues.
+
+Before writing the mission, resolve the applicable source of truth:
+
+- Product intent and target behavior from the repository product docs.
+- Domain language from repository context docs.
+- Current lifecycle, closeout, and command details from the tracker command
+  surfaces.
+- Architecture, ADR, and validation docs for decisions that affect contracts,
+  persistence, workflow policy, public commands, or agent process.
+
+If those sources conflict or leave an important product or architecture choice
+open, create artifact-update work and block dependent implementation on it.
+Do not bury unresolved decisions inside implementation tasks.
+
+A mission must make the desired finished state concrete enough for another
+agent to plan, implement, and validate without private context. Capture:
+
+- The outcome the repository should have when the mission is complete.
+- Constraints and explicit non-scope.
+- Current risks or unknowns that could change sequencing.
+- The linked epics, implementation issues, documentation work, validation work,
+  migration work, review work, or audit work needed to reach the outcome.
+
+Validation work should derive its checks from the mission or issue `Outcome`.
+Only predefine a scenario, command, file, artifact, or evidence class when it is
+itself the product contract or a known risk that would otherwise be ambiguous.
+A criterion such as "the feature works end-to-end" is not ready because it does
+not describe the finished behavior; rewrite it as the user-visible state,
+command result, file content, workflow transition, or documentation surface that
+must be true.
+
+For missions that touch public command behavior, workflow policy, storage or
+migration contracts, agent guidance, validation rules, or multiple subsystems,
+include explicit closeout coverage for an independent validation or audit issue.
+Do not add audit work by rote to tiny missions; when omitting it, the mission
+should still name the closeout proof that makes the omission reasonable.
+
+## Examples
+
+Concrete mission outcome:
 
 ```text
-Problem or Goal
-      |
-      v
-[ Understand ] -- Read docs, ADRs, existing tracker items, current system
-      |
-      v
-[ Shape ] -- Split, sequence, name scope, Outcome, Evidence, and Notes
-      |
-      v
-[ Verify ready ] -- Can a future agent execute without hidden context?
-      |
-      v
-[ Assign or queue ] -- Hand to orchestrator or leave in ready state
+Outcome
+-------
+`atelier issue show <mission-id>` explains mission scope from direct `advances`
+links, reports linked root work and descendants once, and points operators to
+the next lifecycle command without requiring private coordinator notes.
 ```
 
-A ready item must answer what, why, in scope, out of scope, how to prove it, and
-which subskill to load when assignment is not obvious. When the tracker supports
-sectioned Markdown, executable work must include `Description`, `Outcome`,
-`Evidence`, and optional `Notes`. Shape the item around desired outcome and
-proof expectations; avoid prescribing exact implementation steps unless the
-path is a deliberate architecture or product decision.
+Vague mission anti-example:
 
-For Atelier mission work, ready selection starts from the active mission graph:
-
-```bash
-atelier mission status <mission-id>
-atelier mission show <mission-id>
-atelier issue show <candidate-id>
+```text
+Outcome
+-------
+Improve mission architecture and validation confidence across the workflow.
 ```
 
-Use `atelier issue list --ready` to discover candidates or cross-check global
-readiness, then keep only work linked to the active mission or add genuinely
-mission-advancing work with `atelier mission add-work <mission-id> <issue-id>`.
-Mission status should leave clear options for the orchestrator: ready now,
-blocked by a named task, needs evidence, needs an explicit policy check, or
-deferred/not applicable with an owner.
+That anti-example does not say what command, record, or operator behavior must
+change.
 
-## Bulk Work Creation
+Concrete ordinary issue outcome:
 
-When creating a planned group of tracker items with dependencies, prefer the
-bulk or structured planning facility named by `AGENTFACTORY.md`. For Atelier,
-create parent and child items explicitly, then add blocker relationships:
-
-```bash
-atelier issue create "Epic title" --issue-type epic
-atelier issue create "Implement focused slice" --issue-type task --parent <epic-id>
-atelier issue subissue <epic-id> "Validate integrated behavior" --issue-type validation
-atelier issue block <blocked-id> <blocker-id>
-atelier mission add-work <mission-id> <issue-id>
-atelier export
-atelier export --check
+```text
+Outcome
+-------
+`atelier man worker` lists `atelier work ready` as the normal ready-work entry
+point and no longer routes normal worker guidance through deprecated queue flag
+forms.
 ```
 
-Use a bulk graph command only when the bound tracker supports it and any of
-these apply:
+Vague ordinary issue anti-example:
 
-- creating more than three items at once;
-- assigning parent-child relationships while creating children;
-- adding dependency edges between newly created items;
-- using labels, priorities, assignees, custom metadata, or metadata references;
-- wanting the graph to be created atomically.
+```text
+Outcome
+-------
+Clean up worker guidance and make it more aligned with the new process.
+```
 
-For Atelier, dependency direction matches
-`atelier issue block <blocked-id> <blocker-id>`: the first item is blocked, and
-the second item is the prerequisite.
+Concrete validation issue outcome:
 
-Use tracker import only for generated migrations, backups, and explicit-ID
-plans.
-
-## Reshaping Existing Items
-
-Fix unclear scope, missing outcome/evidence expectations, or stale blockers on
-any tracker item you edit. Preserve the item ID and human intent where possible.
-Create a new repair issue instead of reopening misleading closed work unless
-the old item was closed accidentally and no replacement would preserve the
-audit trail better.
-
-If meaning changes materially:
-
-- update the Description, Outcome, Evidence, Notes, or relevant tracker fields;
-- add a note explaining why it changed;
-- adjust parent/blocker links;
-- create follow-up items for split-out work;
-- add a subskill recommendation or phase tag when useful.
-
-Do not perform a broad tracker rewrite unless the user asks for one. Improve
-the area you are already managing.
+```text
+Outcome
+-------
+An independent validator compares the updated planner, product, quality, and
+help text against the simplified mission model, classifies mismatches as
+`pass`, `fail`, `blocked`, or `deferred`, and records the command transcript or
+diff locations inspected.
+```
 
 ## Handoff
 
-At handoff, the tracker graph must be clearer than when you started. Report
-items created or changed, dependency changes, validation or lint run, remaining
-ambiguity, and any follow-up artifact tasks needed.
-
-Follow [repository workflow](../standards/repo-workflow.md) for the handoff
-git check, and [tracker.md](../standards/tracker.md) for syncing or exporting
-tracker state.
+Report items created or changed, dependency changes, unresolved choices,
+validation or lint run, evidence receipts produced, and follow-up artifact
+tasks.

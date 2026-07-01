@@ -1,62 +1,37 @@
 # Audit
 
-Use this subskill to inspect architecture quality, identify complexity-fit
-problems, and record evidence-backed findings without designing or implementing
-refactors.
+Use this subskill to identify evidence-backed architecture, process, or
+operability findings without designing or implementing the fix.
 
-Use `implement` or `migrate` only after a tracker item already describes the
-problem and desired work.
+## Stance
 
-## Read First
+- Read the mapped architecture, quality, validation, product, ADR, and domain
+  sources needed for the audit scope.
+- Report problems, not preferences.
+- Recommend implementation only when the solution is obvious and low-ambiguity.
+- Look for partial work and partial migrations: new and old paths coexisting
+  without a clear boundary, docs describing a target state that commands do not
+  enforce, runtime behavior that migrated only some call sites, fixtures/tests
+  preserving stale assumptions, or tracker items marked complete while dependent
+  cleanup remains unowned.
+- When findings should become work, route them through planning conventions and
+  durable tracker items.
 
-- the mapped architecture quality vocabulary for value tests;
-- the mapped domain context for product terms;
-- the mapped architecture index for ownership and dependency direction;
-- the mapped ADR directory for durable decisions.
+## Finding Shape
 
-## Audit Mode
+For each finding, report:
 
-Audit mode identifies problems, not fixes. For each finding, report:
-
-- **Problem**: the complexity mismatch.
-- **Evidence**: concrete files, packages, workflows, tests, searches, or caller
-  behavior.
-- **Quality smell**: shallow abstraction, information leakage, low cohesion,
-  high coupling, change amplification, speculative abstraction, misplaced
-  responsibility, legacy drag, or weak test interface.
-- **Likely cause**: why the design creates the friction.
-- **Value if fixed**: caller knowledge removed, code deleted, changes
-  localized, tests improved, agent confusion reduced, or behavior made more
-  reliable.
-- **Risk**: what assumption could make a refactor premature or harmful, and
-  what must be learned before shaping work.
+- **Problem**: the mismatch or risk.
+- **Evidence**: concrete files, commands, workflows, tests, docs, or behavior.
+- **Quality smell**: coupling, low cohesion, information leakage, legacy drag,
+  partial migration, partial implementation, misplaced responsibility, weak test
+  interface, or speculative abstraction.
+- **Likely cause**: why the design creates friction.
+- **Value if fixed**: what gets simpler, safer, more local, or more reliable.
+- **Risk**: what assumption could make the fix premature.
 - **Confidence**: high, medium, or low.
-- **Next step**: no action, spike, artifact update, docs clarification, ordinary
-  implementation item, demolition, reconnect, or closeout.
-
-Be specific.
-Recommend an implementation only if a solution is obvious.
-
-## Value Discipline
-
-Ignore implementation effort when deciding whether the architecture problem is
-worth caring about. Cost affects tracker sequencing, not codebase value.
-
-Reject candidates justified only by taste, symmetry, pattern completion,
-smaller files, or speculative future variation. Prefer findings that reduce
-cognitive load, change amplification, coupling, information leakage, or legacy
-drag.
-
-## Tracker Handoff
-
-When the user asks to record findings, use the `plan` subskill conventions:
-
-- create problem items when the problem is clear enough;
-- create spike items when evidence or solution space is incomplete;
-- create tasks to write or update the durable architecture artifact when a
-  choice needs to be recorded;
-- create demolition/reconnect/closeout items only after the target direction is
-  clear.
+- **Next step**: no action, spike, artifact update, implementation, migration,
+  review, or validation.
 
 Durable architecture choices belong in ADRs or target-state docs, not only in
 tracker notes.

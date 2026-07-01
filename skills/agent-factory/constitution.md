@@ -35,7 +35,7 @@ A worker owns a coherent slice. Scope must be small enough to verify.
 Individual workers do not need to be given enough work to one-shot the problem.
 
 Claims become trustworthy through proof. Tests, static checks, code review,
-behavior validation, and closeout answer different questions and are not
+behavior validation, and terminal checks answer different questions and are not
 interchangeable. A candidate that fails verification is wrong, regardless of
 how plausible it looks. Failed verification is information to act on.
 
