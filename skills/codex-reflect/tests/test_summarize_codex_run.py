@@ -184,10 +184,10 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
             self.assertFalse((pack / "app").exists())
             subprocess.run([sys.executable, str(CREATE_APP), str(pack)], check=True, capture_output=True, text=True)
             self.assertTrue((pack / "app" / "package.json").is_file())
-            self.assertTrue((pack / "app" / "src" / "platform" / "PlatformPage.svelte").is_file())
-            self.assertTrue((pack / "app" / "src" / "report" / "ReportLanding.svelte").is_file())
-            self.assertFalse((pack / "app" / "src" / "platform" / "PlatformPage.svelte").stat().st_mode & stat.S_IWUSR)
-            self.assertTrue((pack / "app" / "src" / "report" / "ReportLanding.svelte").stat().st_mode & stat.S_IWUSR)
+            self.assertTrue((pack / "app" / "src" / "platform" / "WorkstreamCaseFile.svelte").is_file())
+            self.assertFalse((pack / "app" / "src" / "platform" / "WorkstreamCaseFile.svelte").stat().st_mode & stat.S_IWUSR)
+            self.assertTrue((pack / "app" / "src" / "report" / "report.ts").is_file())
+            self.assertTrue((pack / "app" / "src" / "report" / "report.ts").stat().st_mode & stat.S_IWUSR)
             self.assertTrue((pack / "manifest.json").is_file())
             api = json.loads((pack / "evidence" / "evidence.json").read_text(encoding="utf-8"))
             public_api = json.loads((pack / "app" / "public" / "data" / "evidence.json").read_text(encoding="utf-8"))
@@ -195,10 +195,11 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
             self.assertEqual(api, public_api)
             self.assertTrue(all(item["id"] for item in api["evidence"]))
             self.assertIn("Live viewer", (markdown / "index.md").read_text(encoding="utf-8"))
-            landing = (pack / "app" / "src" / "report" / "ReportLanding.svelte").read_text(encoding="utf-8")
-            self.assertIn("EvidenceLink", landing)
             app = (pack / "app" / "src" / "App.svelte").read_text(encoding="utf-8")
-            self.assertIn("let route = $state('overview')", app)
+            self.assertIn("WorkstreamTree", app)
+            self.assertNotIn("PlatformPage", app)
+            manifest = json.loads((pack / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["agentWritable"], ["app/src/report"])
 
     def test_project_listing_and_filtering_use_exact_normalized_cwd(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -246,23 +247,199 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
         self.assertEqual(summary["token_final"]["total_tokens"], 20)
         self.assertEqual(report["totals"]["total_tokens"], 20)
 
-    def test_workstream_resolution_follows_create_thread_edges(self):
+    def test_workstream_resolution_follows_all_created_peer_threads(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             root = write_rollout(home, "root", [
                 row("2026-01-01T00:00:00Z", {"id": PARENT}, "session_meta"),
                 row("2026-01-01T00:01:00Z", {"type": "function_call_output", "output": f'{{"threadId":"{STRONG}"}}'}),
+                row("2026-01-01T00:01:30Z", {"type": "function_call_output", "output": f'{{"threadId":"{WEAK}"}}'}),
             ])
             child = write_rollout(home, "child", [
                 row("2026-01-01T00:02:00Z", {"id": STRONG}, "session_meta"),
                 row("2026-01-01T00:03:00Z", {"type": "user_message", "message": f"<codex_delegation><source_thread_id>{PARENT}</source_thread_id></codex_delegation>"}),
             ])
+            peer = write_rollout(home, "peer", [row("2026-01-01T00:02:30Z", {"id": WEAK}, "session_meta")])
 
             root_paths, sessions, edges = RUNS.resolve_workstream(home, PARENT)
 
         self.assertEqual(root_paths, [root])
         self.assertEqual(sessions[STRONG], [child])
-        self.assertIn({"parent": PARENT, "child": STRONG, "kind": "create_thread"}, edges)
+        self.assertEqual(sessions[WEAK], [peer])
+        edge = next(item for item in edges if item["child"] == STRONG)
+        self.assertEqual(edge["parent"], PARENT)
+        self.assertEqual(edge["kind"], "create_thread")
+        self.assertEqual(edge["relationType"], "thread")
+        self.assertEqual(edge["timestamp"], "2026-01-01T00:01:00Z")
+
+    def test_delegation_event_preserves_raw_assignment_agent_type_source_and_call_time(self):
+        rows = [
+            {**row("2026-01-01T00:01:00Z", {"type": "function_call", "call_id": "spawn-1", "name": "spawn_agent", "arguments": json.dumps({"agent_type": "worker", "message": "Assigned issue(s): atelier-demo\nRole/subskill: review"})}), "_line": 8, "_rollout_path": "/tmp/root.jsonl"},
+            {**row("2026-01-01T00:01:02Z", {"type": "function_call_output", "call_id": "spawn-1", "output": json.dumps({"agent_id": STRONG})}), "_line": 9, "_rollout_path": "/tmp/root.jsonl"},
+        ]
+
+        edge = RUNS.session_relation_events(rows, PARENT)[0]
+
+        self.assertEqual(edge["timestamp"], "2026-01-01T00:01:00Z")
+        self.assertEqual(edge["assignment"], "Assigned issue(s): atelier-demo\nRole/subskill: review")
+        self.assertEqual(edge["agentType"], "worker")
+        self.assertEqual(edge["relationType"], "delegation")
+        self.assertNotIn("role", edge)
+        self.assertEqual(edge["source"], {"path": "/tmp/root.jsonl", "line": 8})
+
+    def test_successful_validation_commands_are_contextual_evidence_not_tool_counts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_rollout(Path(directory), "validation", [
+                row("2026-01-01T00:00:00Z", {"id": PARENT}, "session_meta"),
+                row("2026-01-01T00:00:30Z", {"type": "user_message", "message": "Please validate this run."}),
+                row("2026-01-01T00:00:30Z", {"type": "user_message", "message": "Please validate this run."}),
+                row("2026-01-01T00:00:40Z", {"type": "user_message", "message": "<subagent_notification>internal update</subagent_notification>"}),
+                row("2026-01-01T00:00:50Z", {"type": "user_message", "message": "<environment_context>internal context</environment_context>"}),
+                row("2026-01-01T00:00:55Z", {"type": "agent_message", "message": "I will run the validation."}),
+                row("2026-01-01T00:00:55Z", {"type": "agent_message", "message": "I will run the validation."}),
+                row("2026-01-01T00:01:00Z", {"type": "function_call", "call_id": "check", "name": "exec_command", "arguments": '{"cmd":"npm run check"}'}),
+                row("2026-01-01T00:02:00Z", {"type": "function_call_output", "call_id": "check", "output": "Exit code: 0\nNo errors"}),
+            ])
+            summary = RUNS.summarize_archive(path)
+            api = RUNS.normalized_evidence_pack(PARENT, {PARENT: summary}, [], RUNS.single_session_report(summary))
+
+        self.assertEqual(summary["validation_events"][0]["command"], "npm run check")
+        self.assertTrue(any(item["kind"] == "validation" for item in api["evidence"]))
+        user_messages = [item for item in api["evidence"] if item["kind"] == "user_message"]
+        self.assertEqual(len(user_messages), 3)
+        visible = [item for item in user_messages if item["data"]["humanVisible"]]
+        self.assertEqual(len(visible), 1)
+        self.assertEqual(visible[0]["data"]["message"], "Please validate this run.")
+        self.assertEqual(visible[0]["source"]["line"], 2)
+        self.assertEqual(len(visible[0]["data"]["representations"]), 2)
+        agent_messages = [item for item in api["evidence"] if item["kind"] == "agent_message"]
+        self.assertEqual(len(agent_messages), 1)
+        self.assertEqual(len(agent_messages[0]["data"]["representations"]), 2)
+        self.assertFalse(any(item["kind"] == "tool_count" for item in api["evidence"]))
+
+    def test_schema_v5_retains_interactions_tokens_git_and_neutral_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_rollout(Path(directory), "schema-v3", [
+                row("2026-01-01T00:00:00Z", {
+                    "id": PARENT, "cwd": "/tmp/project",
+                    "git": {"branch": "main", "commit_hash": "1111111"},
+                }, "session_meta"),
+                row("2026-01-01T00:00:10Z", {"type": "user_message", "message": "Please implement atelier-demo."}),
+                row("2026-01-01T00:00:20Z", {"type": "agent_message", "message": "I will make the change."}),
+                row("2026-01-01T00:01:00Z", {"type": "function_call", "call_id": "git-commit", "name": "exec_command", "arguments": '{"cmd":"git commit -m \\\"Add proof\\\""}'}),
+                row("2026-01-01T00:01:02Z", {"type": "function_call_output", "call_id": "git-commit", "output": "Exit code: 0\n[feature abcdef1] Add proof"}),
+                row("2026-01-01T00:02:00Z", {"type": "custom_tool_call", "call_id": "patch-1", "name": "apply_patch", "input": "*** Begin Patch"}),
+                row("2026-01-01T00:02:01Z", {"type": "patch_apply_end", "call_id": "patch-1", "success": True, "stdout": "Success", "changes": {"/tmp/project/file.py": {"type": "update"}}}),
+                row("2026-01-01T00:03:00Z", {"type": "function_call", "call_id": "check", "name": "exec_command", "arguments": '{"cmd":"pytest"}'}),
+                row("2026-01-01T00:03:02Z", {"type": "function_call_output", "call_id": "check", "output": "Exit code: 0\n1 passed"}),
+                row("2026-01-01T00:04:00Z", {"type": "function_call", "call_id": "failure", "name": "exec_command", "arguments": '{"cmd":"false"}'}),
+                row("2026-01-01T00:04:01Z", {"type": "function_call_output", "call_id": "failure", "output": "Exit code: 1"}),
+                row("2026-01-01T00:05:00Z", {"type": "token_count", "info": {"model_context_window": 200000, "total_token_usage": {
+                    "input_tokens": 100, "cached_input_tokens": 40, "output_tokens": 20,
+                    "reasoning_output_tokens": 5, "total_tokens": 120,
+                }}}),
+            ])
+            summary = RUNS.summarize_archive(path)
+            edge = {
+                "parent": PARENT, "child": STRONG, "kind": "spawned_subagent",
+                "assignment": "Assigned issue(s): atelier-demo\nRole/subskill: review",
+                "timestamp": "2026-01-01T00:00:05Z", "source": {"path": str(path), "line": 1},
+            }
+            api = RUNS.normalized_evidence_pack(PARENT, {PARENT: summary}, [edge], RUNS.single_session_report(summary))
+
+        self.assertEqual(api["schemaVersion"], 5)
+        session = api["sessions"][0]
+        self.assertEqual(session["label"], f"Session {PARENT[-8:]}")
+        self.assertIsNone(session["role"])
+        self.assertEqual(session["status"], "unknown")
+        self.assertEqual(session["tokens"]["total"], 120)
+        self.assertEqual(session["tokens"]["uncachedInput"], 60)
+        self.assertEqual(session["git"]["initial"], {"branch": "main", "commit_hash": "1111111"})
+
+        evidence = api["evidence"]
+        interactions = [item for item in evidence if item["kind"] == "tool_interaction"]
+        self.assertEqual(len(interactions), 4)
+        commit = next(item for item in interactions if item["data"]["id"] == "git-commit")
+        self.assertEqual(commit["data"]["invocation"]["arguments"]["cmd"], 'git commit -m "Add proof"')
+        self.assertIn("abcdef1", commit["data"]["output"]["text"])
+        self.assertEqual(len([item for item in evidence if item["kind"] == "user_message"]), 1)
+        self.assertEqual(len([item for item in evidence if item["kind"] == "agent_message"]), 1)
+        self.assertEqual(len([item for item in evidence if item["kind"] == "token_snapshot"]), 1)
+
+        validation = next(item for item in evidence if item["kind"] == "validation")
+        patch = next(item for item in evidence if item["kind"] == "patch")
+        failure = next(item for item in evidence if item["kind"] == "failure")
+        self.assertEqual(validation["data"]["toolInteractionEvidenceId"], f"tool:{PARENT}:check")
+        self.assertEqual(patch["data"]["toolInteractionEvidenceId"], f"tool:{PARENT}:patch-1")
+        self.assertEqual(failure["data"]["toolInteractionEvidenceId"], f"tool:{PARENT}:failure")
+
+        git_initial = next(item for item in evidence if item["kind"] == "git_initial_state")
+        git_commit = next(item for item in evidence if item["kind"] == "git_observation")
+        self.assertEqual(git_initial["data"]["branch"], "main")
+        self.assertEqual(git_commit["data"]["operation"], "commit")
+        self.assertEqual(git_commit["data"]["branch"], "feature")
+        self.assertEqual(git_commit["data"]["commit"], "abcdef1")
+        self.assertEqual(git_commit["data"]["toolInteractionEvidenceId"], f"tool:{PARENT}:git-commit")
+        self.assertEqual(RUNS.git_observations(
+            "git branch --show-current && git worktree list && git merge-base HEAD main",
+            "main", "query",
+        ), [])
+
+    def test_model_history_and_token_deltas_are_attributed_to_active_model(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_rollout(Path(directory), "mixed-model", [
+                row("2026-01-01T00:00:00Z", {"id": PARENT, "model_provider": "openai"}, "session_meta"),
+                row("2026-01-01T00:00:10Z", {"model": "gpt-5.5", "effort": "high"}, "turn_context"),
+                row("2026-01-01T00:01:00Z", {"type": "token_count", "info": {"total_token_usage": {
+                    "input_tokens": 100, "cached_input_tokens": 40, "output_tokens": 20,
+                    "reasoning_output_tokens": 5, "total_tokens": 120,
+                }}}),
+                row("2026-01-01T00:02:00Z", {"model": "gpt-5.4-mini", "effort": "medium"}, "turn_context"),
+                row("2026-01-01T00:03:00Z", {"type": "token_count", "info": {"total_token_usage": {
+                    "input_tokens": 150, "cached_input_tokens": 50, "output_tokens": 30,
+                    "reasoning_output_tokens": 8, "total_tokens": 180,
+                }}}),
+            ])
+
+            summary = RUNS.summarize_archive(path)
+            api = RUNS.normalized_evidence_pack(PARENT, {PARENT: summary}, [], RUNS.single_session_report(summary))
+
+        usage = summary["model_usage"]
+        self.assertEqual(usage["provider"], "openai")
+        self.assertEqual([(item["model"], item["effort"]) for item in usage["configurations"]], [
+            ("gpt-5.5", "high"), ("gpt-5.4-mini", "medium"),
+        ])
+        by_model = {item["model"]: item for item in usage["tokensByModel"]}
+        self.assertEqual(by_model["gpt-5.5"]["total"], 120)
+        self.assertEqual(by_model["gpt-5.5"]["uncachedInput"], 60)
+        self.assertEqual(by_model["gpt-5.4-mini"]["total"], 60)
+        self.assertEqual(by_model["gpt-5.4-mini"]["input"], 50)
+        self.assertEqual(by_model["gpt-5.4-mini"]["cachedInput"], 10)
+        self.assertEqual(by_model["gpt-5.4-mini"]["uncachedInput"], 40)
+        self.assertEqual(by_model["gpt-5.4-mini"]["reasoning"], 3)
+        session = api["sessions"][0]
+        self.assertEqual(session["modelUsage"], usage)
+        self.assertEqual(len([item for item in api["evidence"] if item["kind"] == "model_configuration"]), 2)
+
+    def test_patch_output_without_recorded_invocation_still_has_an_honest_interaction_owner(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_rollout(Path(directory), "output-only-patch", [
+                row("2026-01-01T00:00:00Z", {"id": PARENT}, "session_meta"),
+                row("2026-01-01T00:01:00Z", {
+                    "type": "patch_apply_end", "call_id": "missing-invocation", "success": True,
+                    "stdout": "Success", "changes": {"/tmp/file.py": {"type": "update"}},
+                }),
+            ])
+            summary = RUNS.summarize_archive(path)
+            api = RUNS.normalized_evidence_pack(PARENT, {PARENT: summary}, [], RUNS.single_session_report(summary))
+
+        interaction = next(item for item in api["evidence"] if item["kind"] == "tool_interaction")
+        patch = next(item for item in api["evidence"] if item["kind"] == "patch")
+        self.assertFalse(interaction["data"]["invocationRecorded"])
+        self.assertIsNone(interaction["data"]["invocation"])
+        self.assertEqual(interaction["data"]["output"]["source"]["line"], 2)
+        self.assertEqual(patch["data"]["toolInteractionEvidenceId"], interaction["id"])
+        self.assertEqual(summary["operational_metrics"]["tool_call_count"], 0)
 
     def test_workstream_pack_exposes_descendant_briefs_and_edge_evidence(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -280,8 +457,14 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
             self.assertTrue((pack / "markdown" / "workstreams.md").is_file())
             self.assertTrue((pack / "markdown" / "sessions" / f"{STRONG}.md").is_file())
             api = json.loads((pack / "evidence" / "evidence.json").read_text(encoding="utf-8"))
-            self.assertEqual(api["rootSessionId"], PARENT)
-            self.assertTrue(any(item["kind"] == "delegation_edge" for item in api["evidence"]))
+            self.assertEqual(api["discoverySessionId"], PARENT)
+            self.assertEqual(api["primaryThreadId"], STRONG)
+            child_session = next(item for item in api["sessions"] if item["id"] == STRONG)
+            self.assertIsNone(child_session["parentId"])
+            self.assertEqual(api["edges"], [])
+            self.assertEqual(api["threadRelations"][0]["from"], PARENT)
+            self.assertEqual(api["threadRelations"][0]["to"], STRONG)
+            self.assertTrue(any(item["kind"] == "thread_relation" for item in api["evidence"]))
 
 
 if __name__ == "__main__":

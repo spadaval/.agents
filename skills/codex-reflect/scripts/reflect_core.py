@@ -28,7 +28,7 @@ TOKEN_FIELDS = [
     "total_tokens",
 ]
 
-EVIDENCE_SCHEMA_VERSION = 1
+EVIDENCE_SCHEMA_VERSION = 5
 REPORT_TEMPLATE_DIR = Path(__file__).resolve().parents[1] / "template"
 REPORT_VIEWER_SCRIPT = Path(__file__).resolve().with_name("report_viewer.py")
 
@@ -138,6 +138,20 @@ def compact(text: Any, limit: int = 220) -> str:
     return out[: max(0, limit - 3)] + "..."
 
 
+def is_activity_user_message(value: Any) -> bool:
+    """Return whether a user-role transcript item is an actual human message."""
+    text = str(value or "").strip()
+    if not text:
+        return False
+    if text.startswith("# AGENTS.md instructions"):
+        return False
+    return re.match(
+        r"^<(?:codex_delegation|subagent_notification|environment_context|turn_aborted)(?:\s|>)",
+        text,
+        flags=re.IGNORECASE,
+    ) is None
+
+
 def content_text(content: Any) -> str:
     if isinstance(content, str):
         return content
@@ -189,7 +203,7 @@ def require_viewer_prerequisites() -> None:
 
 
 def immutable_tree(path: Path) -> None:
-    """Mark helper-owned extracted artifacts read-only without touching app/src/report."""
+    """Mark helper-owned extracted artifacts read-only."""
     if not path.exists():
         return
     for item in sorted(path.rglob("*"), reverse=True):
@@ -200,27 +214,23 @@ def immutable_tree(path: Path) -> None:
     path.chmod(0o500)
 
 
-def copy_report_template(pack_dir: Path) -> Path:
-    app_dir = pack_dir / "app"
-    shutil.copytree(REPORT_TEMPLATE_DIR, app_dir)
-    # The only agent-owned source area remains writable. Platform code and the
-    # app shell are copied as stable report infrastructure.
-    source_dir = app_dir / "src"
-    report_dir = app_dir / "src" / "report"
-    for item in sorted(source_dir.rglob("*"), reverse=True):
-        if report_dir == item or report_dir in item.parents:
-            continue
-        if item.is_file():
-            item.chmod(0o400)
-        elif item.is_dir():
-            item.chmod(0o500)
-    report_dir.chmod(0o700)
-    for item in report_dir.rglob("*"):
+def writable_tree(path: Path) -> None:
+    """Restore owner-only write access for the report-authoring escape hatch."""
+    if not path.exists():
+        return
+    for item in path.rglob("*"):
         if item.is_file():
             item.chmod(0o600)
         elif item.is_dir():
             item.chmod(0o700)
-    source_dir.chmod(0o500)
+    path.chmod(0o700)
+
+
+def copy_report_template(pack_dir: Path) -> Path:
+    app_dir = pack_dir / "app"
+    shutil.copytree(REPORT_TEMPLATE_DIR, app_dir)
+    immutable_tree(app_dir / "src")
+    writable_tree(app_dir / "src" / "report")
     return app_dir
 
 
@@ -496,6 +506,131 @@ def normalized_command(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
 
 
+def source_ref(row: dict[str, Any]) -> dict[str, Any]:
+    return {"path": row.get("_rollout_path"), "line": row.get("_line")}
+
+
+def final_token_usage(snapshot: Any) -> dict[str, Any] | None:
+    if not isinstance(snapshot, dict):
+        return None
+    input_tokens = int(snapshot.get("input_tokens") or 0)
+    cached_input = int(snapshot.get("cached_input_tokens") or 0)
+    return {
+        "snapshotAt": snapshot.get("timestamp"),
+        "contextWindow": snapshot.get("model_context_window"),
+        "total": int(snapshot.get("total_tokens") or 0),
+        "input": input_tokens,
+        "cachedInput": cached_input,
+        "uncachedInput": max(0, input_tokens - cached_input),
+        "output": int(snapshot.get("output_tokens") or 0),
+        "reasoning": int(snapshot.get("reasoning_output_tokens") or 0),
+    }
+
+
+def model_usage_summary(
+    configurations: list[dict[str, Any]],
+    snapshots: list[dict[str, Any]],
+    provider: Any,
+) -> dict[str, Any]:
+    """Attribute cumulative token counter deltas to the model active at each snapshot."""
+    token_fields = {
+        "total": "total_tokens",
+        "input": "input_tokens",
+        "cachedInput": "cached_input_tokens",
+        "output": "output_tokens",
+        "reasoning": "reasoning_output_tokens",
+    }
+    ordered_configurations = sorted(configurations, key=lambda item: parse_time(item.get("startedAt")) or dt.datetime.min.replace(tzinfo=dt.timezone.utc))
+    ordered_snapshots = sorted(snapshots, key=lambda item: parse_time(item.get("timestamp")) or dt.datetime.min.replace(tzinfo=dt.timezone.utc))
+    previous = {raw: 0 for raw in token_fields.values()}
+    buckets: dict[str, dict[str, Any]] = {}
+    configuration_index = -1
+
+    for snapshot in ordered_snapshots:
+        snapshot_time = parse_time(snapshot.get("timestamp"))
+        while configuration_index + 1 < len(ordered_configurations):
+            candidate_time = parse_time(ordered_configurations[configuration_index + 1].get("startedAt"))
+            if snapshot_time is not None and candidate_time is not None and candidate_time > snapshot_time:
+                break
+            configuration_index += 1
+        configuration = ordered_configurations[configuration_index] if configuration_index >= 0 else None
+        model = str((configuration or {}).get("model") or "unknown")
+        bucket = buckets.setdefault(model, {
+            "model": model, "total": 0, "input": 0, "cachedInput": 0,
+            "uncachedInput": 0, "output": 0, "reasoning": 0, "snapshotCount": 0,
+        })
+        deltas: dict[str, int] = {}
+        for public, raw in token_fields.items():
+            current = int(snapshot.get(raw) or 0)
+            delta = current - previous[raw] if current >= previous[raw] else current
+            previous[raw] = current
+            deltas[public] = delta
+            bucket[public] += delta
+        bucket["uncachedInput"] += max(0, deltas["input"] - deltas["cachedInput"])
+        bucket["snapshotCount"] += 1
+
+    return {
+        "provider": str(provider) if provider else None,
+        "configurations": ordered_configurations,
+        "tokensByModel": sorted(buckets.values(), key=lambda item: (-int(item["total"]), item["model"])),
+    }
+
+
+def git_observations(command: str, output: str, interaction_id: str) -> list[dict[str, Any]]:
+    """Describe only Git operations explicitly present in a captured command."""
+    observations: list[dict[str, Any]] = []
+    operation_pattern = re.compile(
+        r"\bgit\s+(switch|checkout|branch|worktree|commit|merge|rebase|cherry-pick|push)(?=\s|$)",
+        re.IGNORECASE,
+    )
+    for number, match in enumerate(operation_pattern.finditer(command), 1):
+        verb = match.group(1).lower()
+        tail = command[match.end():].lstrip()
+        first_argument = re.match(r"([^;&|\s]+)", tail)
+        first_argument_value = first_argument.group(1) if first_argument else ""
+        if verb == "branch" and (
+            not first_argument_value
+            or first_argument_value in {"--show-current", "--list", "-l", "--all", "-a", "--remote", "-r", "--contains"}
+        ):
+            continue
+        if verb == "worktree" and first_argument_value not in {"add", "remove", "move", "prune", "lock", "unlock"}:
+            continue
+        if verb == "checkout" and first_argument_value == "--":
+            continue
+        operation = {
+            "switch": "branch_switch",
+            "checkout": "branch_switch",
+            "branch": "branch_operation",
+            "worktree": "worktree_operation",
+            "commit": "commit",
+            "merge": "merge",
+            "rebase": "rebase",
+            "cherry-pick": "cherry_pick",
+            "push": "push",
+        }[verb]
+        if verb in {"switch", "checkout"} and re.match(r"(?:-[cCbB]|--create)\b", tail):
+            operation = "branch_create"
+        commit_match = re.search(r"\b([0-9a-f]{7,40})\b", output, re.IGNORECASE)
+        bracket_commit = re.search(r"\[([^\]\s]+)(?:\s+\([^\]]+\))?\s+([0-9a-f]{7,40})\]\s*([^\n]*)", output)
+        observation = {
+            "id": f"{interaction_id}:{number}",
+            "operation": operation,
+            "command": command,
+            "output": output,
+            "toolInteractionId": interaction_id,
+        }
+        if bracket_commit:
+            observation.update({
+                "branch": bracket_commit.group(1),
+                "commit": bracket_commit.group(2),
+                "subject": bracket_commit.group(3).strip() or None,
+            })
+        elif commit_match and operation in {"commit", "merge", "rebase", "cherry_pick"}:
+            observation["commit"] = commit_match.group(1)
+        observations.append(observation)
+    return observations
+
+
 def compact_activity(event: dict[str, Any]) -> dict[str, Any]:
     result = {
         "kind": event.get("kind"),
@@ -620,6 +755,81 @@ def extract_created_thread_ids(rows: list[dict[str, Any]]) -> set[str]:
     return created
 
 
+def session_relation_events(rows: list[dict[str, Any]], source_session_id: str) -> list[dict[str, Any]]:
+    """Pair session-creation calls with outputs without conflating threads and subagents."""
+    calls: dict[str, dict[str, Any]] = {}
+    records: list[dict[str, Any]] = []
+    id_pattern = session_id_pattern()
+    names = {"create_thread", "spawn_agent", "fork_thread", "handoff_thread"}
+    for row in rows:
+        payload = row.get("payload")
+        if not isinstance(payload, dict):
+            continue
+        payload_type = payload.get("type")
+        call_id = str(payload.get("call_id") or "")
+        if payload_type in {"function_call", "custom_tool_call"} and payload.get("name") in names and call_id:
+            arguments = parse_args_json(payload.get("arguments") or payload.get("input"))
+            calls[call_id] = {
+                "name": str(payload.get("name")),
+                "arguments": arguments if isinstance(arguments, dict) else {},
+                "timestamp": row.get("timestamp"),
+                "source": {"path": row.get("_rollout_path"), "line": row.get("_line")},
+            }
+            continue
+        if payload_type not in {"function_call_output", "custom_tool_call_output"}:
+            continue
+        output = payload.get("output")
+        output_text = output if isinstance(output, str) else json.dumps(output, default=str)
+        call = calls.get(call_id, {})
+        name = str(call.get("name") or "")
+        child_ids: list[str] = []
+        try:
+            value = json.loads(output_text)
+        except (TypeError, ValueError):
+            value = {}
+        if isinstance(value, dict):
+            for key in ("threadId", "thread_id", "agent_id"):
+                candidate = value.get(key)
+                if isinstance(candidate, str) and id_pattern.fullmatch(candidate):
+                    child_ids.append(candidate)
+        if not child_ids and name in names:
+            child_ids.extend(id_pattern.findall(output_text))
+        if not child_ids:
+            continue
+        arguments = call.get("arguments") if isinstance(call.get("arguments"), dict) else {}
+        assignment = str(arguments.get("prompt") or arguments.get("message") or "")
+        relation_type = "thread" if name in {"create_thread", "fork_thread", "handoff_thread"} or "threadId" in output_text else "delegation"
+        kind = name or ("create_thread" if relation_type == "thread" else "spawn_agent")
+        for child_id in child_ids:
+            records.append({
+                "parent": source_session_id,
+                "child": child_id,
+                "kind": kind,
+                "relationType": relation_type,
+                "timestamp": call.get("timestamp") or row.get("timestamp"),
+                "assignment": assignment,
+                "agentType": arguments.get("agent_type"),
+                "source": call.get("source") or {"path": row.get("_rollout_path"), "line": row.get("_line")},
+            })
+    unique: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for record in records:
+        key = (str(record["parent"]), str(record["child"]), str(record["kind"]))
+        current = unique.get(key)
+        if current is None or (not current.get("assignment") and record.get("assignment")):
+            unique[key] = record
+    return list(unique.values())
+
+
+def is_validation_command(command: str) -> bool:
+    return bool(re.search(
+        r"(?:^|[;&|]\s*|\s)(?:cargo\s+(?:test|nextest|check|clippy|fmt)|npm\s+(?:test|run\s+(?:test|check|lint))|"
+        r"pnpm\s+(?:test|check|lint)|pytest\b|vitest\b|svelte-check\b|git\s+diff\s+--check\b|"
+        r"(?:target/debug/)?atelier\s+(?:check|review)\b)",
+        command,
+        re.IGNORECASE,
+    ))
+
+
 def load_rollout_rows(paths: list[Path]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for rollout_path in sorted(paths, key=rollout_sort_key):
@@ -640,7 +850,7 @@ def session_id_for_paths(paths: list[Path]) -> str:
     return str(archive_meta(paths[0]).get("id") or paths[0].stem)
 
 
-def resolve_workstream(codex_home: Path, session: str) -> tuple[list[Path], dict[str, list[Path]], list[dict[str, str]]]:
+def resolve_workstream(codex_home: Path, session: str) -> tuple[list[Path], dict[str, list[Path]], list[dict[str, Any]]]:
     index = logical_session_index(codex_home)
     root_paths = find_session_paths(codex_home, session)
     root_id = session_id_for_paths(root_paths)
@@ -655,21 +865,21 @@ def resolve_workstream(codex_home: Path, session: str) -> tuple[list[Path], dict
             break
         if len(available_sources) > 1:
             raise SystemExit(f"Multiple upstream source sessions found for {root_id}: {', '.join(available_sources)}")
-        root_id = available_sources[0]
+        source_id = available_sources[0]
+        root_id = source_id
         root_paths = index[root_id]
 
     sessions: dict[str, list[Path]] = {root_id: root_paths}
-    edges: list[dict[str, str]] = []
+    edges: list[dict[str, Any]] = []
     queue = [root_id]
     while queue:
         parent_id = queue.pop(0)
         rows = load_rollout_rows(sessions[parent_id])
-        children = [(child_id, "create_thread") for child_id in extract_created_thread_ids(rows)]
-        children.extend((child_id, "spawned_subagent") for child_id in extract_spawned_subagent_ids(rows, {parent_id}))
-        for child_id, kind in children:
+        records = session_relation_events(rows, parent_id)
+        for edge in records:
+            child_id = str(edge["child"])
             if child_id not in index or child_id == parent_id:
                 continue
-            edge = {"parent": parent_id, "child": child_id, "kind": kind}
             if edge not in edges:
                 edges.append(edge)
             if child_id not in sessions:
@@ -706,6 +916,7 @@ def summarize_archive(
     agent_messages: list[dict[str, Any]] = []
     turns: dict[str, dict[str, Any]] = {}
     token_snapshots: list[dict[str, Any]] = []
+    model_configurations: list[dict[str, Any]] = []
     calls: dict[str, dict[str, Any]] = {}
     patches: list[dict[str, Any]] = []
 
@@ -735,16 +946,43 @@ def summarize_archive(
             continue
         if not isinstance(payload, dict):
             continue
+        if row.get("type") == "turn_context":
+            collaboration = payload.get("collaboration_mode") if isinstance(payload.get("collaboration_mode"), dict) else {}
+            settings = collaboration.get("settings") if isinstance(collaboration.get("settings"), dict) else {}
+            model = str(payload.get("model") or settings.get("model") or "").strip()
+            effort = payload.get("effort") or payload.get("reasoning_effort") or settings.get("reasoning_effort")
+            configuration = {
+                "model": model or "unknown",
+                "effort": str(effort) if effort else None,
+                "startedAt": row.get("timestamp"),
+                "source": source_ref(row),
+            }
+            previous_configuration = model_configurations[-1] if model_configurations else None
+            if not previous_configuration or (previous_configuration.get("model"), previous_configuration.get("effort")) != (configuration["model"], configuration["effort"]):
+                model_configurations.append(configuration)
+            continue
         if payload_type == "user_message":
-            users.append({"timestamp": row.get("timestamp"), "message": payload.get("message"), "line": row.get("_line")})
+            users.append({
+                "timestamp": row.get("timestamp"), "message": payload.get("message"),
+                "line": row.get("_line"), "source": source_ref(row), "rawType": payload_type,
+            })
         elif payload_type == "agent_message":
-            agent_messages.append({"timestamp": row.get("timestamp"), "message": payload.get("message"), "line": row.get("_line")})
+            agent_messages.append({
+                "timestamp": row.get("timestamp"), "message": payload.get("message"),
+                "line": row.get("_line"), "source": source_ref(row), "rawType": payload_type,
+            })
         elif payload_type == "message":
             role = payload.get("role")
             if role == "user":
-                users.append({"timestamp": row.get("timestamp"), "message": content_text(payload.get("content")), "line": row.get("_line")})
+                users.append({
+                    "timestamp": row.get("timestamp"), "message": content_text(payload.get("content")),
+                    "line": row.get("_line"), "source": source_ref(row), "rawType": payload_type,
+                })
             elif role == "assistant":
-                agent_messages.append({"timestamp": row.get("timestamp"), "message": content_text(payload.get("content")), "line": row.get("_line")})
+                agent_messages.append({
+                    "timestamp": row.get("timestamp"), "message": content_text(payload.get("content")),
+                    "line": row.get("_line"), "source": source_ref(row), "rawType": payload_type,
+                })
         elif payload_type == "task_started":
             turn_id = payload.get("turn_id")
             if turn_id:
@@ -761,47 +999,80 @@ def summarize_archive(
             token_snapshots.append({
                 "timestamp": row.get("timestamp"),
                 "model_context_window": info.get("model_context_window"),
+                "source": source_ref(row),
                 **usage,
             })
         elif payload_type in {"function_call", "custom_tool_call"}:
             call_id = payload.get("call_id")
             if call_id:
-                args = parse_args_json(payload.get("arguments") or payload.get("input"))
+                raw_arguments = payload.get("arguments") if payload_type == "function_call" else payload.get("input")
+                args = parse_args_json(raw_arguments)
                 calls[str(call_id)] = {
                     "id": str(call_id),
                     "name": payload.get("name"),
                     "type": payload_type,
                     "timestamp": row.get("timestamp"),
                     "arguments": args,
+                    "raw_arguments": raw_arguments,
                     "raw_input": payload.get("input") if payload_type == "custom_tool_call" else None,
                     "line": row.get("_line"),
+                    "invocation_source": source_ref(row),
+                    "invocation_recorded": True,
                 }
         elif payload_type in {"function_call_output", "custom_tool_call_output"}:
             call_id = payload.get("call_id")
             if call_id:
                 call = calls.setdefault(str(call_id), {"id": str(call_id)})
-                output = payload.get("output") or ""
+                output = payload.get("output")
+                if output is None:
+                    output = ""
                 output_text = output if isinstance(output, str) else json.dumps(output, default=str)
                 call["output"] = output_text
+                call["raw_output"] = output
                 call["output_timestamp"] = row.get("timestamp")
                 call["output_line"] = row.get("_line")
+                call["output_source"] = source_ref(row)
                 call["exit_code"] = exit_code(output_text)
         elif payload_type == "patch_apply_end":
-            patches.append({
+            call_id = str(payload.get("call_id") or "")
+            patch = {
                 "timestamp": row.get("timestamp"),
                 "success": payload.get("success"),
                 "stdout": compact(payload.get("stdout"), 300),
                 "stderr": compact(payload.get("stderr"), 300),
                 "changes": sorted((payload.get("changes") or {}).keys()),
                 "line": row.get("_line"),
-            })
+                "source": source_ref(row),
+                "toolInteractionId": call_id or None,
+            }
+            patches.append(patch)
+            if call_id:
+                call = calls.setdefault(call_id, {
+                    "id": call_id, "name": "apply_patch", "type": "patch_apply_end",
+                    "timestamp": None, "line": row.get("_line"), "invocation_recorded": False,
+                })
+                output = {
+                    "success": payload.get("success"), "stdout": payload.get("stdout"),
+                    "stderr": payload.get("stderr"), "changes": payload.get("changes"),
+                }
+                call["output"] = json.dumps(output, default=str)
+                call["raw_output"] = output
+                call["output_timestamp"] = row.get("timestamp")
+                call["output_line"] = row.get("_line")
+                call["output_source"] = source_ref(row)
+                call["exit_code"] = 0 if payload.get("success") is True else 1 if payload.get("success") is False else None
 
-    tool_counts = collections.Counter(str(call.get("name") or call.get("type")) for call in calls.values())
+    tool_counts = collections.Counter(
+        str(call.get("name") or call.get("type"))
+        for call in calls.values() if call.get("invocation_recorded")
+    )
     shell_counts = collections.Counter()
     failed_calls: list[dict[str, Any]] = []
     failure_events: list[dict[str, Any]] = []
     call_failure_kinds: dict[str, list[str]] = {}
     for call in calls.values():
+        if not call.get("invocation_recorded"):
+            continue
         args = call.get("arguments") or {}
         if call.get("name") == "exec_command" and isinstance(args, dict):
             cmd = str(args.get("cmd") or "")
@@ -820,6 +1091,7 @@ def summarize_archive(
             failure = {
                 "source": "tool_call",
                 "id": call.get("id"),
+                "toolInteractionId": call.get("id"),
                 "timestamp": call.get("timestamp"),
                 "name": call.get("name"),
                 "cmd": call.get("cmd"),
@@ -843,6 +1115,7 @@ def summarize_archive(
         if patch.get("success") is False:
             failure_events.append({
                 "source": "patch_apply",
+                "toolInteractionId": patch.get("toolInteractionId"),
                 "timestamp": patch.get("timestamp"),
                 "line": patch.get("line"),
                 "failure_kinds": ["patch_apply_failure"],
@@ -856,6 +1129,8 @@ def summarize_archive(
     for message in users:
         activity_events.append({"kind": "user_message", **message})
     for call in calls.values():
+        if not call.get("invocation_recorded"):
+            continue
         activity_events.append({
             "kind": "tool_call",
             "id": call.get("id"),
@@ -909,7 +1184,69 @@ def summarize_archive(
 
     failure_events.sort(key=lambda event: int(event.get("line") or 0))
 
-    tool_calls = [call for call in calls.values() if call.get("name") and isinstance(call.get("line"), int)]
+    validation_events = []
+    for call in calls.values():
+        if call.get("name") != "exec_command" or not call.get("cmd") or not is_validation_command(str(call.get("cmd"))):
+            continue
+        if call_failure_kinds.get(str(call.get("id"))) or "output" not in call:
+            continue
+        validation_events.append({
+            "toolInteractionId": call.get("id"),
+            "timestamp": call.get("timestamp"),
+            "line": call.get("output_line") or call.get("line"),
+            "command": call.get("cmd"),
+            "output": compact(call.get("output"), 700),
+            "success": True,
+        })
+    validation_events.sort(key=lambda event: int(event.get("line") or 0))
+
+    tool_interactions = []
+    observed_git = []
+    for call in calls.values():
+        if not call.get("name") or not isinstance(call.get("line"), int):
+            continue
+        invocation = ({
+            "arguments": call.get("arguments") or {},
+            "rawArguments": call.get("raw_arguments"),
+            "rawInput": call.get("raw_input"),
+            "source": call.get("invocation_source"),
+        } if call.get("invocation_recorded") else None)
+        interaction = {
+            "id": str(call.get("id")),
+            "tool": call.get("name"),
+            "kind": call.get("type"),
+            "invokedAt": call.get("timestamp"),
+            "completedAt": call.get("output_timestamp"),
+            "invocationRecorded": bool(call.get("invocation_recorded")),
+            "invocation": invocation,
+            "output": ({
+                "value": call.get("raw_output"),
+                "text": call.get("output"),
+                "exitCode": call.get("exit_code"),
+                "source": call.get("output_source") or {"path": str(paths[0]), "line": call.get("output_line")},
+            } if "output" in call else None),
+            "command": call.get("cmd"),
+            "failureKinds": call_failure_kinds.get(str(call.get("id")), []),
+        }
+        tool_interactions.append(interaction)
+        if call.get("name") == "exec_command" and call.get("cmd"):
+            for observation in git_observations(str(call["cmd"]), str(call.get("output") or ""), str(call["id"])):
+                observation.update({
+                    "timestamp": call.get("timestamp"),
+                    "success": not bool(call_failure_kinds.get(str(call.get("id")))) if "output" in call else None,
+                    "source": call.get("invocation_source") or {"path": str(paths[0]), "line": call.get("line")},
+                })
+                observed_git.append(observation)
+    tool_interactions.sort(key=lambda item: int(
+        (((item.get("invocation") or {}).get("source") or {}).get("line"))
+        or (((item.get("output") or {}).get("source") or {}).get("line"))
+        or 0
+    ))
+
+    tool_calls = [
+        call for call in calls.values()
+        if call.get("invocation_recorded") and call.get("name") and isinstance(call.get("line"), int)
+    ]
     completed_tool_calls = [call for call in tool_calls if "output" in call]
     clean_tool_calls = [
         call for call in completed_tool_calls
@@ -945,11 +1282,12 @@ def summarize_archive(
             "duration_ms": complete.get("duration_ms"),
             "time_to_first_token_ms": complete.get("time_to_first_token_ms"),
             "model_context_window": started.get("model_context_window"),
-            "last_agent_message": compact(complete.get("last_agent_message"), 500),
+            "last_agent_message": complete.get("last_agent_message"),
         })
 
     linked_session_evidence = extract_linked_session_evidence(rows, own_ids)
     spawned_subagent_ids = sorted(extract_spawned_subagent_ids(rows, own_ids))
+    model_usage = model_usage_summary(model_configurations, token_snapshots, meta.get("model_provider"))
     return {
         "meta": meta,
         "path": str(paths[0]),
@@ -962,10 +1300,16 @@ def summarize_archive(
         "payload_counts": {str(key): value for key, value in payload_counts.items()},
         "user_messages": users,
         "agent_message_count": len(agent_messages),
+        "agent_messages": agent_messages,
         "agent_messages_sample": agent_messages[:3] + (agent_messages[-3:] if len(agent_messages) > 6 else agent_messages[3:]),
+        "last_agent_message": next(
+            (turn.get("last_agent_message") for turn in reversed(turn_list) if turn.get("last_agent_message")),
+            agent_messages[-1].get("message") if agent_messages else None,
+        ),
         "turns": turn_list,
         "token_final": token_snapshots[-1] if token_snapshots else None,
         "token_snapshots": token_snapshots,
+        "model_usage": model_usage,
         "linked_session_ids": [record["id"] for record in linked_session_evidence],
         "linked_session_evidence": linked_session_evidence,
         "detected_linked_session_count": len(linked_session_evidence),
@@ -981,6 +1325,12 @@ def summarize_archive(
         "failed_calls": failed_calls,
         "failure_events": failure_events,
         "patches": patches,
+        "validation_events": validation_events,
+        "tool_interactions": tool_interactions,
+        "git": {
+            "initial": meta.get("git") if isinstance(meta.get("git"), dict) else None,
+            "observations": observed_git,
+        },
         "long_gaps": sorted(gaps, key=lambda item: item["seconds"], reverse=True)[:20],
     }
 
@@ -1644,25 +1994,95 @@ def evidence_id(kind: str, session_id: str, suffix: Any) -> str:
     return f"{kind}:{session_id}:{safe}"
 
 
+def evidence_source_suffix(item: dict[str, Any]) -> str:
+    source = item.get("source") if isinstance(item.get("source"), dict) else {}
+    path = str(source.get("path") or "rollout")
+    return f"{Path(path).name}:{source.get('line', item.get('line', 'unknown'))}"
+
+
+def deduplicated_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Collapse duplicate transcript representations while retaining their provenance."""
+    merged: dict[tuple[str, str], dict[str, Any]] = {}
+    for message in messages:
+        timestamp = str(message.get("timestamp") or "")
+        content = str(message.get("message") or "")
+        key = (timestamp or evidence_source_suffix(message), content)
+        representation = {
+            "rawType": message.get("rawType"),
+            "source": message.get("source") or {"line": message.get("line")},
+        }
+        existing = merged.get(key)
+        if existing is None:
+            existing = {**message, "representations": [representation]}
+            merged[key] = existing
+        else:
+            existing["representations"].append(representation)
+    return list(merged.values())
+
+
 def normalized_evidence_pack(
     root_id: str,
     summaries: dict[str, dict[str, Any]],
-    edges: list[dict[str, str]],
+    edges: list[dict[str, Any]],
     report: dict[str, Any],
 ) -> dict[str, Any]:
     """Create the small, UI-safe evidence API; raw JSONL stays authoritative."""
     evidence: list[dict[str, Any]] = []
     sessions: list[dict[str, Any]] = []
+    thread_kinds = {"create_thread", "fork_thread", "handoff_thread", "handoff"}
+    thread_edges = [edge for edge in edges if edge.get("relationType") == "thread" or edge.get("kind") in thread_kinds]
+    delegation_edges = [edge for edge in edges if edge not in thread_edges]
     for session_id, summary in summaries.items():
         meta = summary.get("meta") if isinstance(summary.get("meta"), dict) else {}
         metrics = summary.get("operational_metrics") or {}
+        incoming = [edge for edge in delegation_edges if edge.get("child") == session_id]
+        outgoing = [edge for edge in delegation_edges if edge.get("parent") == session_id]
+        assignment_edge = next((edge for edge in incoming if edge.get("assignment")), None)
+        if assignment_edge is None and session_id == root_id:
+            assignment_edge = next((edge for edge in outgoing if edge.get("assignment")), None)
+        assignment = str((assignment_edge or {}).get("assignment") or "")
+        if not assignment:
+            first_user = next((item for item in summary.get("user_messages") or [] if item.get("message")), {})
+            assignment = re.sub(r"<codex_delegation>[\s\S]*?</codex_delegation>", "", str(first_user.get("message") or ""), flags=re.IGNORECASE).strip()
+        handoff = str(summary.get("last_agent_message") or "")
+        child_ends = [
+            parse_time((summaries.get(str(edge.get("child"))) or {}).get("end"))
+            for edge in outgoing
+            if str(edge.get("child")) in summaries
+        ]
+        child_ends = [value for value in child_ends if value is not None]
+        if child_ends:
+            children_done = max(child_ends)
+            first_post_children = next((
+                turn for turn in summary.get("turns") or []
+                if parse_time(turn.get("completed")) is not None
+                and parse_time(turn.get("completed")) >= children_done
+                and turn.get("last_agent_message")
+            ), None)
+            if first_post_children:
+                handoff = str(first_post_children.get("last_agent_message") or handoff)
+        token_usage = final_token_usage(summary.get("token_final"))
+        short_id = session_id[-8:]
         session = {
             "id": session_id,
+            "shortId": short_id,
+            "label": f"Session {short_id}",
+            "role": None,
+            "parentId": str(incoming[0].get("parent")) if incoming else None,
+            "parentIds": [str(edge.get("parent")) for edge in incoming],
+            "childIds": [str(edge.get("child")) for edge in outgoing],
+            "delegatedAt": (assignment_edge or {}).get("timestamp"),
+            "assignment": assignment,
+            "finalHandoff": handoff,
+            "status": "unknown",
             "rolloutCount": summary.get("rollout_count", 1),
             "window": {"start": summary.get("start"), "end": summary.get("end"), "durationSeconds": summary.get("duration_seconds")},
             "metrics": metrics,
             "sourceRollouts": summary.get("rollout_paths") or [summary.get("path")],
             "cwd": meta.get("cwd"),
+            "tokens": token_usage,
+            "modelUsage": summary.get("model_usage") or {"provider": None, "configurations": [], "tokensByModel": []},
+            "git": summary.get("git") or {"initial": None, "observations": []},
         }
         sessions.append(session)
         evidence.append({
@@ -1671,20 +2091,95 @@ def normalized_evidence_pack(
             "excerpt": f"Logical session with {session['rolloutCount']} rollout(s), {metrics.get('tool_call_count', 0)} tool calls, and {metrics.get('failure_signal_count', 0)} failure signals.",
             "data": session,
         })
+        if token_usage:
+            evidence.append({
+                "id": evidence_id("tokens", session_id, "final"), "kind": "token_snapshot", "sessionId": session_id,
+                "timestamp": token_usage.get("snapshotAt"), "source": {"paths": session["sourceRollouts"]},
+                "excerpt": f"Final captured token snapshot: {token_usage.get('total', 0):,} total tokens.",
+                "data": token_usage,
+            })
+        for number, configuration in enumerate(session["modelUsage"].get("configurations") or [], 1):
+            evidence.append({
+                "id": evidence_id("model", session_id, str(number)), "kind": "model_configuration", "sessionId": session_id,
+                "timestamp": configuration.get("startedAt"), "source": configuration.get("source") or {"paths": session["sourceRollouts"]},
+                "excerpt": f"Model configured as {configuration.get('model') or 'unknown'}"
+                    + (f" with {configuration.get('effort')} reasoning effort." if configuration.get("effort") else "."),
+                "data": {**configuration, "provider": session["modelUsage"].get("provider")},
+            })
+        interaction_evidence_ids: dict[str, str] = {}
+        for interaction in summary.get("tool_interactions") or []:
+            interaction_id = str(interaction.get("id") or "unknown")
+            item_id = evidence_id("tool", session_id, interaction_id)
+            interaction_evidence_ids[interaction_id] = item_id
+            invocation = interaction.get("invocation") if isinstance(interaction.get("invocation"), dict) else {}
+            output = interaction.get("output") if isinstance(interaction.get("output"), dict) else {}
+            evidence.append({
+                "id": item_id, "kind": "tool_interaction", "sessionId": session_id,
+                "timestamp": interaction.get("invokedAt"),
+                "source": {"invocation": invocation.get("source"), "output": output.get("source")},
+                "excerpt": compact(interaction.get("command") or interaction.get("tool"), 700),
+                "data": interaction,
+            })
         for failure in summary.get("failure_events") or []:
             line = failure.get("line", "unknown")
+            tool_id = str(failure.get("toolInteractionId") or "")
+            failure_data = {**failure, "toolInteractionEvidenceId": interaction_evidence_ids.get(tool_id)}
             evidence.append({
                 "id": evidence_id("failure", session_id, line), "kind": "failure", "sessionId": session_id,
                 "timestamp": failure.get("timestamp"), "source": {"path": summary.get("path"), "line": line},
                 "excerpt": compact(failure.get("output") or failure.get("stderr") or failure.get("cmd") or failure.get("name"), 700),
-                "data": failure,
+                "data": failure_data,
             })
         for patch in summary.get("patches") or []:
             line = patch.get("line", "unknown")
+            tool_id = str(patch.get("toolInteractionId") or "")
+            patch_data = {**patch, "toolInteractionEvidenceId": interaction_evidence_ids.get(tool_id)}
             evidence.append({
                 "id": evidence_id("patch", session_id, line), "kind": "patch", "sessionId": session_id,
                 "timestamp": patch.get("timestamp"), "source": {"path": summary.get("path"), "line": line},
-                "excerpt": ", ".join(patch.get("changes") or []) or "Patch event with no changed paths recorded.", "data": patch,
+                "excerpt": ", ".join(patch.get("changes") or []) or "Patch event with no changed paths recorded.", "data": patch_data,
+            })
+        for validation in summary.get("validation_events") or []:
+            line = validation.get("line", "unknown")
+            tool_id = str(validation.get("toolInteractionId") or "")
+            validation_data = {**validation, "toolInteractionEvidenceId": interaction_evidence_ids.get(tool_id)}
+            evidence.append({
+                "id": evidence_id("validation", session_id, line), "kind": "validation", "sessionId": session_id,
+                "timestamp": validation.get("timestamp"), "source": {"path": summary.get("path"), "line": line},
+                "excerpt": compact(validation.get("command"), 700), "data": validation_data,
+            })
+        for message in deduplicated_messages(summary.get("user_messages") or []):
+            line = message.get("line", "unknown")
+            evidence.append({
+                "id": evidence_id("user", session_id, evidence_source_suffix(message)), "kind": "user_message", "sessionId": session_id,
+                "timestamp": message.get("timestamp"), "source": message.get("source") or {"path": summary.get("path"), "line": line},
+                "excerpt": compact(message.get("message"), 700),
+                "data": {**message, "humanVisible": is_activity_user_message(message.get("message"))},
+            })
+        for message in deduplicated_messages(summary.get("agent_messages") or []):
+            line = message.get("line", "unknown")
+            evidence.append({
+                "id": evidence_id("agent", session_id, evidence_source_suffix(message)), "kind": "agent_message", "sessionId": session_id,
+                "timestamp": message.get("timestamp"), "source": message.get("source") or {"path": summary.get("path"), "line": line},
+                "excerpt": compact(message.get("message"), 700), "data": message,
+            })
+        initial_git = (summary.get("git") or {}).get("initial")
+        if isinstance(initial_git, dict) and initial_git:
+            evidence.append({
+                "id": evidence_id("git", session_id, "initial"), "kind": "git_initial_state", "sessionId": session_id,
+                "timestamp": summary.get("start"), "source": {"paths": session["sourceRollouts"]},
+                "excerpt": compact(f"Initial Git metadata: branch {initial_git.get('branch')}, commit {initial_git.get('commit_hash')}", 700),
+                "data": initial_git,
+            })
+        for observation in (summary.get("git") or {}).get("observations") or []:
+            tool_id = str(observation.get("toolInteractionId") or "")
+            observation_data = {**observation, "toolInteractionEvidenceId": interaction_evidence_ids.get(tool_id)}
+            evidence.append({
+                "id": evidence_id("git", session_id, observation.get("id") or "operation"),
+                "kind": "git_observation", "sessionId": session_id,
+                "timestamp": observation.get("timestamp"), "source": observation.get("source") or {},
+                "excerpt": compact(f"{observation.get('operation')}: {observation.get('command')}", 700),
+                "data": observation_data,
             })
         for gap in summary.get("long_gaps") or []:
             line = gap.get("line", "unknown")
@@ -1700,26 +2195,38 @@ def normalized_evidence_pack(
                 "timestamp": turn.get("started"), "source": {"paths": session["sourceRollouts"]},
                 "excerpt": f"Turn {turn_id}: {turn.get('duration_ms', 'unknown')} ms.", "data": turn,
             })
-        for name, count in (summary.get("tool_counts") or {}).items():
-            evidence.append({
-                "id": evidence_id("tool", session_id, name), "kind": "tool_count", "sessionId": session_id,
-                "timestamp": summary.get("end"), "source": {"paths": session["sourceRollouts"]},
-                "excerpt": f"{name}: {count} parsed tool call(s).", "data": {"tool": name, "count": count},
-            })
-    for edge in edges:
+    for edge in delegation_edges:
         evidence.append({
             "id": evidence_id("edge", edge["parent"], edge["child"]), "kind": "delegation_edge", "sessionId": edge["parent"],
-            "timestamp": None, "source": {"sessionIds": [edge["parent"], edge["child"]]},
+            "timestamp": edge.get("timestamp"), "source": {**(edge.get("source") or {}), "sessionIds": [edge["parent"], edge["child"]]},
             "excerpt": f"{edge['parent']} → {edge['child']} via {edge['kind']}.", "data": edge,
         })
+    thread_relations = []
+    for edge in thread_edges:
+        relation = {
+            "from": str(edge["parent"]), "to": str(edge["child"]), "kind": str(edge.get("kind") or "create_thread"),
+            "timestamp": edge.get("timestamp"), "source": edge.get("source") or {}, "prompt": edge.get("assignment") or "",
+        }
+        thread_relations.append(relation)
+        evidence.append({
+            "id": evidence_id("thread", relation["from"], relation["to"]), "kind": "thread_relation", "sessionId": relation["from"],
+            "timestamp": relation.get("timestamp"), "source": {**relation["source"], "sessionIds": [relation["from"], relation["to"]]},
+            "excerpt": f"{relation['from']} started related thread {relation['to']} via {relation['kind']}.", "data": relation,
+        })
     evidence.sort(key=lambda item: (str(item.get("timestamp") or ""), item["id"]))
+    primary_thread_id = next(
+        (str(edge["child"]) for edge in thread_edges if edge.get("parent") == root_id and edge.get("kind") == "create_thread"),
+        root_id,
+    )
     return {
         "schemaVersion": EVIDENCE_SCHEMA_VERSION,
-        "rootSessionId": root_id,
+        "discoverySessionId": root_id,
+        "primaryThreadId": primary_thread_id,
         "generatedAt": fmt_time(dt.datetime.now(dt.timezone.utc)),
         "report": {"totals": report.get("totals") or {}, "linkedSessionEvidence": report.get("linked_session_evidence") or []},
         "sessions": sessions,
-        "edges": edges,
+        "threadRelations": thread_relations,
+        "edges": delegation_edges,
         "evidence": evidence,
     }
 
@@ -1728,7 +2235,7 @@ def write_report_workspace(
     pack_dir: Path,
     root_id: str,
     summaries: dict[str, dict[str, Any]],
-    edges: list[dict[str, str]],
+    edges: list[dict[str, Any]],
     report: dict[str, Any],
 ) -> None:
     api = normalized_evidence_pack(root_id, summaries, edges, report)
@@ -1736,16 +2243,17 @@ def write_report_workspace(
     manifest = {
         "schemaVersion": EVIDENCE_SCHEMA_VERSION,
         "kind": "codex-reflect-report-workspace",
-        "rootSessionId": root_id,
+        "discoverySessionId": root_id,
+        "primaryThreadId": api["primaryThreadId"],
         "sourceRollouts": sorted({path for summary in summaries.values() for path in (summary.get("rollout_paths") or [summary.get("path")]) if path}),
         "logicalSessions": [{"id": item["id"], "rolloutCount": item["rolloutCount"]} for item in api["sessions"]],
         "evidenceApi": "app/public/data/evidence.json",
         "markdown": "markdown/index.md",
-        "agentWritable": ["app/src/report/"],
+        "agentWritable": ["app/src/report"],
         "appCreated": False,
     }
     write_json(pack_dir / "manifest.json", manifest)
-    write_text(pack_dir / "AGENTS.md", "# Codex Reflect report workspace\n\nEvidence and Markdown are helper-owned and immutable. Analyze `markdown/` and `evidence/` directly. By default, edit only `app/src/report/`; do not duplicate platform routes for mission-specific presentation.\n")
+    write_text(pack_dir / "AGENTS.md", "# Codex Reflect report workspace\n\nEvidence, Markdown, and the viewer platform are helper-owned. Author run-specific analysis only under `app/src/report/`; regenerate the workspace when extraction or platform behavior changes.\n")
     immutable_tree(pack_dir / "evidence")
     (pack_dir / "manifest.json").chmod(0o400)
 
@@ -1822,7 +2330,7 @@ def write_analysis_pack(
         "",
         "## Live viewer",
         "",
-        "The Svelte viewer is user-facing. First run `python3 /root/.codex/skills/codex-reflect/scripts/create_report_app.py ..`, then `python3 /root/.codex/skills/codex-reflect/scripts/report_viewer.py start ../app`. Analyze this Markdown/evidence pack directly before authoring `app/src/report/`.",
+        "The Svelte viewer is user-facing. First run `python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py ..`, then `python3 /root/.agents/skills/codex-reflect/scripts/report_viewer.py start ../app`. Analyze this Markdown/evidence pack directly; regenerate the viewer after extractor or template changes.",
         "",
         "Raw rollout JSONL remains authoritative. These files are bounded summaries and evidence guides, not final conclusions.",
     ])
@@ -1859,11 +2367,18 @@ def render_workstream_map(
             f"{summary.get('detected_spawned_subagent_count', 0)} | "
             f"{metrics.get('failure_signal_count', 0)} |"
         )
-    lines.extend(["", "## Lineage Edges", ""])
-    if not edges:
-        lines.append("- No downstream session edges were resolved.")
-    for edge in edges:
-        lines.append(f"- `{edge['parent']}` → `{edge['child']}` via `{edge['kind']}`")
+    thread_edges = [edge for edge in edges if edge.get("relationType") == "thread" or edge.get("kind") in {"create_thread", "fork_thread", "handoff_thread", "handoff"}]
+    delegation_edges = [edge for edge in edges if edge not in thread_edges]
+    lines.extend(["", "## Related Thread Relations", ""])
+    lines.extend(
+        [f"- `{edge['parent']}` → `{edge['child']}` via `{edge['kind']}` (directional peer relation)" for edge in thread_edges]
+        or ["- No related thread links were resolved."]
+    )
+    lines.extend(["", "## Subagent Delegation", ""])
+    lines.extend(
+        [f"- `{edge['parent']}` → `{edge['child']}` via `{edge['kind']}`" for edge in delegation_edges]
+        or ["- No subagent delegation edges were resolved."]
+    )
     return "\n".join(lines)
 
 
@@ -1871,7 +2386,7 @@ def write_workstream_pack(
     codex_home: Path,
     root_paths: list[Path],
     sessions: dict[str, list[Path]],
-    edges: list[dict[str, str]],
+    edges: list[dict[str, Any]],
     since: dt.datetime | None,
     until: dt.datetime | None,
     output_dir: str | None,

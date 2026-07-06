@@ -58,16 +58,20 @@ until the parent delegation and child handoff establish the relationship.
 
 ## Interactive Artifact
 
-The helper writes `report.html` beside this Markdown pack. It is a
-self-contained, dependency-free exploration view: summary metrics, a grouped
-timeline, a filterable failure table with immediate-response evidence, session
-groups/lineage, and tool activity. Treat it as a navigation and evidence
-surface, not an editorial report. Keep causal interpretation and
-Context/Change/Payoff cards in the user-facing retrospective.
+The helper creates a report-local Svelte app after evidence extraction. Author
+its typed `src/report/report.ts` analysis before sharing it. The app presents
+the task and outcome, optional phase bands and action synthesis in one
+chronological Activity stream, workstream navigation,
+cross-thread findings, resource metrics, reliable Git context integrated into
+session identity and activity, and collapsed raw provenance. It is an
+editorial artifact backed by immutable evidence, not a
+generic log browser; conclusions must carry evidence citations and explicit
+uncertainty.
 
 In the chat response, give the reviewed outcome, the few findings that matter,
-material caveats, and a link to `report.html`; do not replace the response with
-an artifact receipt unless the user asks for artifact-only output.
+material caveats, and a link to the running report viewer; do not replace the
+response with an artifact receipt unless the user asks for artifact-only
+output.
 
 ## Multi-Agent Runs: Hierarchical STAR-I
 
