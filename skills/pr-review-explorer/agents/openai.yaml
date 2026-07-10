@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Review Explorer"
+  short_description: "Explore semantic pull-request diffs"
+  default_prompt: "Use $pr-review-explorer to create a layered, diff-first review app for this pull request."
