@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate HTML Plan"
+  short_description: "Turn deep planning into an interactive plan"
+  default_prompt: "Use $generate-html-plan to interview me thoroughly, resolve the design, and generate a validated interactive HTML plan."
