@@ -68,10 +68,10 @@ criteria when they affect the assignment.
 
 ## Model Routing
 
-Use smaller/faster models only for bounded, low-ambiguity, low-risk work with
-concrete expected output and proof. Use a higher-reasoning model for ambiguous
-architecture, broad refactors, hard debugging, public contracts, persistence,
-security, migration planning, complex review, or final adversarial validation.
+Before delegating, load
+[Submodel Selection](../references/submodel-selection.md). Record the selected
+model, reasoning effort, rationale, and any runtime fallback in every assignment
+block.
 
 ## Handoff
 

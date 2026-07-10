@@ -4,6 +4,9 @@ Use this subskill to connect Agent Factory to a repository. Installation should
 identify durable sources and tracker entry points; it should not copy a second
 workflow manual into the skill.
 
+Load [Repository Shape](../references/repository-shape.md) before evaluating or
+creating the repository entry map.
+
 ## Scope
 
 Verify or create concise repository instructions that name:

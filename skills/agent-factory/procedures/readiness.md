@@ -3,6 +3,10 @@
 Use this subskill to assess whether a repository is legible and operable by
 agents. It evaluates the agent operating environment, not product code quality.
 
+Load [Repository Shape](../references/repository-shape.md) as the portable
+readiness baseline, then apply the repository's own instructions and product
+surfaces.
+
 ## Scope
 
 Check whether a fresh agent can locate:

@@ -35,6 +35,18 @@ for the current checkout and work item.
 - Do not preserve obsolete commands, compatibility aliases, shims, or fallback
   behavior unless a human explicitly asks for that compatibility window.
 
+## References
+
+Load these only when the assignment needs the named cross-cutting guidance:
+
+| Reference | Load when |
+| --- | --- |
+| [Submodel selection](references/submodel-selection.md) | Choosing or reviewing a delegated model and reasoning effort. |
+| [Repository shape](references/repository-shape.md) | Installing Agent Factory, mapping durable repository guidance, or auditing agent readiness. |
+
+Repository-specific work types, relationship semantics, commands, and lifecycle
+policy remain owned by the repository and its product surfaces.
+
 ## Subskills
 
 | Subskill | Use For | Load |
