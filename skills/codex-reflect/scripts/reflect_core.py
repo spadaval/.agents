@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import collections
 import contextlib
 import datetime as dt
@@ -12,9 +11,7 @@ import io
 import json
 import os
 import re
-import shutil
 import sqlite3
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -29,8 +26,6 @@ TOKEN_FIELDS = [
 ]
 
 EVIDENCE_SCHEMA_VERSION = 5
-REPORT_TEMPLATE_DIR = Path(__file__).resolve().parents[1] / "template"
-REPORT_VIEWER_SCRIPT = Path(__file__).resolve().with_name("report_viewer.py")
 
 
 def parse_time(value: Any) -> dt.datetime | None:
@@ -184,24 +179,6 @@ def write_json(path: Path, value: Any) -> None:
     path.chmod(0o600)
 
 
-def require_viewer_prerequisites() -> None:
-    """Fail explicitly: the viewer is a required part of a generated report."""
-    missing = [name for name in ("node", "npm") if shutil.which(name) is None]
-    if missing:
-        raise SystemExit(
-            "Codex Reflect viewer unavailable: install " + ", ".join(missing)
-            + " and rerun. No static HTML fallback is generated."
-        )
-    if not REPORT_TEMPLATE_DIR.is_dir() or not (REPORT_TEMPLATE_DIR / "package.json").is_file():
-        raise SystemExit(
-            f"Codex Reflect viewer unavailable: report template is missing at {REPORT_TEMPLATE_DIR}."
-        )
-    if not REPORT_VIEWER_SCRIPT.is_file():
-        raise SystemExit(
-            f"Codex Reflect viewer unavailable: helper command is missing at {REPORT_VIEWER_SCRIPT}."
-        )
-
-
 def immutable_tree(path: Path) -> None:
     """Mark helper-owned extracted artifacts read-only."""
     if not path.exists():
@@ -212,26 +189,6 @@ def immutable_tree(path: Path) -> None:
         elif item.is_dir():
             item.chmod(0o500)
     path.chmod(0o500)
-
-
-def writable_tree(path: Path) -> None:
-    """Restore owner-only write access for the report-authoring escape hatch."""
-    if not path.exists():
-        return
-    for item in path.rglob("*"):
-        if item.is_file():
-            item.chmod(0o600)
-        elif item.is_dir():
-            item.chmod(0o700)
-    path.chmod(0o700)
-
-
-def copy_report_template(pack_dir: Path) -> Path:
-    app_dir = pack_dir / "app"
-    shutil.copytree(REPORT_TEMPLATE_DIR, app_dir)
-    immutable_tree(app_dir / "src")
-    writable_tree(app_dir / "src" / "report")
-    return app_dir
 
 
 def capture_markdown(renderer: Any, *args: Any) -> str:
@@ -2247,13 +2204,13 @@ def write_report_workspace(
         "primaryThreadId": api["primaryThreadId"],
         "sourceRollouts": sorted({path for summary in summaries.values() for path in (summary.get("rollout_paths") or [summary.get("path")]) if path}),
         "logicalSessions": [{"id": item["id"], "rolloutCount": item["rolloutCount"]} for item in api["sessions"]],
-        "evidenceApi": "app/public/data/evidence.json",
+        "evidenceApi": "evidence/evidence.json",
         "markdown": "markdown/index.md",
-        "agentWritable": ["app/src/report"],
+        "agentWritable": ["src/report"],
         "appCreated": False,
     }
     write_json(pack_dir / "manifest.json", manifest)
-    write_text(pack_dir / "AGENTS.md", "# Codex Reflect report workspace\n\nEvidence, Markdown, and the viewer platform are helper-owned. Author run-specific analysis only under `app/src/report/`; regenerate the workspace when extraction or platform behavior changes.\n")
+    write_text(pack_dir / "AGENTS.md", "# Codex Reflect artifact source\n\nEvidence, Markdown, and the viewer platform are helper-owned. After creating the Artifact Hub app, author run-specific analysis only under `src/report/`; regenerate the artifact when extraction or platform behavior changes.\n")
     immutable_tree(pack_dir / "evidence")
     (pack_dir / "manifest.json").chmod(0o400)
 
@@ -2328,9 +2285,9 @@ def write_analysis_pack(
         ])
     lines.extend([
         "",
-        "## Live viewer",
+        "## Artifact Hub viewer",
         "",
-        "The Svelte viewer is user-facing. First run `python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py ..`, then `python3 /root/.agents/skills/codex-reflect/scripts/report_viewer.py start ../app`. Analyze this Markdown/evidence pack directly; regenerate the viewer after extractor or template changes.",
+        "The Svelte viewer is user-facing. From this workspace, run `python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py .. --id <artifact-id> --consume`, then open it with `/root/.agents/bin/artifact-hub open <artifact-id>`. Analyze this Markdown/evidence pack directly; regenerate the artifact after extractor or template changes.",
         "",
         "Raw rollout JSONL remains authoritative. These files are bounded summaries and evidence guides, not final conclusions.",
     ])
@@ -2405,131 +2362,12 @@ def write_workstream_pack(
     return pack_dir
 
 
-def start_report_viewer(pack_dir: Path) -> str:
-    result = subprocess.run(
-        [sys.executable, str(REPORT_VIEWER_SCRIPT), "start", str(pack_dir / "app")],
-        text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-    )
-    if result.returncode:
-        raise SystemExit(result.stdout.strip() or "Codex Reflect viewer unavailable.")
-    for line in result.stdout.splitlines():
-        if line.startswith("Viewer URL: "):
-            return line.removeprefix("Viewer URL: ").strip()
-    raise SystemExit("Codex Reflect viewer unavailable: helper did not return a loopback URL.")
-
-
 def main() -> int:
     print(
         "summarize_codex_run.py is now an internal extraction library. Use "
-        "discover_sessions.py, extract_evidence.py, create_report_app.py, "
-        "and report_viewer.py instead.",
+        "discover_sessions.py, extract_evidence.py, and create_report_app.py instead.",
         file=sys.stderr,
     )
-    return 2
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--codex-home", default=None, help="Codex home directory, default ${CODEX_HOME:-~/.codex}")
-    parser.add_argument("--list", action="store_true", help="List recent known sessions")
-    parser.add_argument("--find", metavar="QUERY", help="Search session index, history, and transcript messages")
-    parser.add_argument("--projects", action="store_true", help="List projects with known session working directories")
-    parser.add_argument("--project", metavar="PATH", help="Filter --list and --find to an exact normalized session working directory")
-    parser.add_argument("--session", metavar="ID_OR_PATH", help="Build a Markdown analysis pack for every rollout in one logical session")
-    parser.add_argument("--workstream", metavar="ID_OR_PATH", help="Build a root-session pack with all resolved descendant logical sessions")
-    parser.add_argument("--output-dir", metavar="PATH", help="Write a session analysis pack to this new directory instead of ${CODEX_HOME:-~/.codex}/tmp/codex-reflect")
-    parser.add_argument("--token-report", nargs="+", metavar="ID_OR_PATH", help="Report token usage for one or more rollout transcripts")
-    parser.add_argument("--no-linked", action="store_true", help="Do not include linked subagent sessions in --token-report")
-    parser.add_argument("--since", metavar="ISO_TIME", help="Only include parent transcript events at or after this timestamp")
-    parser.add_argument("--until", metavar="ISO_TIME", help="Only include parent transcript events at or before this timestamp")
-    parser.add_argument("--sqlite-logs", action="store_true", help="Search ~/.codex/logs_*.sqlite diagnostics")
-    parser.add_argument("--contains", metavar="TEXT", help="Filter SQLite diagnostics by substring")
-    parser.add_argument("--level", metavar="LEVEL", help="Filter SQLite diagnostics by level")
-    parser.add_argument("--target", metavar="TEXT", help="Filter SQLite diagnostics by target substring")
-    parser.add_argument("--recent", type=int, default=20, help="Number of list/find results")
-    parser.add_argument("--json", action="store_true", help="Emit JSON")
-    parser.add_argument("--no-viewer", action="store_true", help="Generate the workspace without starting Vite (for automation only)")
-    args = parser.parse_args()
-
-    codex_home = codex_home_arg(args.codex_home)
-    since = parse_boundary(args.since)
-    until = parse_boundary(args.until)
-    if since and until and since > until:
-        raise SystemExit("--since must be before --until")
-    if args.output_dir and not (args.session or args.workstream):
-        raise SystemExit("--output-dir requires --session or --workstream")
-    if args.output_dir and args.json:
-        raise SystemExit("--output-dir cannot be combined with --json")
-    if args.no_viewer and not (args.session or args.workstream):
-        raise SystemExit("--no-viewer requires --session or --workstream")
-    if args.session and args.workstream:
-        raise SystemExit("--session and --workstream are mutually exclusive")
-    if args.project and not (args.list or args.find):
-        raise SystemExit("--project requires --list or --find")
-    if args.projects and (args.project or args.list or args.find):
-        raise SystemExit("--projects cannot be combined with --project, --list, or --find")
-    if args.token_report:
-        report = build_token_report(codex_home, args.token_report, not args.no_linked, since=since, until=until)
-        if args.json:
-            print(json.dumps(report, indent=2, sort_keys=True))
-        else:
-            print_token_report(report)
-        return 0
-    if args.list:
-        rows = list_sessions(codex_home, args.recent, args.project)
-        if args.json:
-            print(json.dumps(rows, indent=2, sort_keys=True))
-        else:
-            print_table(rows)
-        return 0
-    if args.find:
-        rows = find_sessions(codex_home, args.find, args.recent, args.project)
-        if args.json:
-            print(json.dumps(rows, indent=2, sort_keys=True))
-        else:
-            print_table(rows)
-        return 0
-    if args.projects:
-        projects = list_projects(codex_home)
-        if args.json:
-            print(json.dumps(projects, indent=2, sort_keys=True))
-        else:
-            print_projects(projects)
-        return 0
-    if args.session:
-        paths = find_session_paths(codex_home, args.session)
-        summary = summarize_archive(paths, since=since, until=until)
-        if args.json:
-            print(json.dumps(summary, indent=2, sort_keys=True))
-        else:
-            require_viewer_prerequisites()
-            pack_dir = write_analysis_pack(codex_home, paths, summary, since, until, args.output_dir)
-            print(f"Analysis pack: {pack_dir / 'markdown' / 'index.md'}")
-            if not args.no_viewer:
-                print(f"Viewer URL: {start_report_viewer(pack_dir)}")
-        return 0
-    if args.workstream:
-        root_paths, sessions, edges = resolve_workstream(codex_home, args.workstream)
-        if args.json:
-            summary = summarize_archive(root_paths, since=since, until=until)
-            print(json.dumps({
-                "root_session_id": session_id_for_paths(root_paths),
-                "root_summary": summary,
-                "logical_sessions": {session_id: [str(path) for path in paths] for session_id, paths in sessions.items()},
-                "edges": edges,
-            }, indent=2, sort_keys=True))
-        else:
-            require_viewer_prerequisites()
-            pack_dir = write_workstream_pack(codex_home, root_paths, sessions, edges, since, until, args.output_dir)
-            print(f"Workstream analysis pack: {pack_dir / 'markdown' / 'index.md'}")
-            if not args.no_viewer:
-                print(f"Viewer URL: {start_report_viewer(pack_dir)}")
-        return 0
-    if args.sqlite_logs:
-        rows = search_sqlite_logs(codex_home, args.contains, args.level, args.target, args.recent)
-        if args.json:
-            print(json.dumps(rows, indent=2, sort_keys=True))
-        else:
-            print_sqlite_logs(rows)
-        return 0
-    parser.print_help(sys.stderr)
     return 2
 
 

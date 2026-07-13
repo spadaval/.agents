@@ -19,6 +19,7 @@
   let railOpen = $state(false);
   let railCollapsed = $state(false);
   let legacyEvidenceId = '';
+  const railStorageKey = `${window.location.pathname}:codex-reflect:rail-collapsed`;
 
   function readHash() {
     const route = parseReportHash(location.hash);
@@ -62,7 +63,7 @@
   }
   function toggleRail() {
     railCollapsed = !railCollapsed;
-    localStorage.setItem('codex-reflect:rail-collapsed', String(railCollapsed));
+    localStorage.setItem(railStorageKey, String(railCollapsed));
   }
 
   const selected = $derived(report?.byId.get(selectedId) || (report ? report.byId.get(report.rootId) : undefined));
@@ -71,7 +72,7 @@
     || null);
 
   onMount(() => {
-    railCollapsed = localStorage.getItem('codex-reflect:rail-collapsed') === 'true';
+    railCollapsed = localStorage.getItem(railStorageKey) === 'true';
     window.addEventListener('hashchange', readHash);
     loadEvidence().then((value) => {
       pack = value; report = deriveReport(value, runAnalysis); selectedId ||= report.rootId;

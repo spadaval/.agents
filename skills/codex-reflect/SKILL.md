@@ -13,20 +13,20 @@ verify.
 1. Locate the relevant transcript, then resolve its lineage to the root
    session before selecting the primary analysis target.
 2. Bound the root analysis window when it spans multiple tasks.
-3. Extract a report workspace with `extract_evidence.py`, then create its
-   report-local app with `create_report_app.py`.
+3. Extract a temporary evidence workspace with `extract_evidence.py`, then
+   create its centralized Artifact Hub app with `create_report_app.py`.
 4. Read the generated `markdown/index.md` and the relevant evidence briefs
    directly. The Svelte viewer is for human exploration, not the agent's
    primary analysis surface.
 5. Verify raw JSONL only around relevant failures, gaps, delegation, handoff,
    and final claims.
-6. Author `app/src/report/report.ts` from the evidence pack. Identify the
+6. Author `<artifact>/src/report/report.ts` from the evidence pack. Identify the
    actual task, lifecycle, outcome, phases, actions, workstream roles, and
    cross-thread findings; cite normalized evidence IDs for every substantive
    conclusion. Do not ask the viewer to infer these semantics from labels or
    keywords.
-7. Run `npm run validate-report`, `npm test`, and `npm run check` in the app,
-   then inspect the live report at desktop and narrow widths.
+7. Validate with Artifact Hub's shared toolchain, then inspect the live report
+   at desktop and narrow widths.
 8. Synthesize a STAR-I retrospective that preserves effective behavior and
    identifies concrete improvements. For multi-agent work, use a root-level
    STAR-I with bounded workstream cards rather than a linear child-by-child
@@ -43,43 +43,44 @@ Run:
 
 ```bash
 python3 /root/.agents/skills/codex-reflect/scripts/extract_evidence.py --session <id-or-path> --output-dir <new-workspace>
-python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py <new-workspace>
-python3 /root/.agents/skills/codex-reflect/scripts/report_viewer.py start <new-workspace>/app
+python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py <new-workspace> \
+  --id reflect-<descriptive-id> --consume
 ```
 
-The command writes an owner-only, self-contained report workspace under
-`${CODEX_HOME:-~/.codex}/tmp/codex-reflect/` and prints the path to `index.md`.
+The first command writes an owner-only temporary evidence workspace and prints
+the path to `index.md`. The second copies that evidence and the specialized
+template into `~/.agents/artifacts/<artifact-id>/`, then removes the temporary
+workspace when `--consume` is used.
 It first merges every rollout file whose metadata has the same session ID, so
 resumed transcripts form one logical-session pack. Its structure is:
 
 ```text
-codex-reflect-<mission>/
-├── evidence/       # helper-owned normalized facts and source excerpts
-├── markdown/       # helper-owned agent-readable briefs; start at index.md
-├── manifest.json
-└── app/            # report-local Svelte/Vite viewer
-    ├── public/data/evidence.json
-    ├── src/platform/     # shared shell and provenance UI
-    └── src/report/       # report-local typed analysis
+~/.agents/artifacts/<artifact-id>/
+├── manifest.json         # minimal Artifact Hub catalog metadata
+├── index.html            # complete app entry point
+├── evidence/             # helper-owned normalized facts and source excerpts
+├── markdown/             # helper-owned agent-readable briefs; start at index.md
+└── src/
+    ├── platform/         # report UI and provenance behavior
+    └── report/           # artifact-local typed analysis
 ```
 
 `extract_evidence.py` has no Node dependency: it produces the immutable pack
-for agent reasoning. `create_report_app.py` checks `node`, `npm`, and the
-embedded template before copying the Svelte app. If any is missing, it stops
-with a clear prerequisite error; it never falls back to static HTML.
-`report_viewer.py start` runs `vite dev --host 127.0.0.1` and prints a loopback
-URL. Use the environment's port forwarding or the printed SSH tunnel form to
-open it remotely. The viewer command is also available directly:
+for agent reasoning. `create_report_app.py` requires the embedded template and
+Artifact Hub CLI. It does not create a package, dependency installation, Vite
+configuration, PID, log, or private server. Validate and open the artifact with:
 
 ```bash
-python3 /root/.agents/skills/codex-reflect/scripts/report_viewer.py start <workspace>/app
-python3 /root/.agents/skills/codex-reflect/scripts/report_viewer.py status <workspace>/app
-python3 /root/.agents/skills/codex-reflect/scripts/report_viewer.py stop <workspace>/app
+cd ~/.agents/artifacts/<artifact-id>
+/root/.agents/node_modules/.bin/vite-node scripts/validate-report.ts
+/root/.agents/node_modules/.bin/vitest run --config /root/.agents/vitest.config.ts --root .
+/root/.agents/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
+/root/.agents/bin/artifact-hub open <artifact-id>
 ```
 
-Keep the viewer bound to loopback; discovering a host IP does not authorize
-binding Vite to it or exposing the viewer directly. To identify the source IP
-chosen for the default outbound route, run:
+Artifact Hub owns the one Vite server and binds it to `0.0.0.0` for the trusted
+internal network. It provides no authentication or TLS. To identify the source
+IP chosen for the default outbound route, run:
 
 ```bash
 ip route get 1.1.1.1 | awk '{for (i = 1; i <= NF; i++) if ($i == "src") { print $(i + 1); exit }}'
@@ -150,7 +151,7 @@ agent-reading path.
 ## Author the report
 
 The normalized evidence API is immutable provenance. The TypeScript modules in
-`app/src/report/` are deliberately report-local and agent-authored. Keep
+`src/report/` are deliberately artifact-local and agent-authored. Keep
 deterministic facts such as timestamps, counts, token snapshots, tool results,
 and observed Git operations in evidence; use the authored report to interpret
 what task was attempted, what mattered, and whether it succeeded.

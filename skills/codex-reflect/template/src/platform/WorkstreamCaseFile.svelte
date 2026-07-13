@@ -12,6 +12,7 @@
   const modelConfigurations = $derived(workstream.modelUsage.configurations);
   const currentModel = $derived(modelConfigurations.at(-1));
   const changedFileCount = $derived(new Set(workstream.changes.flatMap((change) => change.paths)).size);
+  const project = $derived.by(() => report.evidence.sessions.find((session) => session.id === workstream.id)?.cwd?.split('/').filter(Boolean).at(-1));
   function when(value: string | null): string { return value ? new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(value)) : 'Time not recorded'; }
   function duration(value: number | null): string { if (value == null) return 'Not recorded'; if (value < 60) return `${Math.round(value)}s`; if (value < 3600) return `${Math.round(value / 60)}m`; return `${Math.floor(value / 3600)}h ${Math.round((value % 3600) / 60)}m`; }
   function number(value: number | null): string { return value == null ? 'Not recorded' : new Intl.NumberFormat().format(value); }
@@ -58,7 +59,7 @@
   </nav>
   <header class="case-header">
     <span class="kicker">{isRoot ? 'Run analysis' : workstream.isThreadRoot ? 'Related thread analysis' : 'Workstream analysis'}</span><h1>{workstream.label}</h1>
-    <p class="session-context"><span>Session #{workstream.shortId}</span>{#if workstream.git.initial?.branch}<span class="git-context"><code>{workstream.git.initial.branch}</code>{#if workstream.git.initial.commit}<code>@ {workstream.git.initial.commit.slice(0, 10)}</code>{/if}</span>{/if}</p>
+    <p class="session-context">{#if project}<span>{project}</span>{/if}<span>Session #{workstream.shortId}</span>{#if workstream.git.initial?.branch}<span class="git-context"><code>{workstream.git.initial.branch}</code>{#if workstream.git.initial.commit}<code>@ {workstream.git.initial.commit.slice(0, 10)}</code>{/if}</span>{/if}</p>
     <div class="case-chips"><span class={`outcome-chip ${workstream.outcome}`}>{workstream.outcome}</span><span class={`lifecycle-chip ${workstream.lifecycle}`}>{workstream.lifecycle}</span><span class="role-chip">{workstream.role}</span><span>{when(workstream.start)} → {when(workstream.end)}</span></div>
   </header>
   {#if threadRelations.length}<nav class="thread-relations" aria-label="Related threads">{#each threadRelations as relation}{@const otherId = relation.from === workstream.id ? relation.to : relation.from}{#if report.byId.get(otherId)}<button onclick={() => onSelect(otherId)}><span>{relation.from === workstream.id ? 'Started related thread' : 'Started by related thread'}</span><strong>{report.byId.get(otherId)?.label}</strong><time>{when(relation.timestamp || null)}</time></button>{/if}{/each}</nav>{/if}

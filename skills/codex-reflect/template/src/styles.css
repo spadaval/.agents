@@ -128,3 +128,12 @@ code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospac
   .resource-strip { grid-template-columns: 1fr 1fr; }.analysis-columns { grid-template-columns: 1fr; }.action-list { margin-left: 12px; }.raw-evidence-row { grid-template-columns: 1fr; gap: 3px; }
   .matrix-header { display: none; }.matrix-row { grid-template-columns: 1fr; }.matrix-row > span::before { display: block; margin-bottom: 2px; color: var(--faint); font-size: 8px; text-transform: uppercase; }.matrix-row > span:nth-child(2)::before { content: "Workstreams"; }.matrix-row > span:nth-child(3)::before { content: "Result"; }.matrix-row > span:nth-child(4)::before { content: "Remaining risk"; }.derived-evidence { margin-left: 18px; }
 }
+
+/* Artifact Hub UI pass */
+.resource-strip { gap:0; background:transparent; border:0; border-block:1px solid var(--line); }
+.resource-strip > div, .resource-strip > details { padding:14px 12px; background:transparent; border-right:1px solid var(--line); }
+.resource-strip > :first-child { padding-left:0; }.resource-strip > :last-child { border-right:0; }
+.analysis-summary { padding:14px 0 14px 14px; background:transparent; border-left:2px solid var(--green); }
+.theme-list, .analysis-columns { gap:0; border-top:1px solid var(--line); }.theme-list article, .analysis-columns article { padding:15px 0; background:transparent; border:0; border-bottom:1px solid var(--line); }.theme-list article + article, .analysis-columns article + article { padding-left:14px; border-left:1px solid var(--line); }
+.source-disclosure > summary, .event-details[open] { background:transparent; }
+@media(max-width:680px){.resource-strip > div,.resource-strip > details{padding:12px 8px}.resource-strip > :nth-child(odd){padding-left:0}.theme-list article + article,.analysis-columns article + article{padding-left:0;border-left:0}}

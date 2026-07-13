@@ -1,8 +1,8 @@
 import importlib.util
 import json
+import os
 import subprocess
 import sys
-import stat
 import tempfile
 import unittest
 from pathlib import Path
@@ -156,7 +156,7 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
         confidence = {item["id"]: item["confidence"] for item in report["linked_session_evidence"]}
         self.assertEqual(confidence, {STRONG: "strong", WEAK: "weak"})
 
-    def test_analysis_pack_writes_immutable_evidence_and_report_local_app(self):
+    def test_analysis_pack_creates_central_artifact(self):
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             parent_path = write_rollout(home, "parent", [
@@ -182,24 +182,30 @@ class LinkedSessionEvidenceTests(unittest.TestCase):
             self.assertTrue((markdown / "metrics.md").is_file())
             self.assertTrue((markdown / "sessions" / f"{STRONG}.md").is_file())
             self.assertFalse((pack / "app").exists())
-            subprocess.run([sys.executable, str(CREATE_APP), str(pack)], check=True, capture_output=True, text=True)
-            self.assertTrue((pack / "app" / "package.json").is_file())
-            self.assertTrue((pack / "app" / "src" / "platform" / "WorkstreamCaseFile.svelte").is_file())
-            self.assertFalse((pack / "app" / "src" / "platform" / "WorkstreamCaseFile.svelte").stat().st_mode & stat.S_IWUSR)
-            self.assertTrue((pack / "app" / "src" / "report" / "report.ts").is_file())
-            self.assertTrue((pack / "app" / "src" / "report" / "report.ts").stat().st_mode & stat.S_IWUSR)
-            self.assertTrue((pack / "manifest.json").is_file())
             api = json.loads((pack / "evidence" / "evidence.json").read_text(encoding="utf-8"))
-            public_api = json.loads((pack / "app" / "public" / "data" / "evidence.json").read_text(encoding="utf-8"))
+            markdown_index = (markdown / "index.md").read_text(encoding="utf-8")
+            workspace_manifest = json.loads((pack / "manifest.json").read_text(encoding="utf-8"))
+            artifact_root = home / "artifacts"
+            env = {**os.environ, "ARTIFACT_HUB_ROOT": str(artifact_root)}
+            subprocess.run(
+                [sys.executable, str(CREATE_APP), str(pack), "--id", "reflect-test", "--consume"],
+                check=True, capture_output=True, text=True, env=env,
+            )
+            artifact = artifact_root / "reflect-test"
+            self.assertFalse(pack.exists())
+            self.assertFalse((artifact / "package.json").exists())
+            self.assertTrue((artifact / "src" / "platform" / "WorkstreamCaseFile.svelte").is_file())
+            self.assertTrue((artifact / "src" / "report" / "report.ts").is_file())
+            self.assertTrue((artifact / "manifest.json").is_file())
+            artifact_api = json.loads((artifact / "evidence" / "evidence.json").read_text(encoding="utf-8"))
             self.assertEqual(api["schemaVersion"], RUNS.EVIDENCE_SCHEMA_VERSION)
-            self.assertEqual(api, public_api)
+            self.assertEqual(api, artifact_api)
             self.assertTrue(all(item["id"] for item in api["evidence"]))
-            self.assertIn("Live viewer", (markdown / "index.md").read_text(encoding="utf-8"))
-            app = (pack / "app" / "src" / "App.svelte").read_text(encoding="utf-8")
+            self.assertIn("Artifact Hub viewer", markdown_index)
+            app = (artifact / "src" / "App.svelte").read_text(encoding="utf-8")
             self.assertIn("WorkstreamTree", app)
             self.assertNotIn("PlatformPage", app)
-            manifest = json.loads((pack / "manifest.json").read_text(encoding="utf-8"))
-            self.assertEqual(manifest["agentWritable"], ["app/src/report"])
+            self.assertEqual(workspace_manifest["agentWritable"], ["src/report"])
 
     def test_project_listing_and_filtering_use_exact_normalized_cwd(self):
         with tempfile.TemporaryDirectory() as directory:
