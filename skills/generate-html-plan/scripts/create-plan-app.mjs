@@ -1,61 +1,56 @@
 #!/usr/bin/env node
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const supplied = process.argv[2];
-if (!supplied) {
-  throw new Error("Usage: create-plan-app.mjs <new-workspace>");
-}
+const argv = process.argv.slice(2);
+const id = argv[0];
+const value = (name) => {
+  const index = argv.indexOf(name);
+  return index >= 0 ? argv[index + 1] : undefined;
+};
 
-const workspace = resolve(supplied);
-const app = join(workspace, "app");
-if (existsSync(app) || existsSync(join(workspace, "manifest.json"))) {
-  throw new Error(`Plan workspace already exists: ${workspace}`);
-}
-
-for (const command of ["node", "npm"]) {
-  const pathEntries = (process.env.PATH ?? "").split(":");
-  const available = pathEntries.some((entry) =>
-    existsSync(join(entry, command)),
+if (!id || id.startsWith("--")) {
+  throw new Error(
+    "Usage: create-plan-app.mjs <artifact-id> --title <title> [--repository <path>]",
   );
-  if (!available) throw new Error(`Missing required command on PATH: ${command}`);
 }
 
 const skill = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const agentsRoot = resolve(skill, "..", "..");
+const hub = join(agentsRoot, "bin", "artifact-hub");
 const template = join(skill, "assets", "template");
-if (!existsSync(join(template, "package.json"))) {
-  throw new Error(`Plan app template is incomplete: ${template}`);
+if (!existsSync(hub)) throw new Error(`Artifact Hub CLI is missing: ${hub}`);
+if (!existsSync(join(template, "index.html"))) {
+  throw new Error(`Plan artifact template is incomplete: ${template}`);
 }
 
-mkdirSync(workspace, { recursive: true, mode: 0o700 });
-cpSync(template, app, { recursive: true });
-const manifest = {
-  schemaVersion: 1,
-  kind: "generate-html-plan",
-  createdAt: new Date().toISOString(),
-  app: "app",
-  authoredPlan: "app/src/plan/plan.ts",
-};
-writeFileSync(
-  join(workspace, "manifest.json"),
-  `${JSON.stringify(manifest, null, 2)}\n`,
-  { mode: 0o600 },
+const title = value("--title") ?? `Implementation plan: ${id}`;
+const repository = resolve(value("--repository") ?? process.cwd());
+const output = execFileSync(
+  hub,
+  [
+    "create",
+    id,
+    "--title",
+    title,
+    "--from",
+    template,
+    "--entry",
+    "index.html",
+    "--kind",
+    "html-plan",
+    "--tag",
+    "plan",
+    "--source-json",
+    JSON.stringify({ repository, project: repository.split("/").filter(Boolean).at(-1) }),
+    "--json",
+  ],
+  { encoding: "utf8" },
 );
+const result = JSON.parse(output);
 
-const packageName = `html-plan-${workspace.split("/").filter(Boolean).at(-1)}`
-  .toLowerCase()
-  .replace(/[^a-z0-9-]+/g, "-");
-const packagePath = join(app, "package.json");
-const pkg = JSON.parse(readFileSync(packagePath, "utf8"));
-pkg.name = packageName;
-writeFileSync(packagePath, `${JSON.stringify(pkg, null, 2)}\n`);
-
-console.log(`Plan workspace: ${workspace}`);
-console.log(`Author plan: ${join(app, "src", "plan", "plan.ts")}`);
+console.log(`Plan artifact: ${result.path}`);
+console.log(`Author plan: ${join(result.path, "src", "plan", "plan.ts")}`);
+console.log(`Viewer URL: ${result.url}`);

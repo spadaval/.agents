@@ -165,3 +165,15 @@ dd { margin: 3px 0 0; color: #c7d0c7; font-size: 12px; line-height: 1.5; }
   .sources span { grid-template-columns: 1fr; }
   .sources small { grid-column: 1; }
 }
+
+/* Artifact Hub UI pass */
+.hero-grid, .triptych, .overview-bottom { gap:0; border-top:1px solid var(--line); }
+.hero-grid article, .triptych article, .overview-bottom article { padding:20px 0; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; }
+.hero-grid article + article, .triptych article + article, .overview-bottom article + article { padding-left:22px; border-left:1px solid var(--line); }
+.hero-grid .objective, .hero-grid .outcome { border-top:0; }
+.architecture { padding:0; background:transparent; border:0; border-top:1px solid var(--line); border-radius:0; }
+.nodes { gap:0; }.nodes article { padding:16px 0; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; }.nodes article + article { padding-left:16px; border-left:1px solid var(--line); }
+.decision-list, .timeline, .risk-grid { gap:0; border-top:1px solid var(--line); }
+.decision-card, .phase-card, .risk-card, .scenario, .doc-card, .deferred-card { padding:19px 0; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; border-left:0; }
+.decision-card.reviewed, .phase-card.reviewed { opacity:.7; border-left:0; }.phase-index { padding:0 14px 0 0; background:transparent; }.phase-body { padding:0; }.changes > div, .alternative { background:transparent; border-width:0 0 1px; border-radius:0; padding:10px 0; }.risk-card > div:not(.card-topline) { padding-top:10px; }
+@media(max-width:780px){.hero-grid article + article,.triptych article + article,.overview-bottom article + article,.nodes article + article{padding-left:0;border-left:0}}

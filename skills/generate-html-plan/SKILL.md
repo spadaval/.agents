@@ -1,6 +1,6 @@
 ---
 name: generate-html-plan
-description: Run an exhaustive, code-aware planning interview and turn the resolved design into a validated interactive HTML plan. Use when Codex needs to plan a substantial feature, refactor, migration, or architecture change; challenge scope and domain language; resolve a design tree collaboratively; or replace a long Markdown implementation plan with a navigable Svelte/Vite plan app. Supports Codex Plan mode by completing the interview read-only, then explicitly asking the user to disable Plan mode before generating files.
+description: Run an exhaustive, code-aware planning interview and turn the resolved design into a validated interactive HTML plan. Use when Codex needs to plan a substantial feature, refactor, migration, or architecture change; challenge scope and domain language; resolve a design tree collaboratively; or replace a long Markdown implementation plan with a navigable Svelte/Vite plan app. If invoked outside Codex Plan mode, first suggest switching to Plan mode; if the user remains outside it, complete the interview and generate without asking for separate generation permission.
 ---
 
 # Generate HTML Plan
@@ -13,6 +13,12 @@ tree is closed, then generate the plan as a typed Svelte/Vite app.
 
 ### 1. Establish the planning surface
 
+- Before exploring, if Codex is not already in Plan mode, recommend switching
+  to Plan mode for read-only investigation and its structured question UI. Ask:
+  **“This workflow works best in Plan mode. Would you like to switch before we
+  begin?”** Wait for the response. Treat the switch as recommended, not
+  required: if the user declines or continues without switching, proceed in the
+  current mode and do not ask again.
 - Inspect the repository, relevant code, tests, configuration, and existing
   plans before asking anything the code can answer.
 - Find `AGENTS.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, and applicable ADRs. Follow
@@ -65,23 +71,25 @@ After all applicable branches are resolved:
    disabled, explain that the plan cannot be generated yet and repeat the
    request. Never claim the HTML plan exists before the files validate.
 
-Outside Plan mode, still complete the interview before writing. Ask for the
-same explicit generation approval after the closure audit unless the user has
-already unambiguously approved generation after the final interview answer.
+Outside Plan mode, still complete the interview before writing, then proceed
+directly to generation after the closure audit. Do not ask for permission or a
+second go-ahead: invoking this skill already authorizes plan generation once
+the interview is complete.
 
 ### 4. Generate the plan workspace
 
-After approval, choose the user-specified output path or default to a new,
-descriptive directory under `${CODEX_HOME:-~/.codex}/plans/`. Never overwrite
-an existing plan workspace.
+After the Plan-mode handoff and explicit go-ahead, or immediately after closure
+outside Plan mode, choose a new descriptive artifact ID. Artifact Hub writes
+the plan under `~/.agents/artifacts/<id>/`; never overwrite an existing
+artifact.
 
 Run:
 
 ```bash
-node <skill-dir>/scripts/create-plan-app.mjs <workspace>
+node <skill-dir>/scripts/create-plan-app.mjs <artifact-id> --title <title> --repository <repository>
 ```
 
-Author `<workspace>/app/src/plan/plan.ts` from the decision ledger and codebase
+Author `~/.agents/artifacts/<artifact-id>/src/plan/plan.ts` from the decision ledger and codebase
 evidence. Use the exported types; do not replace the typed model with raw HTML
 or an unvalidated JSON blob.
 
@@ -122,33 +130,33 @@ to an execution phase.
 Run:
 
 ```bash
-cd <workspace>/app
-npm install
-npm run validate-plan
-npm test
-npm run check
-node <skill-dir>/scripts/plan-viewer.mjs start .
+cd ~/.agents/artifacts/<artifact-id>
+/root/.agents/node_modules/.bin/vite-node scripts/validate-plan.ts
+/root/.agents/node_modules/.bin/vitest run --config /root/.agents/vitest.config.ts --root .
+/root/.agents/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
+/root/.agents/bin/artifact-hub open <artifact-id>
 ```
 
 Inspect the live plan at desktop and narrow widths. Confirm navigation,
 filters, disclosures, dependency links, and review-state controls work; confirm
-the essential plan remains understandable without expanding every card. Keep
-the viewer bound to `127.0.0.1`.
+the essential plan remains understandable without expanding every card. The
+shared Hub service owns network binding; do not start a plan-local server.
 
-Return the workspace path, viewer URL, validation results, and a short list of
+Return the artifact path, viewer URL, validation results, and a short list of
 domain-documentation files changed. The HTML app is the canonical plan; the
 final chat response is only a concise handoff.
 
 ## Workspace contract
 
 ```text
-<workspace>/
-├── manifest.json
-└── app/
-    ├── src/lib/             # shared typed model and validation
-    ├── src/plan/plan.ts     # plan-local authored content
-    └── ...                  # shared Svelte/Vite viewer
+~/.agents/artifacts/<artifact-id>/
+├── manifest.json            # Artifact Hub catalog metadata
+├── index.html               # artifact-relative Vite entry
+├── src/lib/                 # plan-local typed model and validation
+├── src/plan/plan.ts         # plan-local authored content
+└── ...                      # complete custom Svelte application
 ```
 
-The scaffold is self-contained. Do not add a second full Markdown plan or
-duplicate the app's content into auxiliary documentation.
+The artifact owns its complete Svelte pages but shares Artifact Hub's single
+Vite process and dependency installation. Do not add a second full Markdown
+plan or duplicate the app's content into auxiliary documentation.

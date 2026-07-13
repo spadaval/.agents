@@ -34,6 +34,8 @@
   let impact: "all" | Impact = "all";
   let reviewed = new Set<string>();
 
+  const reviewStorageKey = `${window.location.pathname}:html-plan:reviewed`;
+
   $: normalizedQuery = query.trim().toLowerCase();
   $: decisions = plan.decisions.filter((decision) => {
     const impactMatches = impact === "all" || decision.impact === impact;
@@ -64,7 +66,7 @@
   onMount(() => {
     try {
       reviewed = new Set(
-        JSON.parse(localStorage.getItem("html-plan:reviewed") ?? "[]"),
+        JSON.parse(localStorage.getItem(reviewStorageKey) ?? "[]"),
       );
     } catch {
       reviewed = new Set();
@@ -82,7 +84,7 @@
     if (next.has(key)) next.delete(key);
     else next.add(key);
     reviewed = next;
-    localStorage.setItem("html-plan:reviewed", JSON.stringify([...next]));
+    localStorage.setItem(reviewStorageKey, JSON.stringify([...next]));
   }
 
   function navigate(id: SectionId) {
