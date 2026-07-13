@@ -1,3 +1,9 @@
 # Python bytecode and interpreter caches
 __pycache__/
 *.py[cod]
+
+# Generated local Artifact Hub applications
+/artifacts/
+
+# Shared local dependency installation and Vite caches
+/node_modules/

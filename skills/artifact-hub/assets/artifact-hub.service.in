@@ -1,0 +1,15 @@
+[Unit]
+Description=Local Artifact Hub
+Documentation=file://{{ROOT}}/skills/artifact-hub/references/operations.md
+
+[Service]
+Type=simple
+WorkingDirectory={{ROOT}}
+Environment=HOME={{HOME}}
+ExecStart={{NODE}} {{VITE}} --config {{CONFIG}} --host 0.0.0.0 --port {{PORT}} --strictPort
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

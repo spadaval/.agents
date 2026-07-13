@@ -1,0 +1,4 @@
+interface:
+  display_name: "Artifact Hub"
+  short_description: "Create and manage local Svelte artifacts"
+  default_prompt: "Use $artifact-hub to create or manage a local Svelte artifact in the shared Artifact Hub."
