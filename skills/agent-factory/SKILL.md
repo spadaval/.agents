@@ -24,9 +24,23 @@ for the current checkout and work item.
 - Assign exactly one subskill to each role-specific subagent.
 - A subagent loads only the assigned subskill reference unless the assignment
   explicitly names additional sources.
+- Configure every subagent explicitly with a model, reasoning effort, and
+  self-contained prompt. Load [Submodel selection](references/submodel-selection.md)
+  before spawning, select the least expensive capable model, and prefer smaller
+  models for bounded bulk work such as log scanning, file reading, inventory,
+  extraction, and evidence collection. Do not delegate when the runtime cannot
+  explicitly set the model and reasoning effort unless a human directs that
+  exception.
+- Use fresh subagent context by default. `fork_context` (also called
+  `fork_turns`) should almost never be used because it increases cost, weakens
+  role isolation, and imports stale context. Fork only when required context
+  cannot be summarized safely; record that specific justification before the
+  spawn.
 - Delegated assignments must include repository path, mission or issue IDs,
   branch/workspace context, assigned subskill, owned files or workflows,
-  expected proof, evidence destination, and independence requirements.
+  expected proof, evidence destination, independence requirements, explicit
+  model and reasoning choices with rationale, and a prompt that states scope,
+  sources, output, prohibitions, and completion conditions.
 - Planning and execution are separate. Do not reshape tracker scope while
   implementing unless graph management is the assigned work.
 - Important product, architecture, persistence, security, migration, or
@@ -41,7 +55,7 @@ Load these only when the assignment needs the named cross-cutting guidance:
 
 | Reference | Load when |
 | --- | --- |
-| [Submodel selection](references/submodel-selection.md) | Choosing or reviewing a delegated model and reasoning effort. |
+| [Submodel selection](references/submodel-selection.md) | Required before every delegation to choose and record the model and reasoning effort. |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory, mapping durable repository guidance, or auditing agent readiness. |
 
 Repository-specific work types, relationship semantics, commands, and lifecycle

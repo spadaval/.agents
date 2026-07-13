@@ -34,6 +34,36 @@ the human approves or selects a path.
 If subagents are unavailable, run the roles as clearly separated passes and
 state that the result did not use independent subagents.
 
+## Subagent Configuration
+
+Configure every subagent explicitly. Do not rely on inherited defaults. Before
+each spawn, select and provide all of the following:
+
+- **Model** - Choose the least expensive capable model for the assigned role.
+  Prefer smaller, faster models for bulk evidence work such as scanning logs,
+  reading many files, inventorying references, extracting facts, and other
+  bounded retrieval tasks. Use stronger models only where the role requires
+  difficult framing, adversarial reasoning, or final synthesis.
+- **Reasoning effort** - Set the reasoning level deliberately for the task.
+  Use lower effort for mechanical collection and extraction, and higher effort
+  for option criticism, conflict resolution, and judgment. Never leave effort
+  implicit merely for convenience.
+- **Prompt** - Give the agent a self-contained, role-specific prompt that names
+  its single role, scope, evidence sources, required output, prohibitions, and
+  completion condition. Do not depend on inherited conversation context to
+  make an underspecified prompt workable.
+
+Record the model and reasoning choice in the orchestration notes so the Judge
+and human reviewer can assess whether the delegation was appropriately sized.
+
+Do not fork the parent conversation into subagents by default. `fork_context`
+(also described as `fork_turns` by some orchestrators) should almost never be
+used: it increases context cost, weakens role isolation, and can import stale
+instructions or conclusions. Use a fresh subagent with an explicit prompt and
+only the minimum required references. Fork only when the role genuinely
+requires conversational state that cannot be summarized safely, and state the
+specific justification before spawning it.
+
 ## Workflow
 
 1. **Frame** - Assign a Framer to restate the choice, stakes, constraints,

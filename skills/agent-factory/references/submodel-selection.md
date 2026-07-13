@@ -7,9 +7,11 @@ assignment and its required proof.
 ## Capability Source
 
 Treat the runtime model catalog as authoritative. Select only models and
-reasoning efforts that the current environment exposes. If the delegation
-surface inherits the primary agent's model or does not expose an explicit
-choice, record `inherited` or `default`; do not invent a selection.
+reasoning efforts that the current environment exposes. Every delegation must
+set both values explicitly; never rely on inheritance or defaults. If the
+delegation surface cannot set both values, keep the work local unless a human
+explicitly directs an exception. Record any such exception rather than
+inventing a selection.
 
 The current GPT-5.6 routing tiers are:
 
@@ -22,6 +24,11 @@ The current GPT-5.6 routing tiers are:
 Reserve `gpt-5.6-sol` with `ultra` for primary orchestration of a genuinely
 complex multi-agent workstream, and only when the runtime exposes that effort.
 It is not a substitute for a bounded, single-role assignment.
+
+Prefer the smaller capable tier for high-volume, bounded work such as reading
+logs, scanning many files, inventorying references, extracting facts, and
+collecting evidence. Scale the model or effort only when ambiguity, risk, or
+the judgment required by the proof warrants it.
 
 ## Routing Test
 
@@ -39,7 +46,18 @@ repository context; resolve those assignment gaps first.
 
 ## Assignment Record
 
-Record the model, reasoning effort, routing rationale, and any runtime fallback
-in the delegated assignment. If the preferred combination is unavailable,
-choose the nearest available tier that still meets the risk and proof needs and
-state the constraint.
+Record the explicitly selected model, reasoning effort, routing rationale, and
+any runtime fallback in the delegated assignment. If the preferred combination
+is unavailable, choose the nearest available tier that still meets the risk and
+proof needs and state the constraint.
+
+The assignment prompt must be self-contained and role-specific. State the
+repository and workspace, assigned subskill, scope and ownership, evidence
+sources, required output and proof, prohibitions, independence requirements,
+and completion condition. Do not use inherited conversation context to repair
+an underspecified prompt.
+
+Start subagents with fresh context. `fork_context` (or `fork_turns`) should
+almost never be enabled: it increases context cost, weakens role isolation, and
+can import stale instructions or conclusions. Fork only when essential context
+cannot be summarized safely, and record the concrete reason before spawning.
