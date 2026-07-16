@@ -244,7 +244,6 @@ export async function createArtifact(options, root = ARTIFACT_ROOT) {
   }
 
   try {
-    await fs.mkdir(temp, { mode: 0o700 });
     await fs.cp(template, temp, {
       recursive: true,
       force: false,

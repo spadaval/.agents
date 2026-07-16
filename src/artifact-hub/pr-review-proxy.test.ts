@@ -1,11 +1,26 @@
 import { describe, expect, it } from "vitest";
 import {
   associateDiffs,
+  reviewDecisionArgs,
   splitUnifiedDiff,
   unifiedDiffPath,
 } from "./pr-review-proxy";
 
 describe("PR review runtime proxy", () => {
+  it("queries the authoritative review decision for the correct GitHub host", () => {
+    expect(reviewDecisionArgs("github.example", "owner", "repo", 42)).toEqual([
+      "pr",
+      "view",
+      "42",
+      "--repo",
+      "github.example/owner/repo",
+      "--json",
+      "reviewDecision",
+      "--jq",
+      '.reviewDecision // ""',
+    ]);
+  });
+
   it("splits a combined patch into complete file patches", () => {
     const patch = [
       "diff --git a/a.ts b/a.ts",
@@ -81,6 +96,19 @@ describe("PR review runtime proxy", () => {
         'diff --git "a/caf\\303\\251.ts" "b/caf\\303\\251.ts"\n--- "a/caf\\303\\251.ts"\n+++ "b/caf\\303\\251.ts"',
       ),
     ).toBe("café.ts");
+  });
+
+  it("uses the Git header path when a binary patch has no file markers", () => {
+    expect(
+      unifiedDiffPath(
+        "diff --git a/data/photo.png b/data/photo.png\nBinary files a/data/photo.png and b/data/photo.png differ",
+      ),
+    ).toBe("data/photo.png");
+    expect(
+      unifiedDiffPath(
+        'diff --git "a/data/caf\\303\\251.png" "b/data/caf\\303\\251.png"\nBinary files differ',
+      ),
+    ).toBe("data/café.png");
   });
 
   it("fails visibly when metadata and patch paths differ", () => {

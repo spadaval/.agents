@@ -77,8 +77,15 @@ the created path, URL, and manifest.
 
 Keep source context small and catalog-facing. When available, pass a repository
 path or project name, branch, PR number, status, and source URL; the Hub uses
-those optional fields for filtering and its detail inspector, not to render an
-artifact’s content.
+those optional fields for filtering and type-aware catalog summaries, not to
+render an artifact’s content. Status in a manifest is a creation-time snapshot;
+live-capable catalog rows may enrich it through a runtime endpoint.
+
+PR-review catalog enrichment is resolved as one cached live snapshot. The Hub
+may infer a stack only for open or draft PRs in the same repository when one
+PR's exact head ref uniquely matches another PR's exact base ref. It presents
+that graph as catalog grouping only; closed, ambiguous, or unresolved reviews
+remain standalone and artifact manifests remain unchanged.
 
 ```bash
 ./bin/artifact-hub create review-123 --title "Review #123" \

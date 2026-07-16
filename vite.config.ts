@@ -3,6 +3,7 @@ import { defineConfig, type Plugin } from "vite";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { prReviewProxy } from "./src/artifact-hub/pr-review-proxy";
+import { artifactApi } from "./src/artifact-hub/artifact-api";
 import { artifactRoutes } from "./src/artifact-hub/artifact-routes";
 
 const repositoryRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -65,6 +66,7 @@ function protectRepositoryFiles(): Plugin {
 export default defineConfig({
   plugins: [
     protectRepositoryFiles(),
+    artifactApi(path.join(repositoryRoot, "artifacts")),
     prReviewProxy(path.join(repositoryRoot, "artifacts")),
     artifactRoutes(path.join(repositoryRoot, "artifacts")),
     svelte(),

@@ -19,18 +19,54 @@ const artifact: ParsedArtifact = {
 };
 
 describe("catalog records", () => {
-  it("derives project, branch, reference, and status from PR evidence", () => {
-    const records = buildCatalogRecords([{
-      ...artifact,
-      valid: true,
-      manifest: { ...artifact.manifest, source: { repository: "/root/project", pr: 42, branch: "feature/auth", status: "OPEN" } },
-    }]);
+  it("normalizes universal and PR-specific snapshot fields", () => {
+    const records = buildCatalogRecords([
+      {
+        ...artifact,
+        valid: true,
+        manifest: {
+          ...artifact.manifest,
+          source: {
+            repository: "/root/project",
+            pr: 42,
+            branch: "feature/auth",
+            status: "OPEN",
+          },
+        },
+      },
+    ]);
     expect(records[0]).toMatchObject({
       project: "project",
       branch: "feature/auth",
       reference: "PR #42",
       status: "open",
-      kindLabel: "PR review",
+      kind: "pr-review",
+      imported: false,
+    });
+  });
+
+  it("marks legacy artifacts as imported without turning provenance into a type", () => {
+    const records = buildCatalogRecords([
+      {
+        ...artifact,
+        valid: true,
+        manifest: {
+          ...artifact.manifest,
+          kind: "codex-reflect",
+          source: {
+            repository: "/root/project",
+            producer: "codex-reflect",
+            legacyWorkspace: "/root/old-report",
+            primaryThreadId: "019f3d95-770f-7b40-9865-7f27e62e7d3d",
+          },
+        },
+      },
+    ]);
+    expect(records[0]).toMatchObject({
+      kind: "codex-reflect",
+      imported: true,
+      reference: "Session 019f3d95",
+      producer: "codex-reflect",
     });
   });
 });

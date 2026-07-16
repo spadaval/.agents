@@ -50,8 +50,14 @@ neutral starter and safe copy mechanics.
 - Treat `manifest.json` as catalog metadata and a readiness marker, never as a
   normalized application document.
 - When known, place source context in `source`: `repository`, `project`,
-  `branch`, `pr`, `status`, and `url` let the catalog filter and inspect work
-  without reading or constraining the application’s content.
+  `branch`, `pr`, `status`, and `url` let the catalog filter and render smart
+  summaries without reading or constraining the application’s content. Treat
+  manifest status as a creation-time snapshot; live-capable type adapters may
+  enrich it at runtime.
+- The Hub may group open PR-review artifacts into live stacks when a unique
+  same-repository head-ref to base-ref chain exists. Stack topology is derived
+  from one atomic live summary snapshot, never declared by or written back to
+  artifact manifests. Ambiguous, closed, or unavailable PRs remain standalone.
 - Run domain validation from the producer skill. Artifact Hub validates only
   ID, path, entry, manifest, service, and dependency invariants.
 
@@ -59,6 +65,12 @@ The CLI creates owner-only content in a temporary sibling, writes the manifest
 last, and atomically renames the complete directory into
 `/root/.agents/artifacts/<id>`. Never hand-create a second artifact root or
 start an artifact-local Vite process.
+
+The Hub catalog discovers manifests through `GET /api/artifacts` at page load.
+Keep mutable artifact discovery behind that runtime API; do not use
+`import.meta.glob` as a catalog registry because its key set belongs to Vite's
+module graph and can become stale when artifacts are atomically added or
+removed.
 
 ## Manage the Hub
 

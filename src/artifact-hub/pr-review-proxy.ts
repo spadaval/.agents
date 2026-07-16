@@ -3,6 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import type { Plugin } from "vite";
+import {
+  normalizeReviewDecision,
+  type GitHubReviewDecision,
+} from "./pr-review-decision";
 
 const execFileAsync = promisify(execFile);
 const ID_PATTERN = /^[a-z0-9](?:[a-z0-9._-]{0,78}[a-z0-9])?$/;
@@ -103,11 +107,52 @@ export function unifiedDiffPath(chunk: string): string {
   const added = markers.find((line) => line.startsWith("+++ "))?.slice(4);
   const removed = markers.find((line) => line.startsWith("--- "))?.slice(4);
   const marker = added && added !== "/dev/null" ? added : removed;
+  if (marker && marker !== "/dev/null") {
+    const decoded = decodeGitQuotedPath(marker);
+    return decoded.replace(/^[ab]\//, "");
+  }
+
+  const header = markers.find((line) => line.startsWith("diff --git "));
+  const fallback = header ? gitDiffHeaderPaths(header).at(-1) : undefined;
+  if (fallback && fallback !== "/dev/null")
+    return decodeGitQuotedPath(fallback).replace(/^b\//, "");
+
   if (!marker || marker === "/dev/null") {
     throw new Error("unified diff chunk has no source or destination path");
   }
-  const decoded = decodeGitQuotedPath(marker);
-  return decoded.replace(/^[ab]\//, "");
+  throw new Error("unified diff chunk has no source or destination path");
+}
+
+function gitDiffHeaderPaths(header: string): string[] {
+  const source = header.slice("diff --git ".length);
+  const paths: string[] = [];
+  let current = "";
+  let quoted = false;
+  let escaped = false;
+  for (const character of source) {
+    if (quoted) {
+      current += character;
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === '"') quoted = false;
+      continue;
+    }
+    if (character === '"') {
+      quoted = true;
+      current += character;
+      continue;
+    }
+    if (character === " ") {
+      if (current) {
+        paths.push(current);
+        current = "";
+      }
+      continue;
+    }
+    current += character;
+  }
+  if (current) paths.push(current);
+  return paths;
 }
 
 export function associateDiffs(
@@ -162,27 +207,246 @@ function repositoryCoordinates(source: RuntimeSource) {
   return { host: url.hostname, owner, repository };
 }
 
-async function loadPr(source: RuntimeSource) {
+function prSummary(
+  metadata: Record<string, any>,
+  source: RuntimeSource,
+  owner: string,
+  repository: string,
+  fallbackChangedFiles = 0,
+  reviewDecision?: GitHubReviewDecision,
+) {
+  return {
+    schemaVersion: 1 as const,
+    repository: `${owner}/${repository}`,
+    pr: {
+      additions: Number(metadata.additions ?? 0),
+      author: metadata.user
+        ? { login: metadata.user.login, name: metadata.user.name ?? "" }
+        : undefined,
+      baseRefName: String(metadata.base?.ref ?? ""),
+      baseRefOid: String(metadata.base?.sha ?? ""),
+      body: String(metadata.body ?? ""),
+      changedFiles: Number(metadata.changed_files ?? fallbackChangedFiles),
+      comments: Number(metadata.comments ?? 0),
+      createdAt: String(metadata.created_at ?? ""),
+      deletions: Number(metadata.deletions ?? 0),
+      headRefName: String(metadata.head?.ref ?? ""),
+      headRefOid: String(metadata.head?.sha ?? ""),
+      headRepository: String(
+        metadata.head?.repo?.full_name ?? `${owner}/${repository}`,
+      ),
+      isDraft: Boolean(metadata.draft),
+      number: Number(metadata.number),
+      reviewDecision,
+      reviewComments: Number(metadata.review_comments ?? 0),
+      baseRepository: String(
+        metadata.base?.repo?.full_name ?? `${owner}/${repository}`,
+      ),
+      state: String(metadata.state ?? "").toUpperCase(),
+      title: String(metadata.title ?? ""),
+      updatedAt: String(metadata.updated_at ?? ""),
+      url: String(metadata.html_url ?? source.url ?? ""),
+    },
+  };
+}
+
+export function reviewDecisionArgs(
+  host: string,
+  owner: string,
+  repository: string,
+  pr: number,
+): string[] {
+  return [
+    "pr",
+    "view",
+    String(pr),
+    "--repo",
+    `${host}/${owner}/${repository}`,
+    "--json",
+    "reviewDecision",
+    "--jq",
+    '.reviewDecision // ""',
+  ];
+}
+
+async function loadReviewDecision(
+  source: RuntimeSource,
+  host: string,
+  owner: string,
+  repository: string,
+) {
+  return normalizeReviewDecision(
+    await run("gh", reviewDecisionArgs(host, owner, repository, source.pr)),
+  );
+}
+
+async function loadPrSummary(source: RuntimeSource) {
   const { host, owner, repository } = repositoryCoordinates(source);
-  const apiPath = `repos/${owner}/${repository}/pulls/${source.pr}`;
-  const [metadataText, filesText, unifiedDiff] = await Promise.all([
-    run("gh", ["api", "--hostname", host, apiPath]),
+  const [metadataText, reviewDecision] = await Promise.all([
     run("gh", [
       "api",
       "--hostname",
       host,
-      "--paginate",
-      "--slurp",
-      `${apiPath}/files?per_page=100`,
+      `repos/${owner}/${repository}/pulls/${source.pr}`,
     ]),
-    run("gh", [
-      "pr",
-      "diff",
-      String(source.pr),
-      "--repo",
-      `${host}/${owner}/${repository}`,
-    ]),
+    loadReviewDecision(source, host, owner, repository),
   ]);
+  return prSummary(
+    JSON.parse(metadataText),
+    source,
+    owner,
+    repository,
+    0,
+    reviewDecision,
+  );
+}
+
+type PrSummaryValue = Awaited<ReturnType<typeof loadPrSummary>>;
+
+type BatchPrSummarySnapshot = {
+  schemaVersion: 1;
+  generatedAt: string;
+  freshness: "live" | "partial" | "stale";
+  summaries: Record<string, PrSummaryValue>;
+  errors: Record<string, string>;
+};
+
+let batchCache:
+  { expiresAt: number; promise: Promise<BatchPrSummarySnapshot> } | undefined;
+let lastCompleteBatch: BatchPrSummarySnapshot | undefined;
+
+async function listPrSources(
+  artifactRoot: string,
+): Promise<Array<{ id: string; source: RuntimeSource }>> {
+  const entries = await fs.readdir(artifactRoot, { withFileTypes: true });
+  const sources = await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory() && ID_PATTERN.test(entry.name))
+      .map(async (entry) => {
+        try {
+          const manifest = JSON.parse(
+            await fs.readFile(
+              path.join(artifactRoot, entry.name, "manifest.json"),
+              "utf8",
+            ),
+          ) as { kind?: unknown };
+          if (manifest.kind !== "pr-review") return undefined;
+          return {
+            id: entry.name,
+            source: await sourceForArtifact(artifactRoot, entry.name),
+          };
+        } catch {
+          return undefined;
+        }
+      }),
+  );
+  return sources.filter(
+    (value): value is { id: string; source: RuntimeSource } =>
+      value !== undefined,
+  );
+}
+
+async function mapWithConcurrency<T, R>(
+  values: T[],
+  concurrency: number,
+  mapper: (value: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(values.length);
+  let nextIndex = 0;
+  async function worker() {
+    while (nextIndex < values.length) {
+      const index = nextIndex++;
+      results[index] = await mapper(values[index]);
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, values.length) }, () =>
+      worker(),
+    ),
+  );
+  return results;
+}
+
+async function loadBatchPrSummaries(
+  artifactRoot: string,
+): Promise<BatchPrSummarySnapshot> {
+  const sources = await listPrSources(artifactRoot);
+  type SettledSummary =
+    | { id: string; ok: true; value: PrSummaryValue }
+    | { id: string; ok: false; error: string };
+  const settled = await mapWithConcurrency<
+    { id: string; source: RuntimeSource },
+    SettledSummary
+  >(sources, 4, async ({ id, source }) => {
+    try {
+      return { id, ok: true, value: await loadPrSummary(source) };
+    } catch (error) {
+      return {
+        id,
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  });
+  const summaries: Record<string, PrSummaryValue> = {};
+  const errors: Record<string, string> = {};
+  for (const result of settled) {
+    if (result.ok) summaries[result.id] = result.value;
+    else errors[result.id] = result.error;
+  }
+  const complete = Object.keys(errors).length === 0;
+  const snapshot: BatchPrSummarySnapshot = {
+    schemaVersion: 1,
+    generatedAt: new Date().toISOString(),
+    freshness: complete ? "live" : "partial",
+    summaries,
+    errors,
+  };
+  if (complete) {
+    lastCompleteBatch = snapshot;
+    return snapshot;
+  }
+  return lastCompleteBatch
+    ? { ...lastCompleteBatch, freshness: "stale", errors }
+    : snapshot;
+}
+
+function batchPrSummaries(
+  artifactRoot: string,
+): Promise<BatchPrSummarySnapshot> {
+  if (batchCache && batchCache.expiresAt > Date.now())
+    return batchCache.promise;
+  const promise = loadBatchPrSummaries(artifactRoot);
+  batchCache = { expiresAt: Date.now() + CACHE_TTL_MS, promise };
+  promise.catch(() => {
+    if (batchCache?.promise === promise) batchCache = undefined;
+  });
+  return promise;
+}
+
+async function loadPr(source: RuntimeSource) {
+  const { host, owner, repository } = repositoryCoordinates(source);
+  const apiPath = `repos/${owner}/${repository}/pulls/${source.pr}`;
+  const [metadataText, filesText, unifiedDiff, reviewDecision] =
+    await Promise.all([
+      run("gh", ["api", "--hostname", host, apiPath]),
+      run("gh", [
+        "api",
+        "--hostname",
+        host,
+        "--paginate",
+        "--slurp",
+        `${apiPath}/files?per_page=100`,
+      ]),
+      run("gh", [
+        "pr",
+        "diff",
+        String(source.pr),
+        "--repo",
+        `${host}/${owner}/${repository}`,
+      ]),
+      loadReviewDecision(source, host, owner, repository),
+    ]);
   const metadata = JSON.parse(metadataText);
   const pages = JSON.parse(filesText) as GitHubFile[][];
   const apiFiles = pages.flat();
@@ -195,27 +459,16 @@ async function loadPr(source: RuntimeSource) {
     deletions: String(file.deletions),
     diff: diffs.get(file.filename)!,
   }));
+  const summary = prSummary(
+    metadata,
+    source,
+    owner,
+    repository,
+    files.length,
+    reviewDecision,
+  );
   return {
-    schemaVersion: 1,
-    repository: `${owner}/${repository}`,
-    pr: {
-      additions: Number(metadata.additions ?? 0),
-      author: metadata.user
-        ? { login: metadata.user.login, name: metadata.user.name ?? "" }
-        : undefined,
-      baseRefName: String(metadata.base?.ref ?? ""),
-      baseRefOid: String(metadata.base?.sha ?? ""),
-      body: String(metadata.body ?? ""),
-      changedFiles: Number(metadata.changed_files ?? files.length),
-      deletions: Number(metadata.deletions ?? 0),
-      headRefName: String(metadata.head?.ref ?? ""),
-      headRefOid: String(metadata.head?.sha ?? ""),
-      isDraft: Boolean(metadata.draft),
-      number: Number(metadata.number),
-      state: String(metadata.state ?? "").toUpperCase(),
-      title: String(metadata.title ?? ""),
-      url: String(metadata.html_url ?? source.url ?? ""),
-    },
+    ...summary,
     files,
   };
 }
@@ -235,19 +488,48 @@ export function prReviewProxy(artifactRoot: string): Plugin {
     configureServer(server) {
       server.middlewares.use(async (request, response, next) => {
         const url = new URL(request.url ?? "/", "http://artifact-hub.local");
-        const match = url.pathname.match(/^\/api\/pr-review\/([^/]+)$/);
+        if (url.pathname === "/api/pr-review-summaries") {
+          try {
+            const value = await batchPrSummaries(artifactRoot);
+            response.statusCode = 200;
+            response.setHeader(
+              "Content-Type",
+              "application/json; charset=utf-8",
+            );
+            response.setHeader("Cache-Control", "no-store");
+            response.end(JSON.stringify(value));
+          } catch (error) {
+            response.statusCode = 502;
+            response.setHeader(
+              "Content-Type",
+              "application/json; charset=utf-8",
+            );
+            response.end(
+              JSON.stringify({
+                error: error instanceof Error ? error.message : String(error),
+              }),
+            );
+          }
+          return;
+        }
+        const match = url.pathname.match(
+          /^\/api\/pr-review\/([^/]+)(\/summary)?$/,
+        );
         if (!match) return next();
         try {
           const id = decodeURIComponent(match[1]);
+          const summaryOnly = Boolean(match[2]);
           const source = await sourceForArtifact(artifactRoot, id);
-          const cacheKey = `${id}:${JSON.stringify(source)}`;
+          const cacheKey = `${summaryOnly ? "summary" : "review"}:${id}:${JSON.stringify(source)}`;
           let cached = cache.get(cacheKey);
           if (cached && cached.expiresAt <= Date.now()) {
             cache.delete(cacheKey);
             cached = undefined;
           }
           if (!cached) {
-            const promise = loadPr(source);
+            const promise = summaryOnly
+              ? loadPrSummary(source)
+              : loadPr(source);
             cached = { expiresAt: Date.now() + CACHE_TTL_MS, promise };
             cache.set(cacheKey, cached);
             promise.catch(() => {
