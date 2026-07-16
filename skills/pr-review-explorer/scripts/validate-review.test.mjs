@@ -37,15 +37,10 @@ function fixture() {
 function entry(root, kind, name, metadata, markup = "") {
   const directory = join(root, `src/review/${kind}`);
   mkdirSync(directory, { recursive: true });
-  const exports = Object.entries(metadata)
-    .map(
-      ([field, value]) =>
-        `export const ${field} = ${JSON.stringify(value, null, 2)};`,
-    )
-    .join("\n");
+  const meta = { kind: kind === "layers" ? "layer" : "story", ...metadata };
   writeFileSync(
     join(directory, `${name}.svelte`),
-    `<script module lang="ts">\n${exports}\n</script>\n${markup}\n`,
+    `<script module lang="ts">\nexport const meta = ${JSON.stringify(meta, null, 2)} as const;\n</script>\n${markup}\n`,
   );
 }
 
@@ -72,18 +67,41 @@ test("accepts exact paths and intentional membership in multiple layers", () => 
     id: "runtime",
     order: 10,
     title: "Runtime",
+    summary: "Runtime changes.",
     files: ["src/a.ts", "src/b.ts"],
   });
   entry(
     root,
     "layers",
     "risk",
-    { id: "risk", order: 20, title: "Risk", files: ["src/a.ts"] },
+    {
+      id: "risk",
+      order: 20,
+      title: "Risk",
+      summary: "Risk changes.",
+      files: ["src/a.ts"],
+    },
     "<p>Shared evidence.</p>",
   );
   const result = validate(root);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /2 changed files; 2 layers; 0 stories/);
+  assert.match(result.stdout, /2 changed files; 2 layers; 0 stories; 0 findings/);
+});
+
+test("validates typed findings and their exact changed-file anchors", () => {
+  const root = fixture();
+  evidence(root, ["src/a.ts"]);
+  entry(root, "layers", "runtime", {
+    id: "runtime", title: "Runtime", summary: "Runtime changes.", files: ["src/a.ts"],
+  });
+  mkdirSync(join(root, "src/review/findings"));
+  writeFileSync(
+    join(root, "src/review/findings/bug.ts"),
+    `export default { id: "bug", kind: "bug", severity: 2, title: "Broken", body: "It breaks.", reviewedHeadOid: "deadbeef", anchors: [{ path: "src/a.ts", side: "new", start: 2, end: 3 }] } as const;`,
+  );
+  const result = validate(root);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /1 findings/);
 });
 
 test("reports unassigned and stale paths", () => {
@@ -93,6 +111,7 @@ test("reports unassigned and stale paths", () => {
     id: "runtime",
     order: 10,
     title: "Runtime",
+    summary: "Runtime changes.",
     files: ["src/a.ts", "src/stale.ts"],
   });
   const result = validate(root);
@@ -108,12 +127,14 @@ test("reports duplicate layer metadata, duplicate entries, empty layers, and mul
     id: "same",
     order: 10,
     title: "One",
+    summary: "First changes.",
     files: ["src/a.ts", "src/a.ts"],
   });
   entry(root, "layers", "two", {
     id: "same",
     order: 10,
     title: "Two",
+    summary: "Second changes.",
     files: [],
   });
   entry(root, "stories", "one", {
@@ -145,6 +166,7 @@ test("loads runtime paths with authenticated enterprise gh api", () => {
     id: "runtime",
     order: 10,
     title: "Runtime",
+    summary: "Runtime changes.",
     files: ["src/live.ts"],
   });
   mkdirSync(join(root, "runtime"));

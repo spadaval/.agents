@@ -51,16 +51,26 @@ extracted data separate from agent-authored review stories.
 
    ```svelte
    <script module lang="ts">
-     export const id = "runtime-boundary";
-     export const order = 10;
-     export const title = "Runtime boundary";
-     export const files = ["src/runtime/client.ts", "src/runtime/server.ts"];
+     import type { LayerMeta } from "../types";
+
+     export const meta = {
+       kind: "layer",
+       id: "runtime-boundary",
+       order: 10,
+       title: "Runtime boundary",
+       summary: "Explain the boundary the runtime owns.",
+       files: ["src/runtime/client.ts", "src/runtime/server.ts"],
+     } as const satisfies LayerMeta;
    </script>
 
    <p>Optional authored context shown before the exact file diffs.</p>
    ```
 
-   Non-empty `id`, non-empty `title`, and non-empty `files` are required.
+   Non-empty `id`, non-empty `title`, non-empty one-line `summary`, and
+   non-empty `files` are required. `summary` is concise authored context for
+   navigation controls; do not derive it by truncating the Svelte story body.
+   Do not export `description` from a layer: its Svelte story body is the
+   extended layer narrative. `description` remains for global stories only.
    `order` is an optional finite number used before the title/id sort fallback.
    Every `files[]` item is an exact changed path, not a glob or predicate.
    IDs and specified orders are unique among layers, and a path may
@@ -70,13 +80,78 @@ extracted data separate from agent-authored review stories.
 
    Free-standing stories are optional and live flat under
    `<artifact>/src/review/stories/*.svelte`. Create them normally only when the
-   user explicitly requests a narrative outside the layer sequence. They use
-   the same literal non-empty `id` and `title` exports, may export finite
-   `order` and `primary = true`, and contain their story as Svelte markup.
+   user explicitly requests a narrative outside the layer sequence. They use a
+   literal `meta` object satisfying `StoryMeta`, with non-empty `id` and
+   `title`, may set finite `order` and `primary: true`, and contain their story
+   as Svelte markup. The static validator inspects this literal metadata without
+   executing the component.
    Story IDs and specified orders are unique among stories, and at most one
-   story may be primary.
+   story may be primary. Treat the primary story's metadata as the artifact's
+   PR-level introduction, not as an editorial headline. Its `title` should
+   directly describe the PR's goal and major changes. Its `description` should
+   be a self-contained paragraph summarizing the PR's purpose and consequential
+   implementation changes. Avoid slogans, teasers, or meta-commentary about
+   how to read the PR. This constrains the entry point's informational role,
+   not the narrative body's voice: stories may be candid, critical, or emphatic
+   when the evidence warrants it.
 
-3. Validate and inspect the viewer:
+   At runtime, the review shell discovers authored layers, stories, and
+   findings through the same-origin
+   `GET /api/artifacts/<artifact-id>/modules` registry and then dynamically
+   imports only the returned allowlisted module URLs. Do not replace this with
+   `import.meta.glob`: artifact content is mutable registry data, while Vite's
+   glob key set is a compile-time module-graph concern. Natural artifact,
+   story, layer, and file deep links continue to load the stable shell before
+   the runtime module registry is resolved.
+
+3. Add requested-review mode only when the user explicitly asks for review
+   findings. Keep findings in typed TypeScript modules under
+   `<artifact>/src/review/findings/*.ts`, separate from Svelte stories. Define
+   a discriminated union with direct `kind` values; render those kinds
+   directly, rather than encoding them in tags or prose. Give every finding a
+   stable ID, title, explanation, severity `1`–`5`, reviewed PR head OID, and
+   one or more exact anchors. Treat S1 as highest severity and S5 as lowest.
+
+   ```ts
+   import type { ReviewFinding } from "../types";
+
+   export default {
+     id: "retry-duplicates-work",
+     kind: "bug",
+     severity: 2,
+     title: "Retry can repeat committed work",
+     body: "The retry path runs after a possible commit and can perform the operation twice.",
+     reviewedHeadOid: "<PR-head-commit>",
+     anchors: [{ path: "src/retry.ts", side: "new", start: 44, end: 52 }],
+   } as const satisfies ReviewFinding;
+   ```
+
+   Anchor every finding to an exact repository path, diff side, and line or
+   line range. Resolve and validate anchors against the reviewed patch; never
+   guess a nearby line or silently relocate an anchor. Bind the finding to the
+   reviewed PR head OID. If that head is stale, keep the finding visible as
+   stale and do not present its inline annotation as current evidence.
+
+   The viewer generates a direct **Review** page from typed findings and shows
+   `Zarro boogs found.` when none exist. A richer multi-file review story is an
+   optional global Svelte story, not a requirement for a small finding. Keep it
+   directly navigable and distinct from layer stories, and preserve a selected
+   finding's exact anchor when opening its full diff.
+
+   Annotate full file diffs through `@pierre/diffs` using the exact anchor and
+   the finding's direct kind and severity. Do not annotate story excerpts.
+   Keep annotation state tied to the current file revision, and show stale-head
+   state instead of attaching an annotation to an approximate line. Keep
+   finding data immutable evidence plus authored review content; do not infer
+   findings from the diff.
+
+   Treat requested-review mode as a review surface, not an automatic code
+   review, issue tracker, PR editor, or replacement for the complete diff.
+   Do not create findings unless requested, invent unsupported severity or kind
+   values, infer anchors, silently repair stale OIDs, or add a second raw diff
+   renderer.
+
+4. Validate and inspect the viewer:
 
    ```bash
    cd <artifact>
@@ -96,25 +171,71 @@ extracted data separate from agent-authored review stories.
 
    Review routes are clean Artifact Hub paths, not physical HTML filenames or
    hash fragments. The artifact root renders the primary story when one exists
-   (otherwise the change map), while explicit destinations use
-   `/story/<id>`, `/layer/<id>`, `/layer/<id>/diffs/<changed-path>`, `/map`,
-   and `/files/<changed-path>`. When a layer is active, show its changed files
-   directly beneath the layer story in the persistent navigation rail. Show all
-   files for the active layer in that rail; keep inactive layers collapsed and
-   let the rail itself provide the only vertical scroll. Do not paginate, add a
-   “show more” control, or create a nested scrolling file list. Selecting a file
-   replaces the main story pane with that full diff while preserving the layer
-   grouping; do not add an intermediate “layer diffs” page or move layer files
-   into a generic bottom bucket. Artifact Hub serves the manifest-declared HTML
-   entry for direct navigation and refreshes at every logical route.
+   (otherwise the first layer). Use `/story/<id>`, `/layer/<id>`,
+   `/layer/<id>/diffs/<changed-path>`, and `/files/<changed-path>` for explicit
+   destinations; redirect legacy `/map` paths to the root entry point. Artifact
+   Hub serves the manifest-declared HTML entry for direct navigation and
+   refreshes at every logical route.
+
+   Render a persistent, evidence-backed topbar above the viewer. It should make
+   the PR identifiable without opening another panel: project and repository
+   path, title and number, state, branch direction, changed-file and line
+   counts, comment activity, author, recent update time, and an explicit link
+   to the GitHub PR. Extend the runtime normalizer, Hub proxy, and extraction
+   script together; never hardcode PR-specific metadata in the artifact.
+   When live evidence cannot load, show a recovery state in the artifact—not a
+   bare transport error. Identify the PR when known, surface the HTTP status and
+   safe proxy detail, explain that the authored artifact remains intact, and
+   provide retry and GitHub-PR actions. Treat binary Git patch chunks as valid
+   evidence: resolve their paths from the `diff --git` header when `---`/`+++`
+   markers are absent.
+
+   The persistent navigation rail is one file navigator, not separate Review
+   and Files modes. Begin with the layer-scope picker, containing **All
+   changes** and every semantic layer; do not add a redundant Scope or Files-in
+   label. Implement this as the
+   purpose-built
+   `LayerScopeSelect` component, not a native `<select>` or generic dropdown
+   framework. Its trigger shows the active scope; options show a title,
+   authored summary, file count, and total changed lines. All changes renders
+   the complete PR tree; a selected layer renders only its exact changed paths. Both use
+   `@pierre/trees` with real repository paths, Git status, and total
+   changed-line count (additions plus deletions). The all-changes tree also
+   shows layer-membership signals.
+
+   Under Scope, render one **Stories** section of direct links. Review is a
+   peer of the primary PR story and any explicitly authored global stories; it
+   carries its finding count but is not a separate navigation mode. Never hide
+   global stories in a selector. When a layer is selected, append a visually
+   separated **Current layer** sub-section inside Stories with its **Read layer
+   story** link. Do not render a duplicate **Read PR story** link for All
+   changes: the primary PR story is already a global story. The layer link
+   remains available while viewing a scoped file.
+
+   The picker controls both the central narrative context and the tree scope:
+   choose a layer to open its story and scope the tree; choose All changes to
+   return to the primary PR story and full tree.
+   Give the tree all remaining fixed sidebar height and let it use its normal
+   virtualized scroll. Do not fake natural expansion, estimate a virtual
+   viewport, add a second nested file list, paginate, or add a “show more”
+   control.
+
+   Selecting a file uses the central pane for its full diff. A selection from a
+   scoped layer tree keeps the layer route and grouping; a selection from All
+   changes uses the file route. The central pane is for a story, a layer, or
+   one file diff; do not create a standalone Change Map main screen, a generic
+   all-files diff page, or an embedded diff navigator. Diff excerpts may appear
+   inline in a story, but full diffs remain a separate central view.
 
    Keep evidence navigation local to each excerpt. `DiffExcerpt` already shows
    its file, line range, explanation, and full-diff link; do not synthesize a
    repetitive “featured in this story” index from the same excerpts. Both full
    file diffs and story excerpts must render through `@pierre/diffs`; an
-   excerpt utility may select a semantic old/new line range and reconstruct a
-   minimal valid patch, but must not implement a separate raw `<pre>` diff
-   renderer or bypass Pierre's syntax highlighting.
+   excerpt utility may select an exact semantic old/new line range and
+   reconstruct a minimal valid patch, but must not infer surrounding context,
+   replacement rows, or editorial emphasis. The authored range is the entire
+   excerpt; use the complete file diff for anything beyond it. Do not implement
+   a separate raw `<pre>` diff renderer or bypass Pierre's syntax highlighting.
 
    Keep application styling in Svelte component `<style>` blocks. A root
    component may use explicit `:global(...)` rules only for document reset and
@@ -133,7 +254,8 @@ extracted data separate from agent-authored review stories.
 ├── scripts/validate-review.ts
 └── src/review/
     ├── layers/*.svelte             # required canonical layer stories
-    └── stories/*.svelte            # optional free-standing stories
+    ├── stories/*.svelte            # optional free-standing stories
+    └── findings/*.ts               # optional typed requested-review findings
 ```
 
 A generated artifact has either live runtime identity or extracted evidence;

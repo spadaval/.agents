@@ -9,8 +9,18 @@ type Metadata = {
   id: string;
   order?: number;
   title: string;
+  summary?: string;
   files?: string[];
   primary?: boolean;
+};
+type Finding = {
+  id: string;
+  kind: string;
+  severity: number;
+  title: string;
+  body: string;
+  reviewedHeadOid: string;
+  anchors: Array<{ path: string; side: string; start: number; end: number }>;
 };
 type RuntimeSource = {
   repository?: string;
@@ -23,8 +33,12 @@ const root = resolve(process.cwd());
 const { parse } = createRequire(resolve(root, "package.json"))(
   "svelte/compiler",
 ) as typeof import("svelte/compiler");
+const ts = createRequire(resolve(root, "package.json"))(
+  "typescript",
+) as typeof import("typescript");
 const layersDirectory = resolve(root, "src/review/layers");
 const storiesDirectory = resolve(root, "src/review/stories");
+const findingsDirectory = resolve(root, "src/review/findings");
 const evidencePath = resolve(root, "evidence/pr.json");
 const runtimePath = resolve(root, "runtime/source.json");
 const errors: string[] = [];
@@ -108,11 +122,12 @@ function readMetadata(path: string): Record<string, Literal> {
         );
     }
   }
-  if (!Object.keys(metadata).length)
+  const meta = metadata.meta;
+  if (!meta || Array.isArray(meta) || typeof meta !== "object")
     throw new Error(
-      `${path}: module script must export entry metadata constants.`,
+      `${path}: module script must export a literal meta object.`,
     );
-  return metadata;
+  return meta as Record<string, Literal>;
 }
 
 function modulePaths(directory: string): string[] {
@@ -123,12 +138,159 @@ function modulePaths(directory: string): string[] {
     .sort();
 }
 
+function findingPaths(): string[] {
+  if (!existsSync(findingsDirectory)) return [];
+  return readdirSync(findingsDirectory, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".ts"))
+    .map((entry) => resolve(findingsDirectory, entry.name))
+    .sort();
+}
+
+function tsLiteralValue(
+  node: import("typescript").Expression,
+  file: string,
+): Literal {
+  while (
+    ts.isAsExpression(node) ||
+    ts.isSatisfiesExpression(node) ||
+    ts.isParenthesizedExpression(node)
+  )
+    node = node.expression;
+  if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node))
+    return node.text;
+  if (ts.isNumericLiteral(node)) return Number(node.text);
+  if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
+  if (node.kind === ts.SyntaxKind.FalseKeyword) return false;
+  if (node.kind === ts.SyntaxKind.NullKeyword) return null;
+  if (
+    ts.isPrefixUnaryExpression(node) &&
+    node.operator === ts.SyntaxKind.MinusToken
+  ) {
+    const value = tsLiteralValue(node.operand, file);
+    if (typeof value === "number") return -value;
+  }
+  if (ts.isArrayLiteralExpression(node))
+    return node.elements.map((element) => {
+      if (!ts.isExpression(element))
+        throw new Error(`${file}: finding arrays may only contain literals.`);
+      return tsLiteralValue(element, file);
+    });
+  if (ts.isObjectLiteralExpression(node)) {
+    const value: Record<string, Literal> = {};
+    for (const property of node.properties) {
+      if (!ts.isPropertyAssignment(property) || !property.name)
+        throw new Error(
+          `${file}: findings must contain literal property assignments only.`,
+        );
+      const name =
+        ts.isIdentifier(property.name) || ts.isStringLiteral(property.name)
+          ? property.name.text
+          : undefined;
+      if (!name)
+        throw new Error(
+          `${file}: finding property names must be identifiers or strings.`,
+        );
+      value[name] = tsLiteralValue(property.initializer, file);
+    }
+    return value;
+  }
+  throw new Error(`${file}: finding values must be static JSON-compatible literals.`);
+}
+
+function readFinding(path: string): Record<string, Literal> {
+  const source = ts.createSourceFile(
+    path,
+    readFileSync(path, "utf8"),
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const assignment = source.statements.find(ts.isExportAssignment);
+  if (!assignment || assignment.isExportEquals)
+    throw new Error(`${path}: must default-export one literal finding object.`);
+  const value = tsLiteralValue(assignment.expression, path);
+  if (!value || Array.isArray(value) || typeof value !== "object")
+    throw new Error(`${path}: default export must be a literal finding object.`);
+  return value as Record<string, Literal>;
+}
+
+function collectFindings(): Finding[] {
+  const findings: Finding[] = [];
+  const ids = new Set<string>();
+  const validKinds = new Set([
+    "bug",
+    "regression",
+    "security",
+    "performance",
+    "maintainability",
+    "missing-test",
+    "question",
+  ]);
+  for (const path of findingPaths()) {
+    const label = `finding ${basename(path)}`;
+    try {
+      const value = readFinding(path);
+      if (typeof value.id !== "string" || !value.id.trim())
+        errors.push(`${label}: id must be a non-empty string.`);
+      else if (ids.has(value.id))
+        errors.push(`duplicate finding id: ${value.id}.`);
+      else ids.add(value.id);
+      if (typeof value.kind !== "string" || !validKinds.has(value.kind))
+        errors.push(`${label}: kind must be a supported direct finding kind.`);
+      if (
+        !Number.isInteger(value.severity) ||
+        (value.severity as number) < 1 ||
+        (value.severity as number) > 5
+      )
+        errors.push(`${label}: severity must be an integer from 1 to 5.`);
+      if (typeof value.title !== "string" || !value.title.trim())
+        errors.push(`${label}: title must be a non-empty string.`);
+      if (typeof value.body !== "string" || !value.body.trim())
+        errors.push(`${label}: body must be a non-empty string.`);
+      if (
+        typeof value.reviewedHeadOid !== "string" ||
+        !value.reviewedHeadOid.trim()
+      )
+        errors.push(`${label}: reviewedHeadOid must be a non-empty commit OID.`);
+      if (!Array.isArray(value.anchors) || !value.anchors.length)
+        errors.push(`${label}: anchors must be a non-empty array.`);
+      else
+        for (const anchor of value.anchors) {
+          if (!anchor || Array.isArray(anchor) || typeof anchor !== "object") {
+            errors.push(`${label}: every anchor must be an object.`);
+            continue;
+          }
+          const item = anchor as Record<string, Literal>;
+          if (typeof item.path !== "string" || !item.path)
+            errors.push(`${label}: anchor path must be a non-empty exact path.`);
+          if (item.side !== "new" && item.side !== "old")
+            errors.push(`${label}: anchor side must be "new" or "old".`);
+          if (
+            !Number.isInteger(item.start) ||
+            !Number.isInteger(item.end) ||
+            (item.start as number) < 1 ||
+            (item.end as number) < (item.start as number)
+          )
+            errors.push(
+              `${label}: anchor range must use positive start/end lines.`,
+            );
+        }
+      findings.push(value as unknown as Finding);
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
+  }
+  return findings;
+}
+
 function validateCommon(
   metadata: Record<string, Literal>,
   path: string,
   kind: "layer" | "story",
 ): Metadata | undefined {
   const label = `${kind} ${basename(path)}`;
+  if (metadata.kind !== kind)
+    errors.push(`${label}: meta.kind must be "${kind}".`);
   if (typeof metadata.id !== "string" || !metadata.id.trim())
     errors.push(`${label}: id must be a non-empty string.`);
   if (
@@ -151,6 +313,13 @@ function collect(kind: "layer" | "story", directory: string): Metadata[] {
       const entry = validateCommon(metadata, path, kind);
       if (!entry) continue;
       if (kind === "layer") {
+        if (typeof metadata.summary !== "string" || !metadata.summary.trim()) {
+          errors.push(
+            `layer ${basename(path)}: summary must be a non-empty string.`,
+          );
+          continue;
+        }
+        entry.summary = metadata.summary;
         if (
           !Array.isArray(metadata.files) ||
           metadata.files.some((file) => typeof file !== "string" || !file)
@@ -284,6 +453,7 @@ function changedFiles(): {
 
 const layers = collect("layer", layersDirectory);
 const stories = collect("story", storiesDirectory);
+const findings = collectFindings();
 if (layers.length === 0)
   errors.push("src/review/layers must contain at least one layer module.");
 if (stories.filter((story) => story.primary).length > 1)
@@ -303,11 +473,17 @@ if (changed) {
     if (!mapped.has(file)) errors.push(`unassigned changed file: ${file}.`);
   for (const file of mapped)
     if (!changed.has(file)) errors.push(`stale mapped path: ${file}.`);
+  for (const finding of findings)
+    for (const anchor of finding.anchors)
+      if (!changed.has(anchor.path))
+        errors.push(
+          `finding ${finding.id}: anchor path is not a current changed file: ${anchor.path}.`,
+        );
 }
 
 if (errors.length) {
   throw new Error(`Review validation failed:\n- ${errors.join("\n- ")}`);
 }
 console.log(
-  `Review validation passed (${source}: ${changed!.size} changed files; ${layers.length} layers; ${stories.length} stories).`,
+  `Review validation passed (${source}: ${changed!.size} changed files; ${layers.length} layers; ${stories.length} stories; ${findings.length} findings).`,
 );

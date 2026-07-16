@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadReviewPack } from "./load";
+import { ReviewLoadError, loadReviewPack } from "./load";
 
 const pack = {
   repository: "owner/repo",
@@ -65,5 +65,34 @@ describe("loadReviewPack", () => {
       /Enterprise repositories require a same-origin endpoint/,
     );
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves the proxy status, detail, and PR link for an evidence failure", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            repository: "https://enterprise.test/owner/repo",
+            url: "https://enterprise.test/owner/repo/pull/7",
+            pr: 7,
+            endpoint: "/hub/pr-pack",
+          }),
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: "binary diff could not be read" }), {
+          status: 502,
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(loadReviewPack()).rejects.toMatchObject({
+      name: "ReviewLoadError",
+      status: 502,
+      detail: "binary diff could not be read",
+      prNumber: 7,
+      prUrl: "https://enterprise.test/owner/repo/pull/7",
+    });
   });
 });

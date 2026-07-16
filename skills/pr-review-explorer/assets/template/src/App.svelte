@@ -1,28 +1,42 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import DiffView from "./DiffView.svelte";
-  import { layers, primaryStory, stories } from "./review/discovery";
+  import DiffView, { type FindingAnnotation } from "./DiffView.svelte";
+  import { loadReviewEntries } from "./review/discovery";
   import { provideReviewRuntime } from "./review/context";
-  import { loadReviewPack, type ReviewPack } from "./review/load";
-  import type { LayerEntry, ReviewFile, StoryEntry } from "./review/types";
+  import {
+    ReviewLoadError,
+    loadReviewPack,
+    type ReviewPack,
+  } from "./review/load";
+  import ChangeTree from "./review/primitives/ChangeTree.svelte";
+  import LayerScopeSelect, {
+    type LayerScopeOption,
+  } from "./review/primitives/LayerScopeSelect.svelte";
+  import ReviewTopbar from "./review/primitives/ReviewTopbar.svelte";
+  import type {
+    LayerEntry,
+    FindingEntry,
+    ReviewAnchor,
+    ReviewFile,
+    StoryEntry,
+  } from "./review/types";
 
-  type View = "map" | "story" | "layer" | "layer-diffs" | "files";
+  type View = "review" | "story" | "layer" | "layer-diffs" | "files";
 
   let pack = $state<ReviewPack | null>(null);
-  let loadError = $state("");
-  let view = $state<View>("map");
+  let layers = $state<LayerEntry[]>([]);
+  let stories = $state<StoryEntry[]>([]);
+  let findings = $state<FindingEntry[]>([]);
+  let primaryStory = $state<StoryEntry | undefined>();
+  let loadError = $state<ReviewLoadError | null>(null);
+  let view = $state<View>("story");
+  let scopeLayerId = $state<string | null>(null);
   let activeId = $state("");
   let selectedPath = $state("");
-  let query = $state("");
-  let rail = $state(
-    typeof window === "undefined"
-      ? true
-      : window.matchMedia("(min-width: 761px)").matches,
-  );
+  let selectedFindingId = $state<string | null>(null);
+  let selectedFindingAnchorKey = $state<string | null>(null);
+  let mobileRailOpen = $state(false);
 
-  const project = $derived(
-    pack?.repository?.split("/").filter(Boolean).at(-1) ?? "repository",
-  );
   const selectedLayer = $derived(layers.find((layer) => layer.id === activeId));
   const selectedStory = $derived(
     stories.find((story) => story.id === activeId),
@@ -30,17 +44,17 @@
   const layerFiles = $derived(
     selectedLayer ? filesForLayer(selectedLayer) : [],
   );
+  const scopeLayer = $derived(
+    scopeLayerId ? layers.find((layer) => layer.id === scopeLayerId) : undefined,
+  );
+  const scopedFiles = $derived(
+    scopeLayer ? filesForLayer(scopeLayer) : (pack?.files ?? []),
+  );
   const browseFiles = $derived(
     view === "layer-diffs" ? layerFiles : (pack?.files ?? []),
   );
-  const filteredFiles = $derived(
-    browseFiles.filter((file) =>
-      file.path.toLowerCase().includes(query.trim().toLowerCase()),
-    ),
-  );
   const selectedFile = $derived(
-    filteredFiles.find((file) => file.path === selectedPath) ??
-      filteredFiles[0],
+    browseFiles.find((file) => file.path === selectedPath) ?? browseFiles[0],
   );
 
   const artifactBase =
@@ -62,8 +76,11 @@
         ? id
         : "";
     selectedPath = nextView === "files" ? id : "";
-    query = "";
-    if (window.matchMedia("(max-width: 760px)").matches) rail = false;
+    selectedFindingId = null;
+    selectedFindingAnchorKey = null;
+    scopeLayerId =
+      nextView === "layer" || nextView === "layer-diffs" ? id : null;
+    if (window.matchMedia("(max-width: 760px)").matches) mobileRailOpen = false;
   };
 
   const navigate = (nextView: View, id = "", replace = false) => {
@@ -82,7 +99,7 @@
       .replace(/^\/+|\/+$/g, "");
     if (!relative) {
       if (primaryStory) return selectView("story", primaryStory.id);
-      return selectView("map");
+      return selectView("layer", layers[0]?.id ?? "");
     }
     const [kind, ...encoded] = relative.split("/");
     const id = encoded.map(decodeURIComponent).join("/");
@@ -99,11 +116,23 @@
       }
       return navigate("layer", layerId, true);
     }
-    if (kind === "files") return navigate("files", id, true);
-    if (kind === "map") return navigate("map", "", true);
+    if (kind === "review") return navigate("review", "", true);
+    if (kind === "files") {
+      if (!id) return navigate("story", primaryStory?.id ?? "", true);
+      selectView("files", id);
+      const findingId = new URLSearchParams(window.location.search).get("finding");
+      const anchorKey = new URLSearchParams(window.location.search).get("anchor");
+      const selectedFinding = findings.find((finding) => finding.id === findingId);
+      if (selectedFinding?.anchors.some((anchor) => findingAnchorKey(anchor) === anchorKey)) {
+        selectedFindingId = findingId;
+        selectedFindingAnchorKey = anchorKey;
+      }
+      return;
+    }
+    if (kind === "map") return navigate("story", primaryStory?.id ?? "", true);
     history.replaceState({}, "", `${artifactBase}/`);
     if (primaryStory) return selectView("story", primaryStory.id);
-    selectView("map");
+    selectView("layer", layers[0]?.id ?? "");
   };
 
   function filesForLayer(layer: LayerEntry) {
@@ -118,6 +147,27 @@
   });
 
   const layerStats = (layer: LayerEntry) => stats(filesForLayer(layer));
+  const scopeOptions = $derived<LayerScopeOption[]>([
+    {
+      id: "all",
+      title: "All changes",
+      summary: "Every changed file in this pull request.",
+      files: pack?.files.length ?? 0,
+      lines:
+        stats(pack?.files ?? []).additions + stats(pack?.files ?? []).deletions,
+    },
+    ...layers.map((layer, index) => {
+      const totals = layerStats(layer);
+      return {
+        id: layer.id,
+        title: layer.title,
+        summary: layer.summary,
+        files: totals.files,
+        lines: totals.additions + totals.deletions,
+        layerNumber: index + 1,
+      };
+    }),
+  ]);
   const layersForFile = (path: string) =>
     layers.filter((layer) => layer.files.includes(path));
   const unknownLayerPaths = (layer: LayerEntry) =>
@@ -141,49 +191,133 @@
     if (window.location.pathname !== href) history.pushState({}, "", href);
   };
 
+  const chooseScope = (layerId: string) => {
+    if (layerId === "all") {
+      if (primaryStory) return navigate("story", primaryStory.id);
+      return navigate("layer", layers[0]?.id ?? "");
+    }
+    navigate("layer", layerId);
+  };
+
+  const findingCount = (path: string) =>
+    findings.filter((finding) =>
+      finding.anchors.some((anchor) => anchor.path === path),
+    ).length;
+  const findingAnchorKey = (anchor: ReviewAnchor) =>
+    `${anchor.side}:${anchor.start}:${anchor.end}`;
+  const findingHref = (findingId: string, anchor: ReviewAnchor) =>
+    `${fileHref(anchor.path)}?finding=${encodeURIComponent(findingId)}&anchor=${encodeURIComponent(findingAnchorKey(anchor))}`;
+  const reviewFindingHref = (findingId: string) =>
+    `${routeHref("review")}#${encodeURIComponent(findingId)}`;
+  const findingIsStale = (finding: (typeof findings)[number]) =>
+    Boolean(pack?.pr.headRefOid) && finding.reviewedHeadOid !== pack?.pr.headRefOid;
+  const openFinding = (findingId: string, anchor: ReviewAnchor) => {
+    selectView("files", anchor.path);
+    selectedFindingId = findingId;
+    selectedFindingAnchorKey = findingAnchorKey(anchor);
+    const href = findingHref(findingId, anchor);
+    if (`${window.location.pathname}${window.location.search}` !== href)
+      history.pushState({}, "", href);
+  };
+  const findingAnnotations = (path: string): FindingAnnotation[] =>
+    findings.flatMap((finding) =>
+      finding.anchors
+        .filter((anchor) => anchor.path === path)
+        .map((anchor) => ({
+          finding,
+          anchor,
+          reviewHref: reviewFindingHref(finding.id),
+          selected:
+            finding.id === selectedFindingId &&
+            findingAnchorKey(anchor) === selectedFindingAnchorKey,
+        })),
+    );
+
   const defaultTitle = (entry: LayerEntry | StoryEntry) => entry.title;
+
+  const load = async () => {
+    loadError = null;
+    try {
+      const [nextPack, entries] = await Promise.all([
+        loadReviewPack(),
+        loadReviewEntries(),
+      ]);
+      pack = nextPack;
+      layers = entries.layers;
+      stories = entries.stories;
+      findings = entries.findings;
+      primaryStory = entries.primaryStory;
+      decodeRoute();
+    } catch (error) {
+      loadError =
+        error instanceof ReviewLoadError
+          ? error
+          : new ReviewLoadError(
+              error instanceof Error ? error.message : String(error),
+            );
+    }
+  };
 
   onMount(() => {
     const onRoute = () => decodeRoute();
     window.addEventListener("popstate", onRoute);
-    loadReviewPack()
-      .then((value) => {
-        pack = value;
-        decodeRoute();
-      })
-      .catch((error: Error) => (loadError = error.message));
+    void load();
     return () => window.removeEventListener("popstate", onRoute);
   });
 </script>
 
 {#if loadError}
-  <main class="loading">Unable to load PR: {loadError}</main>
+  <main class="load-error">
+    <section>
+      <p class="eyebrow">LIVE EVIDENCE UNAVAILABLE</p>
+      <h1>Couldn’t load{loadError.prNumber ? ` PR #${loadError.prNumber}` : " this pull request"}.</h1>
+      <p>
+        Artifact Hub could not retrieve the current GitHub evidence
+        {loadError.status ? ` (HTTP ${loadError.status})` : ""}.
+      </p>
+      {#if loadError.detail}
+        <pre><code>{loadError.detail}</code></pre>
+      {/if}
+      <p class="recovery">
+        The review artifact is still present; only its live PR data failed to
+        load. Retry after GitHub's patch data is available, or open the pull
+        request directly.
+      </p>
+      <div class="error-actions">
+        <button onclick={() => void load()}>Retry evidence load</button>
+        {#if loadError.prUrl}
+          <a href={loadError.prUrl} target="_blank" rel="noreferrer">Open GitHub PR ↗</a>
+        {/if}
+      </div>
+    </section>
+  </main>
 {:else if !pack}
   <main class="loading">Opening PR…</main>
 {:else}
-  <div class:rail-closed={!rail} class="shell">
+  <div class:mobile-rail-open={mobileRailOpen} class="shell">
+    <ReviewTopbar repository={pack.repository} pr={pack.pr} />
     <aside>
-      <button
-        class="collapse"
-        aria-label="Toggle navigation"
-        onclick={() => (rail = !rail)}>{rail ? "‹" : "›"}</button
-      >
-      <div class="brand">
-        <span>PR REVIEW</span><strong>#{pack.pr.number}</strong>
+      <div class="rail-scope">
+        <LayerScopeSelect
+          options={scopeOptions}
+          selectedId={scopeLayer?.id ?? "all"}
+          onSelect={chooseScope}
+        />
       </div>
-      <nav>
+      <nav class="rail-stories" aria-label="Stories">
+        <p>Stories</p>
         <a
-          class:chosen={view === "map"}
-          href={routeHref("map")}
+          class:chosen={view === "review"}
+          href={routeHref("review")}
           onclick={(event) => {
             event.preventDefault();
-            navigate("map");
+            navigate("review");
           }}
         >
-          <small>CHANGE MAP</small>All changed files
+          <small>REVIEW</small>
+          <span>Review <b>{findings.length}</b></span>
         </a>
         {#if stories.length}
-          <p class="nav-heading">Stories</p>
           {#each stories as story}
             <a
               class:chosen={view === "story" && activeId === story.id}
@@ -193,112 +327,94 @@
                 navigate("story", story.id);
               }}
             >
-              <small>{story.primary ? "PRIMARY" : "STORY"}</small>{story.title}
+              <small>{story.primary ? "PR STORY" : "STORY"}</small>
+              <span>{story.title}</span>
             </a>
           {/each}
         {/if}
-        {#if layers.length}
-          <p class="nav-heading">Layers</p>
-          {#each layers as layer, index}
-            <div
-              class="layer-nav"
-              class:active={(view === "layer" || view === "layer-diffs") &&
-                activeId === layer.id}
+        {#if scopeLayer}
+          <div class="rail-layer-story">
+            <p>Current layer</p>
+            <a
+              class:chosen={view === "layer" && activeId === scopeLayer.id}
+              href={routeHref("layer", scopeLayer.id)}
+              onclick={(event) => {
+                event.preventDefault();
+                navigate("layer", scopeLayer.id);
+              }}
             >
-              <a
-                class:chosen={view === "layer" && activeId === layer.id}
-                href={routeHref("layer", layer.id)}
-                onclick={(event) => {
-                  event.preventDefault();
-                  navigate("layer", layer.id);
-                }}
-              >
-                <small
-                  >{String(index + 1).padStart(2, "0")} · {layerStats(layer)
-                    .files} FILES</small
-                >
-                {layer.title}
-              </a>
-              {#if (view === "layer" || view === "layer-diffs") && activeId === layer.id}
-                {@render layerDiffFiles(layer)}
-              {/if}
-            </div>
-          {/each}
+              <small>READ LAYER STORY</small>
+              <span>{scopeLayer.title}</span>
+            </a>
+          </div>
         {/if}
-        <p class="nav-heading">Diffs</p>
-        <a
-          class:chosen={view === "files"}
-          href={routeHref("files")}
-          onclick={(event) => {
-            event.preventDefault();
-            navigate("files");
-          }}
-        >
-          <small>{pack.files.length} FILES</small>Browse every diff
-        </a>
-        {#if view === "files"}{@render diffNavigator()}{/if}
       </nav>
+      <div class="tree-pane">
+        <ChangeTree
+          files={scopedFiles}
+          layerCount={scopeLayer ? () => 0 : (path) => layersForFile(path).length}
+          {findingCount}
+          onSelect={scopeLayer
+            ? (path) => chooseLayerFile(scopeLayer.id, path)
+            : openFile}
+          variant="rail"
+          showLayerCount={!scopeLayer}
+        />
+      </div>
     </aside>
 
-    {#if view === "map"}
-      <main class="content landing-main">
+    {#if view === "review"}
+      <main class="content narrative-main">
         <header>
-          <button class="mobile" onclick={() => (rail = !rail)}>☰</button>
-          <p class="eyebrow">{project} · PR #{pack.pr.number}</p>
-          <p class="branch-line">
-            <code>{pack.pr.headRefName}</code><span>→</span><code
-              >{pack.pr.baseRefName}</code
-            >
+          <button class="mobile" onclick={() => (mobileRailOpen = !mobileRailOpen)}>☰</button>
+          <p class="eyebrow">CODE REVIEW</p>
+          <h1>Review</h1>
+          <p class="description">
+            {findings.length
+              ? `${findings.length} typed finding${findings.length === 1 ? "" : "s"} anchored to the current pull-request diff.`
+              : "Review findings appear here when they are supplied with the artifact."}
           </p>
-          <h1>{pack.pr.title}</h1>
-          <div class="metrics">
-            <span><b>{pack.pr.changedFiles}</b> files</span><span class="add"
-              ><b>+{pack.pr.additions}</b> additions</span
-            ><span class="del"><b>−{pack.pr.deletions}</b> deletions</span><a
-              href={pack.pr.url}>Open PR</a
-            >
-          </div>
         </header>
-        <section class="change-map">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">MACHINE-DERIVED</p>
-              <h2>Change map</h2>
-            </div>
-            <span
-              >{pack.files.filter((file) => layersForFile(file.path).length)
-                .length} of {pack.files.length} files mapped to layers</span
-            >
-          </div>
-          <div class="file-map">
-            {#each pack.files as file}
-              {@const memberships = layersForFile(file.path)}
-              <a
-                href={fileHref(file.path)}
-                onclick={(event) => {
-                  event.preventDefault();
-                  openFile(file.path);
-                }}
-              >
-                <span class="status">{file.status}</span><code>{file.path}</code
-                >
-                <span class="memberships">
-                  {#if memberships.length}{#each memberships as layer}<i
-                        >{layer.title}</i
-                      >{/each}{:else}<i class="unmapped">Unmapped</i>{/if}
-                </span>
-                <small
-                  ><em>+{file.additions}</em> <b>−{file.deletions}</b></small
-                >
-              </a>
+        <section class="review-findings">
+          {#if findings.length}
+            {#each findings as finding}
+              <article class="finding-summary" id={finding.id} class:stale={findingIsStale(finding)}>
+                <div class="finding-summary__heading">
+                  <p class="finding-summary__meta">
+                    {finding.kind} · S{finding.severity}
+                  </p>
+                  <h2>{finding.title}</h2>
+                </div>
+                <p>{finding.body}</p>
+                {#if findingIsStale(finding)}
+                  <p class="finding-stale">Reviewed against an older PR head; inspect the current diff before acting on this finding.</p>
+                {/if}
+                <div class="finding-summary__anchors">
+                  {#each finding.anchors as anchor}
+                    <a
+                      href={findingHref(finding.id, anchor)}
+                      onclick={(event) => {
+                        event.preventDefault();
+                        openFinding(finding.id, anchor);
+                      }}
+                    >
+                      <code>{anchor.path}</code>
+                      <span>{anchor.side} lines {anchor.start}–{anchor.end}</span>
+                      <span>Open full diff →</span>
+                    </a>
+                  {/each}
+                </div>
+              </article>
             {/each}
-          </div>
+          {:else}
+            <p class="review-empty">Zarro boogs found.</p>
+          {/if}
         </section>
       </main>
     {:else if view === "story" && selectedStory}
       <main class="content narrative-main">
         <header>
-          <button class="mobile" onclick={() => (rail = !rail)}>☰</button>
+          <button class="mobile" onclick={() => (mobileRailOpen = !mobileRailOpen)}>☰</button>
           <p class="eyebrow">
             STORY{selectedStory.primary ? " · PRIMARY" : ""}
           </p>
@@ -312,14 +428,12 @@
     {:else if view === "layer" && selectedLayer}
       <main class="content narrative-main">
         <header>
-          <button class="mobile" onclick={() => (rail = !rail)}>☰</button>
+          <button class="mobile" onclick={() => (mobileRailOpen = !mobileRailOpen)}>☰</button>
           <p class="eyebrow">
             LAYER {String(layers.indexOf(selectedLayer) + 1).padStart(2, "0")}
           </p>
           <h1>{defaultTitle(selectedLayer)}</h1>
-          {#if selectedLayer.description}<p class="description">
-              {selectedLayer.description}
-            </p>{/if}
+          <p class="description">{selectedLayer.summary}</p>
           <div class="metrics">
             <span><b>{layerFiles.length}</b> files</span><span class="add"
               ><b>+{layerStats(selectedLayer).additions}</b> additions</span
@@ -340,7 +454,7 @@
     {:else if view === "layer-diffs" && selectedLayer}
       <main class="content files-main">
         <header>
-          <button class="mobile" onclick={() => (rail = !rail)}>☰</button>
+          <button class="mobile" onclick={() => (mobileRailOpen = !mobileRailOpen)}>☰</button>
           <p class="eyebrow">LAYER DIFFS</p>
           <h1>{selectedLayer.title}</h1>
           <div class="metrics">
@@ -359,11 +473,14 @@
     {:else}
       <main class="content files-main">
         <header>
-          <button class="mobile" onclick={() => (rail = !rail)}>☰</button>
-          <p class="eyebrow">ALL FILES</p>
-          <h1>Complete pull request patch</h1>
+          <button class="mobile" onclick={() => (mobileRailOpen = !mobileRailOpen)}>☰</button>
+          <p class="eyebrow">FILE DIFF</p>
+          <h1>{selectedFile?.path ?? "File diff"}</h1>
           <div class="metrics">
-            <span><b>{pack.files.length}</b> files</span>
+            {#if selectedFile}<span class="add"
+                ><b>+{selectedFile.additions}</b> additions</span
+              ><span class="del"><b>−{selectedFile.deletions}</b> deletions</span
+              >{/if}
           </div>
         </header>
         <section class="full-diff">{@render selectedDiff()}</section>
@@ -371,53 +488,6 @@
     {/if}
   </div>
 {/if}
-
-{#snippet layerDiffFiles(layer: LayerEntry)}
-  {@const files = filesForLayer(layer)}
-  <div class="layer-file-list">
-    {#each files as file}
-      <a
-        class:chosen={view === "layer-diffs" && selectedPath === file.path}
-        href={layerFileHref(layer.id, file.path)}
-        onclick={(event) => {
-          event.preventDefault();
-          chooseLayerFile(layer.id, file.path);
-        }}
-      >
-        <span class="status">{file.status}</span>
-        <code>{file.path}</code>
-        <small><em>+{file.additions}</em> <i>−{file.deletions}</i></small>
-      </a>
-    {/each}
-  </div>
-{/snippet}
-
-{#snippet diffNavigator()}
-  <div class="diff-navigator">
-    <label>
-      Filter diffs
-      <input bind:value={query} placeholder="Path contains…" />
-    </label>
-    {#each filteredFiles as file}
-      <a
-        class:chosen={selectedFile?.path === file.path}
-        href={view === "layer-diffs" && selectedLayer
-          ? layerFileHref(selectedLayer.id, file.path)
-          : fileHref(file.path)}
-        onclick={(event) => {
-          event.preventDefault();
-          chooseFile(file.path);
-        }}
-      >
-        <span class="status">{file.status}</span>
-        <code>{file.path}</code>
-        <small><em>+{file.additions}</em> <i>−{file.deletions}</i></small>
-      </a>
-    {:else}
-      <p class="empty">No changed file matches this filter.</p>
-    {/each}
-  </div>
-{/snippet}
 
 {#snippet selectedDiff()}
   {#if selectedFile}
@@ -429,7 +499,14 @@
         <i>−{selectedFile.deletions}</i></small
       >
     </div>
-    <DiffView diff={selectedFile.diff} />
+    <DiffView
+      diff={selectedFile.diff}
+      annotations={findingAnnotations(selectedFile.path).map((metadata) => ({
+        side: metadata.anchor.side === "new" ? "additions" : "deletions",
+        lineNumber: metadata.anchor.start,
+        metadata,
+      }))}
+    />
   {:else}
     <p class="empty">No file is available in this view.</p>
   {/if}
@@ -449,6 +526,7 @@
     --green: #71d39a;
     --red: #ff9a92;
     --muted: #a4afa5;
+    --topbar-height: 64px;
   }
   :global(*) {
     box-sizing: border-box;
@@ -457,47 +535,46 @@
     margin: 0;
     background: var(--canvas);
   }
-  button,
-  input {
+  :global(html) {
+    scrollbar-color: #4d5e4f var(--canvas);
+    scrollbar-width: thin;
+  }
+  :global(html::-webkit-scrollbar) {
+    width: 8px;
+    height: 8px;
+  }
+  :global(html::-webkit-scrollbar-track) {
+    background: var(--canvas);
+  }
+  :global(html::-webkit-scrollbar-thumb) {
+    background: #4d5e4f;
+    border: 2px solid var(--canvas);
+    border-radius: 999px;
+  }
+  :global(html::-webkit-scrollbar-thumb:hover) {
+    background: #6a806d;
+  }
+  button {
     font: inherit;
   }
   .shell {
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
-    min-height: 100vh;
-  }
-  .shell.rail-closed {
-    grid-template-columns: 42px minmax(0, 1fr);
+    min-height: calc(100vh - var(--topbar-height));
+    padding-top: var(--topbar-height);
   }
   .shell > aside {
     position: fixed;
-    inset: 0 auto 0 0;
+    inset: var(--topbar-height) auto 0 0;
     z-index: 5;
+    display: flex;
+    flex-direction: column;
     width: 300px;
-    overflow: auto;
+    overflow: hidden;
     color: #e7ece6;
     background: var(--rail);
     border-right: 1px solid #1c231e;
   }
-  .rail-closed > aside {
-    width: 42px;
-    overflow: hidden;
-  }
-  .collapse {
-    position: absolute;
-    top: 20px;
-    right: 9px;
-    color: #dce5dd;
-    font-size: 20px;
-    background: #1b211d;
-    border: 1px solid #39443a;
-    border-radius: 3px;
-  }
-  .brand {
-    padding: 22px 18px;
-    border-bottom: 1px solid #29322b;
-  }
-  .brand span,
   .eyebrow {
     display: block;
     color: #8d9d90;
@@ -506,139 +583,78 @@
       monospace;
     letter-spacing: 0.13em;
   }
-  .brand strong {
-    display: block;
-    margin-top: 5px;
-    font:
-      600 21px Georgia,
-      serif;
-  }
-  nav {
-    padding: 12px 9px;
-  }
-  nav > a {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    color: #dce4dc;
-    font-size: 13px;
-    text-align: left;
-    text-decoration: none;
-    background: transparent;
-    border: 0;
-    border-radius: 3px;
-  }
-  nav > a:hover,
-  nav > a.chosen {
-    background: #202a22;
-    box-shadow: inset 2px 0 var(--green);
-  }
-  .layer-nav {
-    margin: 3px 0 8px;
-    border-radius: 3px;
-  }
-  .layer-nav > a {
-    display: block;
-    color: #dce4dc;
-    text-decoration: none;
-  }
-  .layer-nav > a:first-child {
-    padding: 9px 10px 4px;
-    font-size: 13px;
-  }
-  .layer-nav.active > a:first-child {
-    background: #202a22;
-    box-shadow: inset 2px 0 var(--green);
-  }
-  .layer-file-list {
+  .rail-scope,
+  .rail-stories {
     display: grid;
-    gap: 2px;
-    margin: 4px 8px 10px 16px;
-    padding: 4px 0 4px 5px;
-    border-left: 1px solid #29322b;
+    gap: 4px;
+    padding: 12px 9px;
+    border-bottom: 1px solid #29322b;
   }
-  nav small,
-  .nav-heading {
-    display: block;
+  .rail-stories > p,
+  .rail-layer-story > p {
+    margin: 0;
     color: #90a092;
-    font-size: 10px;
-  }
-  .nav-heading {
-    margin: 17px 10px 5px;
-    padding-top: 12px;
-    font-weight: 700;
+    font:
+      700 9px/1.4 ui-monospace,
+      monospace;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    border-top: 1px solid #29322b;
   }
-  .diff-navigator {
+  .rail-stories a,
+  .rail-layer-story a {
     display: grid;
-    gap: 3px;
-    margin: 8px 0 0;
-    padding-top: 8px;
-    border-top: 1px solid #29322b;
-  }
-  .diff-navigator label {
-    padding: 4px 10px 8px;
-    color: var(--muted);
-    font:
-      700 9px ui-monospace,
-      monospace;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .diff-navigator input {
-    width: 100%;
-    margin-top: 6px;
-    padding: 7px;
-    color: #dfe7df;
-    background: #0c100d;
-    border: 1px solid #334037;
-    border-radius: 3px;
-  }
-  .diff-navigator > a,
-  .layer-file-list > a {
-    display: grid;
-    grid-template-columns: 20px minmax(0, 1fr);
-    gap: 3px 6px;
+    gap: 2px;
     padding: 7px 9px;
-    color: inherit;
+    color: #dce4dc;
     text-decoration: none;
     border-radius: 3px;
   }
-  .diff-navigator > a:hover,
-  .diff-navigator > a.chosen,
-  .layer-file-list > a:hover,
-  .layer-file-list > a.chosen {
-    background: #253126;
+  .rail-stories a:hover,
+  .rail-stories a.chosen,
+  .rail-layer-story a:hover,
+  .rail-layer-story a.chosen {
+    background: #202a22;
     box-shadow: inset 2px 0 var(--green);
   }
-  .diff-navigator code,
-  .layer-file-list code {
-    overflow: hidden;
-    font-size: 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .rail-stories small,
+  .rail-layer-story small {
+    color: #90a092;
+    font: 9px ui-monospace, monospace;
   }
-  .diff-navigator small,
-  .layer-file-list small {
-    grid-column: 2;
-    font:
-      9px ui-monospace,
-      monospace;
+  .rail-stories a > span,
+  .rail-layer-story > a > span {
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .rail-stories b {
+    display: inline-grid;
+    min-width: 18px;
+    min-height: 18px;
+    margin-left: 5px;
+    padding: 1px 5px;
+    color: #dff0e1;
+    font: 700 10px/16px ui-monospace, monospace;
+    text-align: center;
+    background: #28422e;
+    border-radius: 999px;
+  }
+  .rail-layer-story {
+    display: grid;
+    gap: 4px;
+    margin: 8px -9px -12px;
+    padding: 10px 9px 12px;
+    border-top: 1px solid #29322b;
+  }
+  .tree-pane {
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 12px 8px;
   }
   h1 {
     margin: 7px 0;
     color: #f1f5ef;
     font:
       600 clamp(25px, 3vw, 34px)/1.15 Georgia,
-      serif;
-  }
-  h2 {
-    margin: 4px 0 8px;
-    color: #eef3ed;
-    font:
-      600 22px/1.2 Georgia,
       serif;
   }
   .metrics {
@@ -680,6 +696,63 @@
     padding: 60px;
     color: var(--muted);
   }
+  .load-error {
+    display: grid;
+    min-height: 100vh;
+    padding: 48px 24px;
+    place-items: center;
+  }
+  .load-error section {
+    width: min(680px, 100%);
+    padding: 28px 30px;
+    background: var(--paper);
+    border: 1px solid #573d35;
+    border-radius: 6px;
+    box-shadow: 0 18px 50px #0004;
+  }
+  .load-error h1 {
+    margin: 7px 0 13px;
+  }
+  .load-error p {
+    margin: 0 0 15px;
+    color: #c8d0c7;
+    line-height: 1.55;
+  }
+  .load-error pre {
+    overflow: auto;
+    margin: 16px 0;
+    padding: 13px 14px;
+    color: #f0c8c0;
+    font: 12px/1.5 ui-monospace, monospace;
+    white-space: pre-wrap;
+    background: #241917;
+    border: 1px solid #4a332e;
+    border-radius: 4px;
+  }
+  .load-error .recovery {
+    color: var(--muted);
+  }
+  .error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .error-actions button,
+  .error-actions a {
+    padding: 9px 11px;
+    color: #e6eee6;
+    font: 600 12px Inter, ui-sans-serif, system-ui, sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    background: #203024;
+    border: 1px solid #4c6b52;
+    border-radius: 4px;
+  }
+  .error-actions a {
+    color: var(--blue);
+    background: transparent;
+    border-color: #405044;
+  }
   .mobile {
     display: none;
   }
@@ -694,17 +767,6 @@
     padding-bottom: 25px;
     border-bottom: 1px solid var(--line);
   }
-  .branch-line {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin: 7px 0 0;
-    color: var(--muted);
-    font-size: 11px;
-  }
-  .branch-line span {
-    color: var(--green);
-  }
   .description {
     max-width: 780px;
     color: #d2d9d0;
@@ -712,7 +774,6 @@
       18px/1.58 Georgia,
       serif;
   }
-  .change-map,
   .narrative,
   .full-diff {
     padding-top: 28px;
@@ -720,65 +781,93 @@
   .narrative:empty {
     display: none;
   }
-  .section-heading {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    align-items: end;
-    margin-bottom: 14px;
-  }
-  .section-heading span {
-    color: var(--muted);
-    font-size: 11px;
-  }
-  .file-map {
-    border-top: 1px solid var(--line);
-  }
-  .file-map > a {
+  .review-findings {
     display: grid;
-    grid-template-columns: 42px minmax(220px, 1fr) minmax(160px, auto) 90px;
-    gap: 12px;
-    align-items: center;
-    padding: 12px 4px;
-    color: inherit;
-    text-decoration: none;
-    border-bottom: 1px solid var(--line);
+    gap: 14px;
+    padding-top: 28px;
   }
-  .file-map > a:hover {
-    background: #161c17;
+  .finding-summary {
+    padding: 18px 20px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--green);
+    border-radius: 5px;
   }
-  .file-map code {
-    overflow-wrap: anywhere;
-    color: #c6ddd0;
-    font-size: 12px;
+  .finding-summary.stale {
+    border-left-color: #e5b76a;
   }
-  .memberships {
+  .finding-summary__heading {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 8px 18px;
+    align-items: baseline;
   }
-  .memberships i {
-    padding: 3px 6px;
-    color: #bcd1c1;
-    font:
-      9px ui-monospace,
-      monospace;
-    background: #1c2920;
-    border-radius: 999px;
+  .finding-summary__meta {
+    margin: 0;
+    color: #9bc1a2;
+    font: 700 10px/1.4 ui-monospace, monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
-  .memberships i.unmapped {
+  .finding-summary h2 {
+    margin: 0;
+    color: #eff5ee;
+    font: 600 20px/1.25 Georgia, serif;
+  }
+  .finding-summary > p {
+    margin: 11px 0 0;
+    color: #ced7ce;
+    line-height: 1.55;
+  }
+  .finding-summary > .finding-stale {
+    color: #ead09d;
+    font-size: 13px;
+  }
+  .finding-summary__anchors {
+    display: grid;
+    gap: 7px;
+    margin-top: 15px;
+  }
+  .finding-summary__anchors a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 10px;
+    color: var(--blue);
+    text-decoration: none;
+    background: #121713;
+    border: 1px solid #364239;
+    border-radius: 3px;
+  }
+  .finding-summary__anchors a:hover {
+    background: #182219;
+    border-color: #547259;
+  }
+  .finding-summary__anchors code {
+    overflow: hidden;
+    color: #c9dbcb;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .finding-summary__anchors span {
     color: var(--muted);
-    background: #242724;
+    font: 10px ui-monospace, monospace;
+    white-space: nowrap;
   }
-  .file-map small {
-    text-align: right;
-    font:
-      10px ui-monospace,
-      monospace;
+  .finding-summary__anchors span:last-child {
+    color: var(--blue);
   }
-  .file-map small b {
-    color: var(--red);
-    font-weight: 400;
+  .review-empty {
+    margin: 0;
+    padding: 28px;
+    color: #c7d4c8;
+    font: 600 20px/1.4 Georgia, serif;
+    text-align: center;
+    background: var(--paper);
+    border: 1px dashed #465349;
+    border-radius: 5px;
   }
   .evidence-warning {
     padding: 12px 14px;
@@ -814,15 +903,15 @@
     color: var(--muted);
   }
   @media (max-width: 760px) {
-    .shell,
-    .shell.rail-closed {
+    :global(:root) { --topbar-height: 60px; }
+    .shell {
       display: block;
     }
     .shell > aside {
       transform: translateX(-100%);
       transition: 0.15s;
     }
-    .shell:not(.rail-closed) > aside {
+    .shell.mobile-rail-open > aside {
       transform: translateX(0);
     }
     .mobile {
@@ -836,19 +925,10 @@
       border: 1px solid #414841;
       border-radius: 3px;
     }
-    .collapse {
-      display: none;
-    }
   }
   @media (max-width: 820px) {
     .content {
       padding: 57px 18px 50px;
-    }
-    .file-map > a {
-      grid-template-columns: 32px minmax(0, 1fr) 75px;
-    }
-    .memberships {
-      grid-column: 2 / -1;
     }
   }
 </style>

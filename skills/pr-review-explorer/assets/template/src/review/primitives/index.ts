@@ -1,4 +1,7 @@
 export { default as Callout } from "./Callout.svelte";
+export { default as ChangeTree } from "./ChangeTree.svelte";
+export { default as LayerScopeSelect } from "./LayerScopeSelect.svelte";
+export { default as ReviewTopbar } from "./ReviewTopbar.svelte";
 export { default as DiffExcerpt } from "./DiffExcerpt.svelte";
 export { default as PierreDiff } from "./PierreDiff.svelte";
 export { default as FileReference } from "./FileReference.svelte";

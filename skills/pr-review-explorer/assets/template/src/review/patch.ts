@@ -102,8 +102,8 @@ const hunkForRows = (rows: PatchRow[]) => {
 };
 
 /**
- * Creates a minimal valid unified patch for a semantic old- or new-file line
- * range. Rendering remains Pierre's responsibility; this only selects evidence.
+ * Creates a minimal valid unified patch for exactly the requested semantic
+ * old- or new-file range. Rendering remains Pierre's responsibility.
  */
 export const createPatchExcerpt = (
   patch: string,
@@ -111,15 +111,12 @@ export const createPatchExcerpt = (
   side: ExcerptSide,
   start: number,
   end: number,
-  context = 2,
 ): PatchExcerpt => {
   if (
     !Number.isInteger(start) ||
     !Number.isInteger(end) ||
-    !Number.isInteger(context) ||
     start < 1 ||
-    end < start ||
-    context < 0
+    end < start
   ) {
     return {
       ok: false,
@@ -153,30 +150,7 @@ export const createPatchExcerpt = (
 
     const selectedFirst = Math.min(...selected);
     const selectedLast = Math.max(...selected);
-    let first = Math.max(0, selectedFirst - context);
-    let last = Math.min(hunk.rows.length - 1, selectedLast + context);
-
-    // A selected addition needs the deletion block it replaces; likewise an
-    // old-file selection needs the corresponding additions. Do not expand
-    // through same-side rows: a newly added file is one enormous addition run.
-    if (side === "new") {
-      for (let index = selectedFirst - 1; index >= 0; index -= 1) {
-        const kind = hunk.rows[index].kind;
-        if (kind !== "deletion" && kind !== "marker") break;
-        first = Math.min(first, index);
-      }
-    } else {
-      for (
-        let index = selectedLast + 1;
-        index < hunk.rows.length;
-        index += 1
-      ) {
-        const kind = hunk.rows[index].kind;
-        if (kind !== "addition" && kind !== "marker") break;
-        last = Math.max(last, index);
-      }
-    }
-    return [hunkForRows(hunk.rows.slice(first, last + 1))];
+    return [hunkForRows(hunk.rows.slice(selectedFirst, selectedLast + 1))];
   });
 
   return {

@@ -22,14 +22,16 @@ describe("createPatchExcerpt", () => {
     if (!result.ok) return;
     const file = parsePatchFiles(result.patch)[0]?.files[0];
     expect(file?.name).toBe("src/example.ts");
-    expect(result.patch).toContain("-old value\n+new value\n+another value");
+    expect(result.patch).toContain("+new value\n+another value");
+    expect(result.patch).not.toContain("-old value");
   });
 
-  it("selects old-file evidence while retaining its replacement", () => {
+  it("selects only the requested old-file evidence", () => {
     const result = createPatchExcerpt(patch, "src/example.ts", "old", 11, 11);
     expect(result).toMatchObject({ ok: true });
     if (!result.ok) return;
-    expect(result.patch).toContain("-old value\n+new value\n+another value");
+    expect(result.patch).toContain("-old value");
+    expect(result.patch).not.toContain("+new value");
   });
 
   it("creates a valid patch from GitHub's headerless file patch", () => {
@@ -47,7 +49,7 @@ describe("createPatchExcerpt", () => {
     );
   });
 
-  it("does not expand an excerpt to an entire newly added file", () => {
+  it("selects exactly the requested rows from a newly added file", () => {
     const additions = Array.from(
       { length: 100 },
       (_, index) => `+line ${index + 1}`,
@@ -61,9 +63,10 @@ describe("createPatchExcerpt", () => {
     );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.patch).toContain("+line 38");
-    expect(result.patch).toContain("+line 47");
-    expect(result.patch).not.toContain("+line 1\n");
+    expect(result.patch).toContain("+line 40");
+    expect(result.patch).toContain("+line 45");
+    expect(result.patch).not.toContain("+line 39");
+    expect(result.patch).not.toContain("+line 46");
     expect(result.patch).not.toContain("+line 100");
   });
 
