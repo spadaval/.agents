@@ -7,3 +7,7 @@ __pycache__/
 
 # Shared local dependency installation and Vite caches
 /node_modules/
+
+# Finder metadata
+.DS_Store
+._*
