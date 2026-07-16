@@ -1,6 +1,6 @@
 ---
 name: generate-html-plan
-description: Run an exhaustive, code-aware planning interview and turn the resolved design into a validated interactive HTML plan. Use when Codex needs to plan a substantial feature, refactor, migration, or architecture change; challenge scope and domain language; resolve a design tree collaboratively; or replace a long Markdown implementation plan with a navigable Svelte/Vite plan app. If invoked outside Codex Plan mode, first suggest switching to Plan mode; if the user remains outside it, complete the interview and generate without asking for separate generation permission.
+description: Run an exhaustive, code-aware planning interview and turn the resolved design into a validated interactive HTML plan. Use when Codex needs to plan a substantial feature, refactor, migration, or architecture change; challenge scope and domain language; resolve a design tree collaboratively; or replace a long Markdown implementation plan with a navigable Svelte/Vite plan app.
 ---
 
 # Generate HTML Plan
@@ -13,12 +13,6 @@ tree is closed, then generate the plan as a typed Svelte/Vite app.
 
 ### 1. Establish the planning surface
 
-- Before exploring, if Codex is not already in Plan mode, recommend switching
-  to Plan mode for read-only investigation and its structured question UI. Ask:
-  **“This workflow works best in Plan mode. Would you like to switch before we
-  begin?”** Wait for the response. Treat the switch as recommended, not
-  required: if the user declines or continues without switching, proceed in the
-  current mode and do not ask again.
 - Inspect the repository, relevant code, tests, configuration, and existing
   plans before asking anything the code can answer.
 - Find `AGENTS.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, and applicable ADRs. Follow
