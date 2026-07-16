@@ -17,10 +17,8 @@ Check whether a fresh agent can locate:
 - current tracker status and role guidance;
 - runnable validation commands and focused role/status commands.
 
-In Atelier repositories, prefer `atelier man <role>`, `atelier status`,
-focused `atelier issue show <objective-id>`, and `atelier check` for live
-operability. Do not treat hidden diagnostics, local-state repair, or
-maintenance commands as normal readiness paths.
+Do not treat hidden diagnostics, local-state repair, or maintenance commands as
+normal readiness paths.
 
 ## Report
 

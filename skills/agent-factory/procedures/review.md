@@ -7,8 +7,6 @@ well-built and supported by evidence. It is not scenario validation.
 ## Stance
 
 - Be read-only unless explicitly asked to fix issues.
-- In Atelier repositories, use `atelier man reviewer` for current tactical
-  review commands and validation docs for proof expectations.
 - Read changed files plus the relevant tracker item, parent scope, product docs,
   architecture docs, ADRs, code standards, and validation policy.
 - Lead with findings ordered by severity. Cite concrete files and lines when

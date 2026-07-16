@@ -14,12 +14,9 @@ Before editing, classify the assigned work:
 - **temporary breakage**: allowed only when named, scoped, owned, and
   recoverable.
 
-Use repository-owned command and validation surfaces for exact checks. In
-Atelier repositories, `atelier man admin`, `atelier man worker`, focused
-`atelier issue show <objective-id>`, issue transition, `atelier check`, and
-mapped validation docs own current tactical details. Use local-state repair
-commands only when Atelier reports degraded local state or the migration
-explicitly owns repair.
+Use repository-owned command and validation surfaces for exact checks. Use
+local-state repair only when diagnostics report degraded derived state or the
+migration explicitly owns repair.
 
 ## Rules
 

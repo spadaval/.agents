@@ -9,9 +9,6 @@ not prewrite validation transcripts for later agents.
 
 - Start from repository instructions, the tracker's current status surfaces, and
   the relevant product, architecture, ADR, and validation docs.
-- In Atelier repositories, use `atelier man manager` for current command
-  routing and focused `atelier issue show <objective-id>` or focused
-  `show`/`list` commands for drill-down.
 - Write the desired finished state first. Avoid replacing the target state with
   broad process language, private implementation steps, or boilerplate proof
   systems unless that exact path is the decision being tracked.
@@ -98,9 +95,9 @@ Concrete mission outcome:
 ```text
 Outcome
 -------
-`atelier issue show <mission-id>` explains mission scope from direct `advances`
-links, reports linked root work and descendants once, and points operators to
-the next lifecycle command without requiring private coordinator notes.
+The mission view explains its scope from linked root work, reports descendants
+once, and makes the next valid lifecycle action discoverable without private
+coordinator notes.
 ```
 
 Vague mission anti-example:
@@ -119,9 +116,8 @@ Concrete ordinary issue outcome:
 ```text
 Outcome
 -------
-`atelier man worker` lists `atelier work ready` as the normal ready-work entry
-point and no longer routes normal worker guidance through deprecated queue flag
-forms.
+Worker guidance identifies the normal ready-work entry point and no longer
+routes ordinary work through the deprecated queue workflow.
 ```
 
 Vague ordinary issue anti-example:

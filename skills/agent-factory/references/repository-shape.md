@@ -8,7 +8,7 @@ Names may vary, but each responsibility needs one discoverable owner.
 
 A short root instruction file should point to, rather than duplicate:
 
-- tracker identity and live workflow/status entry points;
+- tracker identity, location, and live workflow/status entry points;
 - product intent and domain language;
 - the documentation index;
 - product behavior and operator contracts;
@@ -21,6 +21,26 @@ A short root instruction file should point to, rather than duplicate:
 Keep this entry map compact. Repository-specific command cookbooks and product
 policy belong in their owning executable help or documentation.
 
+## Agent Factory Binding
+
+Onboarding should add or update a concise `## Agent Factory` section in the
+applicable `AGENTS.md`; do not require a standalone Agent Factory binding file.
+The section records only repository facts that a capable agent cannot safely
+infer:
+
+- the selected tracker and its repository, project, or local location;
+- repository-specific encodings for missions, epics, validation work,
+  dependencies, or evidence when the tracker does not model them directly;
+- links to the validation and workflow policy that govern tracked work; and
+- unusual setup, permission, or recovery constraints.
+
+Keep tracker configuration with its natural owner: GitHub templates and labels
+under GitHub-owned configuration, Atelier workflow in Atelier-owned
+configuration, and branch or review policy in the repository's contributing or
+workflow docs. `AGENTS.md` selects and links those sources instead of copying
+them. In a monorepo, use the nearest scoped `AGENTS.md`; add a nested binding
+only when that subtree genuinely uses different tracker or workflow conventions.
+
 ## Opinionated Baseline
 
 A repository that expects durable, multi-person or multi-agent work should make
@@ -28,7 +48,7 @@ its governing knowledge visible in version control. A good default is:
 
 | Location | Purpose | Keep it good by |
 | --- | --- | --- |
-| `AGENTS.md` (or equivalent root entry map) | Orient a fresh contributor and link every governing source. | Keeping it short, navigational, and free of copied workflow manuals. |
+| `AGENTS.md` (or equivalent root entry map) | Orient a fresh contributor, declare the Agent Factory tracker binding, and link every governing source. | Keeping it short, navigational, scoped, and free of copied workflow manuals. |
 | `PRODUCT_INTENT.md` (or equivalent) | State the product's enduring purpose, users, desired outcomes, non-goals, and direction. | Changing it only when the product direction changes; link detailed behavior instead of growing a second product manual. |
 | `CONTEXT.md` | Provide a glossary of domain terms, important distinctions, and resolved vocabulary used by plans, docs, and code. | Defining terms precisely, recording ambiguities, and removing or marking obsolete vocabulary. It is a reference, not a chronological decision log. |
 | `docs/index.md` | Give the documentation tree a maintained, human-readable front door. | Explaining which document owns each concern and linking to the current source, not merely listing files. |
@@ -103,7 +123,7 @@ and dependency explicitly.
 | ADRs | Costly, surprising, or repeatedly contested decisions, including context, choice, consequences, and supersession state. |
 | Quality standards | Language, code, testing, review, and repository conventions that apply across changes. |
 | Validation router | Which checks prove which claims, where proof is recorded, independence triggers, and result classification. |
-| Tracker | Durable scope, outcomes, dependencies, lifecycle state, and evidence links for current work. |
+| Tracker | Durable scope, outcomes, dependencies, lifecycle state, and evidence links for current work; provider-owned configuration encodes Agent Factory concepts when needed. |
 
 Product and architecture docs may cross-link, but they should not silently own
 each other's contracts. ADRs explain why a durable choice was made; they do not
@@ -136,6 +156,7 @@ A fresh agent should be able to answer, from the entry map and linked sources:
 5. Why were important non-obvious choices made?
 6. Which standards apply, and what proves this change?
 7. Which state is durable, and how is local derived state repaired?
+8. Which tracker is selected, and how does it represent Agent Factory work?
 
 A missing responsibility is a repository-readiness gap even when the code is
 otherwise buildable. Record the gap in the repository's tracker instead of

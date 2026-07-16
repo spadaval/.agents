@@ -10,20 +10,22 @@ user-invocable: true
 Agent Factory is the portable coordination layer. It assigns bounded agent roles
 from durable repository state; it is not the repository command manual.
 
-For Atelier repositories, tactical workflow lives in Atelier's executable
-surfaces: `atelier man <role>`, `atelier status`, focused `atelier issue show <objective-id>`, and focused `show`/`list`/`transition` commands. Use those
-surfaces for current command names, readiness, proof, recovery, and closeout
-detail. Do not encode repository-specific review, branch, provider, merge, or
-completion policy in this skill; follow the process guidance emitted by Atelier
-for the current checkout and work item.
+Agent Factory deliberately keeps useful coordination concepts such as missions,
+epics, evidence, and independent validation even when a repository's tracker
+does not model them directly. Repository instructions select the tracker;
+tracker command references explain how to realize those concepts there.
 
 ## Coordination Rules
 
 - Use repository instructions to locate the tracker, product docs, architecture
   docs, validation policy, and code standards.
+- Procedures define intent and policy. When they require tracker interaction,
+  load the matching tracker command reference and use the section for the
+  repository's selected tracker. Treat live command help as authoritative for
+  current syntax.
 - Assign exactly one subskill to each role-specific subagent.
-- A subagent loads only the assigned subskill reference unless the assignment
-  explicitly names additional sources.
+- A subagent loads the assigned subskill and only the tracker command references
+  needed to act. Other skill references must be named explicitly.
 - Configure every subagent explicitly with a model, reasoning effort, and
   self-contained prompt. Load [Submodel selection](references/submodel-selection.md)
   before spawning, select the least expensive capable model, and prefer smaller
@@ -36,11 +38,11 @@ for the current checkout and work item.
   role isolation, and imports stale context. Fork only when required context
   cannot be summarized safely; record that specific justification before the
   spawn.
-- Delegated assignments must include repository path, mission or issue IDs,
-  branch/workspace context, assigned subskill, owned files or workflows,
-  expected proof, evidence destination, independence requirements, explicit
-  model and reasoning choices with rationale, and a prompt that states scope,
-  sources, output, prohibitions, and completion conditions.
+- Delegated assignments must include repository path, selected tracker, mission
+  or issue IDs, branch/workspace context, assigned subskill, owned files or
+  workflows, expected proof, evidence destination, independence requirements,
+  explicit model and reasoning choices with rationale, and a prompt that states
+  scope, sources, output, prohibitions, and completion conditions.
 - Planning and execution are separate. Do not reshape tracker scope while
   implementing unless graph management is the assigned work.
 - Important product, architecture, persistence, security, migration, or
@@ -57,9 +59,14 @@ Load these only when the assignment needs the named cross-cutting guidance:
 | --- | --- |
 | [Submodel selection](references/submodel-selection.md) | Required before every delegation to choose and record the model and reasoning effort. |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory, mapping durable repository guidance, or auditing agent readiness. |
+| [Navigating work](references/tracker-commands/navigating-work.md) | Finding status, ready work, or focused mission, epic, issue, and dependency context. |
+| [Managing issues](references/tracker-commands/managing-issues.md) | Creating, relating, updating, transitioning, or closing tracked work. |
+| [Evidence tracking](references/tracker-commands/evidence-tracking.md) | Recording, attaching, inspecting, or classifying proof. |
+| [Integrating changes](references/tracker-commands/integrating-changes.md) | Connecting tracked work to branches, commits, reviews, and integration state. |
+| [Administration and recovery](references/tracker-commands/administration-and-recovery.md) | Setting up, checking, diagnosing, repairing, or pruning tracker state. |
 
-Repository-specific work types, relationship semantics, commands, and lifecycle
-policy remain owned by the repository and its product surfaces.
+Load tracker command references only as the work needs them. They provide
+mechanics, not a second procedure or a substitute for repository policy.
 
 ## Subskills
 

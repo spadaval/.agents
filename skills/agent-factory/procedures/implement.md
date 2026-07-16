@@ -8,8 +8,6 @@ breaking migration.
 
 - Read the assigned tracker item and only enough parent, sibling, doc, ADR, and
   code context to execute the slice safely.
-- In Atelier repositories, use `atelier man worker` and the issue or mission
-  status surfaces for current workflow commands.
 - Verify the item is unblocked, scoped, and has observable proof expectations.
   If it is really planning, migration, validation, or review work, stop and
   route to the correct subskill.

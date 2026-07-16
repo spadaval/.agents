@@ -10,10 +10,6 @@ One agent, one role. Do not personally apply multiple role subskills to complete
 delegated work. Spawn subagents for complex role-specific work and assign
 exactly one Agent Factory subskill to each.
 
-Use the repository's executable guidance for tactical details. In Atelier
-repositories, start from `atelier man manager`, `atelier status`, focused
-`atelier issue show <objective-id>`, and focused record drill-down commands.
-
 ## Orchestrator Responsibilities
 
 - Establish the active mission, epic, or workstream and its durable scope.

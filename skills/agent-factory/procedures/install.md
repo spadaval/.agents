@@ -19,11 +19,6 @@ Verify or create concise repository instructions that name:
 - any repository-specific constraints that an agent must know before invoking
   the tracker.
 
-For Atelier repositories, `AGENTS.md` and `docs/index.md` are the map, while
-`atelier man`, `atelier status`, focused `atelier issue show <objective-id>`,
-command help, product docs, workflow policy, and validation docs own tactical
-operation.
-
 ## Rules
 
 - Keep `AGENTS.md` short. It is a table of contents and repository-specific

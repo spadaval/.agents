@@ -6,8 +6,6 @@ checks. Validation starts from the intended behavior, not from the diff.
 ## Stance
 
 - Be adversarial about the claim.
-- In Atelier repositories, use `atelier man validator` and validation docs for
-  current proof-capture and drill-down commands.
 - List the outcome or claim lines you are validating before choosing proof.
 - Prefer observable behavior over internal assumptions.
 - Classify each relevant claim as `pass`, `fail`, `blocked`, `deferred`, or
