@@ -41,6 +41,8 @@ neutral starter and safe copy mechanics.
 - Treat that entry as an implementation detail. Public artifact URLs end at
   `/artifacts/<id>/`; logical application routes continue beneath that root,
   and the Hub resolves direct navigation back to the manifest-declared entry.
+- The Hub injects its shared root-navigation control while serving artifact
+  HTML. Do not duplicate that control in artifact source or producer templates.
 - Do not include `package.json`, lockfiles, `node_modules`, Vite configuration,
   viewer launchers, PID files, or runtime logs.
 - Extend `/root/.agents/tsconfig.json` from an artifact-local `tsconfig.json`
@@ -54,10 +56,16 @@ neutral starter and safe copy mechanics.
   summaries without reading or constraining the application’s content. Treat
   manifest status as a creation-time snapshot; live-capable type adapters may
   enrich it at runtime.
-- The Hub may group open PR-review artifacts into live stacks when a unique
+- The Hub derives one review collection for artifacts that resolve to the same
+  canonical PR identity: GitHub host, base repository, and PR number. Head SHA
+  is revision metadata within that collection, not part of PR identity. Strong
+  manifest URL identity may preserve collections when live data is unavailable;
+  uncertain identities remain standalone.
+- The Hub may group open PR review collections into live stacks when a unique
   same-repository head-ref to base-ref chain exists. Stack topology is derived
   from one atomic live summary snapshot, never declared by or written back to
-  artifact manifests. Ambiguous, closed, or unavailable PRs remain standalone.
+  artifact manifests. Ambiguous, closed, or unavailable PRs remain outside
+  stacks without losing their review collections.
 - Run domain validation from the producer skill. Artifact Hub validates only
   ID, path, entry, manifest, service, and dependency invariants.
 

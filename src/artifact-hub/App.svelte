@@ -4,11 +4,13 @@
   import { loadArtifactCatalog } from "./catalog-api";
   import { catalogKind, catalogKinds } from "./catalog-registry";
   import type { ParsedArtifact } from "./manifest";
+  import PrReviewGroup from "./PrReviewGroup.svelte";
   import PrStackGroup from "./PrStackGroup.svelte";
   import {
     loadPrCatalogSnapshot,
     type PrCatalogSnapshot,
   } from "./pr-summary-api";
+  import { groupPrRecords, type PrGroup } from "./pr-groups";
   import { inferPrStacks, type PrStack } from "./pr-stacks";
 
   type SortOrder = "newest" | "oldest" | "title";
@@ -19,6 +21,7 @@
         record: ArtifactRecord;
         rank: ArtifactRecord;
       }
+    | { type: "pr-group"; key: string; group: PrGroup; rank: ArtifactRecord }
     | { type: "stack"; key: string; stack: PrStack; rank: ArtifactRecord };
 
   let artifacts = $state<ParsedArtifact[]>([]);
@@ -52,20 +55,51 @@
   const matchingIds = $derived(
     new Set(matchingRecords.map((record) => record.artifact.manifest.id)),
   );
-  const stackResolution = $derived(inferPrStacks(records, prSnapshot));
+  const prGroupResolution = $derived(groupPrRecords(records, prSnapshot));
+  const stackResolution = $derived(
+    inferPrStacks(prGroupResolution.groups, prSnapshot),
+  );
+  const matchingPrGroups = $derived(
+    prGroupResolution.groups.filter((group) =>
+      group.records.some((record) =>
+        matchingIds.has(record.artifact.manifest.id),
+      ),
+    ),
+  );
+  const matchingReviewCount = $derived(
+    matchingRecords.filter((record) => record.kind === "pr-review").length,
+  );
   const catalogUnits = $derived.by(() => {
     const units: CatalogUnit[] = [];
     for (const stack of stackResolution.stacks) {
-      const matches = stack.records.filter((record) =>
-        matchingIds.has(record.artifact.manifest.id),
+      const matches = stack.groups.flatMap((group) =>
+        group.records.filter((record) =>
+          matchingIds.has(record.artifact.manifest.id),
+        ),
       );
       if (!matches.length) continue;
       const rank = [...matches].sort(compareRecords)[0];
       units.push({ type: "stack", key: stack.id, stack, rank });
     }
+    for (const group of matchingPrGroups) {
+      if (stackResolution.memberToStack.has(group.id)) continue;
+      const matches = group.records.filter((record) =>
+        matchingIds.has(record.artifact.manifest.id),
+      );
+      const rank = [...matches].sort(compareRecords)[0];
+      if (group.records.length > 1) {
+        units.push({ type: "pr-group", key: group.id, group, rank });
+      } else {
+        units.push({
+          type: "record",
+          key: group.records[0].artifact.manifest.id,
+          record: group.records[0],
+          rank,
+        });
+      }
+    }
     for (const record of matchingRecords) {
-      if (stackResolution.memberToStack.has(record.artifact.manifest.id))
-        continue;
+      if (record.kind === "pr-review") continue;
       units.push({
         type: "record",
         key: record.artifact.manifest.id,
@@ -322,7 +356,13 @@
           <div class="result-actions">
             <span
               >{matchingRecords.length}
-              {matchingRecords.length === 1 ? "result" : "results"}</span
+              {matchingRecords.length === 1 ? "artifact" : "artifacts"}
+              {#if matchingReviewCount}
+                · {matchingReviewCount}
+                {matchingReviewCount === 1 ? "review" : "reviews"} across
+                {matchingPrGroups.length}
+                {matchingPrGroups.length === 1 ? "PR" : "PRs"}
+              {/if}</span
             >
             <label class="sort-control"
               >Sort
@@ -347,11 +387,13 @@
         <section class="artifact-list" aria-label="Artifacts">
           {#each catalogUnits as unit (unit.key)}
             {#if unit.type === "stack" && prSnapshot}
-              <PrStackGroup
-                stack={unit.stack}
-                snapshot={prSnapshot}
+              <PrStackGroup stack={unit.stack} {matchingIds} {relativeTime} />
+            {:else if unit.type === "pr-group"}
+              <PrReviewGroup
+                group={unit.group}
                 {matchingIds}
                 {relativeTime}
+                ambiguous={stackResolution.ambiguous.has(unit.group.id)}
               />
             {:else if unit.type === "record"}
               {@const record = unit.record}
@@ -362,7 +404,9 @@
                 prSummary={prSnapshot?.summaries[record.artifact.manifest.id]}
                 prFreshness={prSnapshot?.freshness}
                 ambiguous={stackResolution.ambiguous.has(
-                  record.artifact.manifest.id,
+                  prGroupResolution.recordToGroup.get(
+                    record.artifact.manifest.id,
+                  ) ?? "",
                 )}
               />
             {/if}

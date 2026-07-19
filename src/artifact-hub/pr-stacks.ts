@@ -1,10 +1,10 @@
-import type { ArtifactRecord } from "./catalog";
 import type { PrCatalogSnapshot, PrCatalogSummary } from "./pr-summary-api";
+import type { PrGroup } from "./pr-groups";
 
 export type PrStack = {
   id: string;
   project: string;
-  records: ArtifactRecord[];
+  groups: PrGroup[];
   freshness: PrCatalogSnapshot["freshness"];
 };
 
@@ -16,16 +16,16 @@ export type PrStackResolution = {
 
 type Node = {
   id: string;
-  record: ArtifactRecord;
+  group: PrGroup;
   summary: PrCatalogSummary;
 };
 
 const repositoryKey = (value: string) => value.toLowerCase();
-const refKey = (repository: string, ref: string) =>
-  `${repositoryKey(repository)}\u0000${ref}`;
+const refKey = (host: string, repository: string, ref: string) =>
+  `${host}\u0000${repositoryKey(repository)}\u0000${ref}`;
 
 export function inferPrStacks(
-  records: ArtifactRecord[],
+  groups: PrGroup[],
   snapshot: PrCatalogSnapshot | null,
 ): PrStackResolution {
   const empty = (): PrStackResolution => ({
@@ -35,16 +35,16 @@ export function inferPrStacks(
   });
   if (!snapshot) return empty();
 
-  const nodes: Node[] = records.flatMap((record) => {
-    if (record.kind !== "pr-review") return [];
-    const summary = snapshot.summaries[record.artifact.manifest.id];
-    if (!summary || summary.pr.state !== "OPEN") return [];
-    return [{ id: record.artifact.manifest.id, record, summary }];
+  const nodes: Node[] = groups.flatMap((group) => {
+    const summary = group.summary;
+    if (!group.identity || !summary || summary.pr.state !== "OPEN") return [];
+    return [{ id: group.id, group, summary }];
   });
   const byId = new Map(nodes.map((node) => [node.id, node]));
   const parentsByHead = new Map<string, Node[]>();
   for (const node of nodes) {
     const key = refKey(
+      node.group.identity!.host,
       node.summary.pr.headRepository,
       node.summary.pr.headRefName,
     );
@@ -58,6 +58,7 @@ export function inferPrStacks(
   const ambiguous = new Set<string>();
   for (const child of nodes) {
     const key = refKey(
+      child.group.identity!.host,
       child.summary.pr.baseRepository,
       child.summary.pr.baseRefName,
     );
@@ -137,20 +138,20 @@ export function inferPrStacks(
       component.forEach((id) => ambiguous.add(id));
       continue;
     }
-    const stackRecords = ordered.map((id) => byId.get(id)!.record);
+    const stackGroups = ordered.map((id) => byId.get(id)!.group);
     const root = byId.get(ordered[0])!;
     stacks.push({
       id: `pr-stack:${repositoryKey(root.summary.repository)}:${ordered.join(",")}`,
-      project: root.record.project,
-      records: stackRecords,
+      project: root.group.project,
+      groups: stackGroups,
       freshness: snapshot.freshness,
     });
   }
 
   const memberToStack = new Map<string, string>();
   for (const stack of stacks) {
-    for (const record of stack.records) {
-      memberToStack.set(record.artifact.manifest.id, stack.id);
+    for (const group of stack.groups) {
+      memberToStack.set(group.id, stack.id);
     }
   }
   return { stacks, memberToStack, ambiguous };
