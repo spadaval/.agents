@@ -33,6 +33,17 @@ export function injectArtifactBase(html: string, id: string): string {
   );
 }
 
+const artifactNavigationScript =
+  '<script type="module" src="/src/artifact-hub/artifact-navigation.ts"></script>';
+
+export function injectArtifactNavigation(html: string): string {
+  if (html.includes(artifactNavigationScript)) return html;
+  if (/<\/body>/i.test(html)) {
+    return html.replace(/<\/body>/i, `${artifactNavigationScript}</body>`);
+  }
+  return `${html}${artifactNavigationScript}`;
+}
+
 async function isFile(filePath: string): Promise<boolean> {
   try {
     return (await fs.stat(filePath)).isFile();
@@ -83,7 +94,7 @@ export function artifactRoutes(artifactRoot: string): Plugin {
           const source = await fs.readFile(entryPath, "utf8");
           const html = await server.transformIndexHtml(
             url.pathname,
-            injectArtifactBase(source, route.id),
+            injectArtifactNavigation(injectArtifactBase(source, route.id)),
           );
           response.statusCode = 200;
           response.setHeader("Content-Type", "text/html; charset=utf-8");

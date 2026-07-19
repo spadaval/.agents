@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { injectArtifactBase, matchArtifactRoute } from "./artifact-routes";
+import {
+  injectArtifactBase,
+  injectArtifactNavigation,
+  matchArtifactRoute,
+} from "./artifact-routes";
 
 describe("Artifact Hub clean routes", () => {
   it("matches artifact roots and deep application paths", () => {
@@ -35,5 +39,16 @@ describe("Artifact Hub clean routes", () => {
         "review-475",
       ).match(/<base/g),
     ).toHaveLength(1);
+  });
+
+  it("injects shared navigation without changing artifact source files", () => {
+    const html = injectArtifactNavigation(
+      "<html><head></head><body><main>Artifact</main></body></html>",
+    );
+
+    expect(html).toContain(
+      '<script type="module" src="/src/artifact-hub/artifact-navigation.ts"></script></body>',
+    );
+    expect(injectArtifactNavigation(html)).toBe(html);
   });
 });
