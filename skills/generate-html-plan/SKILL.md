@@ -1,156 +1,91 @@
 ---
 name: generate-html-plan
-description: Run an exhaustive, code-aware planning interview and turn the resolved design into a validated interactive HTML plan. Use when Codex needs to plan a substantial feature, refactor, migration, or architecture change; challenge scope and domain language; resolve a design tree collaboratively; or replace a long Markdown implementation plan with a navigable Svelte/Vite plan app.
+description: Explore and resolve a substantial implementation plan, then communicate it as a clear, domain-specific Svelte application in Artifact Hub. Use for feature, refactor, migration, or architecture planning when an interactive visual plan will be easier to understand than a long chat or Markdown document.
 ---
 
 # Generate HTML Plan
 
-Treat planning as a collaborative design investigation, not a prompt for an
-immediate prose plan. Explore first, interview until the consequential design
-tree is closed, then generate the plan as a typed Svelte/Vite app.
+Produce a plan that a person can understand quickly and use to guide implementation. Treat the Svelte app as the plan itself, not as a viewer for a prescribed document schema.
 
-## Workflow
+## Plan collaboratively
 
-### 1. Establish the planning surface
+1. Inspect the relevant repository code, tests, configuration, and local guidance. Do not ask the user for facts the repository can answer.
+2. Identify consequential choices and interview the user in small batches until those choices are resolved. Explain meaningful options, tradeoffs, and a recommendation. Record low-impact assumptions explicitly.
+3. Keep scope, success, current behavior, system boundaries, failure handling, compatibility, operations, delivery order, and validation in mind. Apply only the parts that matter to this domain.
+4. Before generation, briefly summarize resolved choices, assumptions, and deferred work. Outside Plan mode, generate immediately. In Plan mode, wait until editing is enabled and the user explicitly asks to generate.
 
-- Inspect the repository, relevant code, tests, configuration, and existing
-  plans before asking anything the code can answer.
-- Find `AGENTS.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, and applicable ADRs. Follow
-  a context map to context-local documentation.
-- State the planning topic, known constraints, and the first unresolved branch.
-- Build a private coverage map. At minimum consider intent and success,
-  current behavior, actors and scenarios, scope and non-goals, domain language
-  and invariants, interfaces and data, permissions and security, failure and
-  recovery behavior, compatibility and migration, observability and
-  operations, delivery slices, testing, and rollout. Mark a branch
-  inapplicable only for a concrete reason.
+Do not turn the conversation into a long Markdown implementation plan. The app is the canonical handoff.
 
-### 2. Interview to closure
+## Build the plan app
 
-- Walk dependency order: settle upstream product and domain decisions before
-  downstream implementation choices.
-- Ask related questions in repeated small batches, then wait indefinitely for
-  the answer. When a structured question tool is available, use it without an
-  automatic timeout. Use as many rounds as the design requires.
-- For every consequential question provide:
-  - distinct options and their material tradeoffs;
-  - a recommendation and why it fits the observed system;
-  - decision impact or implementation complexity (`S`, `M`, `L`, or `XL`);
-  - a concrete scenario when that makes the distinction easier to evaluate.
-- Do not silently fill a branch because the likely answer seems obvious. An
-  explicit assumption is acceptable only when it is low-impact, reversible,
-  and visibly recorded for the final plan.
-- Reopen the coverage map when an answer reveals a new dependency. Do not ask
-  whether the user wants more questions while consequential branches remain.
-- Challenge conflicting glossary terms, fuzzy nouns, and claims that disagree
-  with code. Prefer a precise canonical term and stress-test boundaries with
-  examples.
-- Keep a decision ledger in the conversation: resolved choice, rationale,
-  rejected alternatives, assumptions, evidence, deferred items, and affected
-  areas. Do not emit a long Markdown plan as a substitute for the HTML output.
-
-### 3. Respect Plan mode's write boundary
-
-When Codex is in Plan mode, perform all exploration and interviewing read-only.
-Do not scaffold the app or update domain documentation.
-
-After all applicable branches are resolved:
-
-1. Give a compact closure audit: resolved decision areas, explicit
-   assumptions, intentionally deferred items, and documentation changes that
-   will be made. This is a handoff summary, not the implementation plan.
-2. Ask the user: **“Please disable Plan mode, then reply ‘Generate the HTML
-   plan’.”**
-3. Wait for both the mode change and explicit go-ahead. If editing remains
-   disabled, explain that the plan cannot be generated yet and repeat the
-   request. Never claim the HTML plan exists before the files validate.
-
-Outside Plan mode, still complete the interview before writing, then proceed
-directly to generation after the closure audit. Do not ask for permission or a
-second go-ahead: invoking this skill already authorizes plan generation once
-the interview is complete.
-
-### 4. Generate the plan workspace
-
-After the Plan-mode handoff and explicit go-ahead, or immediately after closure
-outside Plan mode, choose a new descriptive artifact ID. Artifact Hub writes
-the plan under `~/.agents/artifacts/<id>/`; never overwrite an existing
-artifact.
-
-Run:
+Choose a new descriptive artifact ID and scaffold it:
 
 ```bash
 node <skill-dir>/scripts/create-plan-app.mjs <artifact-id> --title <title> --repository <repository>
 ```
 
-Author `~/.agents/artifacts/<artifact-id>/src/plan/plan.ts` from the decision ledger and codebase
-evidence. Use the exported types; do not replace the typed model with raw HTML
-or an unvalidated JSON blob.
+Then author a complete Svelte app in the created artifact. Design its information architecture and interactions around the actual problem. The agent is free to use components, TypeScript modules, diagrams, timelines, filters, simulations, or light animation when they improve understanding. Do not force the content into a shared plan schema or generic card layout.
 
-The generated plan must:
+Optimize for the reader:
 
-- lead with outcome, scope, non-goals, constraints, and success signals;
-- expose decisions with rationale, alternatives, impact, confidence, and
-  source paths where useful;
-- show system relationships and execution phases in dependency order;
-- give each phase concrete changes, affected files or areas, dependencies,
-  verification, and completion signals;
-- include realistic scenarios, risks with mitigations and triggers, explicit
-  assumptions, and intentionally deferred work;
-- distinguish product decisions from implementation mechanics;
-- contain no unresolved consequential question disguised as a step;
-- stay concise enough to scan. Put detail in expandable disclosures instead of
-  repeating it across sections.
+- Lead with the concrete problem and intended system outcome. Make boundaries, important decisions, implementation path, risks, and validation easy to find; treat these as planning concepts, not mandatory page sections.
+- Separate independent workstreams. Give each its own problems, decisions, architecture, roadmap, delivery context, and evidence instead of blending unrelated work.
+- Combine a roadmap and change sequence when they communicate the same dependency order. Keep achieved evidence separate from planned work, and highlight measured improvements or meaningful validation results.
+- Show relationships visually when that is clearer than prose.
+- Use progressive disclosure for supporting detail while keeping the essential plan understandable at a glance.
+- Keep the tone informational and pragmatic. Prefer compact navigation, plain interface typography, and concise technical language. Avoid slogans, oversized hero typography, magazine-style composition, editorial prose, and decorative visual storytelling.
+- Do not build a hero section. Use a compact title and outcome summary within the application shell; at desktop width, the first viewport should also expose navigation and the beginning of substantive plan content. Keep the main heading at interface scale (roughly 2.5rem or smaller), not poster scale.
+- Do not use kicker/eyebrow labels or numbered editorial headings unless they communicate real state, scope, or navigation. A visual label is not useful merely because it makes the page look designed.
+- Give every visual encoding an actual meaning. Do not add decorative progress bars, fabricated precision, or rows for target stages that no longer exist.
+- Preserve accessibility, responsive behavior, and Artifact Hub's injected root navigation.
+- Cite relevant repository paths where they help implementation.
 
-The viewer provides hierarchy, semantic color, filters, collapsible detail,
-and locally persisted review state. Preserve those shared behaviors. Change
-the template only for reusable platform improvements; keep plan-specific
-content in `src/plan/plan.ts`.
+The artifact owns its Svelte files, styles, data, and components. There is no required plan-specific file format. Do not add a duplicate Markdown plan.
 
-### 5. Write domain documentation after the handoff
+## Choose and render diagrams
 
-Apply resolved domain-language updates only after editing is enabled. Read
-[references/context-format.md](references/context-format.md) before creating or
-updating `CONTEXT.md` or `CONTEXT-MAP.md`.
+Use D2 for substantial architecture boundaries, multi-stage control flows, ownership relationships, and dependency graphs. Use native HTML tables or grids for exact timings, mappings, comparisons, roadmaps, and delivery sequences. Omit the diagram when prose or a small table is clearer.
 
-Offer an ADR only when the decision is hard to reverse, surprising without its
-context, and the result of a real tradeoff. Read
-[references/adr-format.md](references/adr-format.md) before writing one. List
-documentation changes in the HTML plan whether they are applied now or assigned
-to an execution phase.
+When a D2 diagram is justified:
 
-### 6. Validate and inspect
+1. Keep authoritative sources under `src/assets/diagrams/*.d2` and generated SVGs under `src/assets/diagrams/generated/`.
+2. Use ELK layout and trusted, source-controlled local sources and styling only. Do not accept runtime/user-provided D2, remote icons, or externally fetched diagram content.
+3. Generate with the template's pinned helper:
 
-Run:
+   ```bash
+   D2_BIN=/path/to/d2-v0.7.1 bash ./scripts/generate-diagrams.sh
+   ```
+
+   Resolve the renderer as local tool state. Never copy, commit, or bundle the
+   D2 executable into the artifact or skill.
+
+4. Render the SVG with the supplied `src/lib/DiagramViewer.svelte`. Supply a factual title and accessible description; use its expandable modal instead of enlarging the inline diagram until it disrupts the page. Configure the primitive through its props and CSS variables—do not replace it with a one-off viewer or delete its component tests.
+5. When comparing the same architecture or control flow before and after the
+   change, use one explicit Current/Target selector so the reader can switch
+   the shared view in place. Show removed behavior only in the current view;
+   omit it from the target rather than inventing a zero-duration stage. Do not
+   render two oversized canvases merely to avoid the selector.
+
+## Documentation
+
+Apply domain-language updates only when the user has authorized repository edits. Read [references/context-format.md](references/context-format.md) before changing `CONTEXT.md` or `CONTEXT-MAP.md`. Offer an ADR only for a consequential, durable tradeoff; read [references/adr-format.md](references/adr-format.md) first.
+
+## Validate and hand off
+
+Run the checks appropriate to the app, including at minimum:
 
 ```bash
 cd ~/.agents/artifacts/<artifact-id>
-/root/.agents/node_modules/.bin/vite-node scripts/validate-plan.ts
-/root/.agents/node_modules/.bin/vitest run --config /root/.agents/vitest.config.ts --root .
 /root/.agents/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
 /root/.agents/bin/artifact-hub open <artifact-id>
 ```
 
-Inspect the live plan at desktop and narrow widths. Confirm navigation,
-filters, disclosures, dependency links, and review-state controls work; confirm
-the essential plan remains understandable without expanding every card. The
-shared Hub service owns network binding; do not start a plan-local server.
+Inspect the live app at desktop and narrow widths. Exercise its navigation and interactions, and confirm the central plan remains legible without opening every detail. Run any artifact-specific tests the app introduces.
 
-Return the artifact path, viewer URL, validation results, and a short list of
-domain-documentation files changed. The HTML app is the canonical plan; the
-final chat response is only a concise handoff.
+When diagrams are present, also run `bash ./scripts/generate-diagrams.sh`, verify the committed SVG matches its source, and exercise modal open/close, Escape, focus restoration, keyboard panning, and narrow-width scrolling.
+
+Return the artifact path, viewer URL, validation results, and any domain documentation changed. Keep the final chat response to a concise handoff.
 
 ## Workspace contract
 
-```text
-~/.agents/artifacts/<artifact-id>/
-├── manifest.json            # Artifact Hub catalog metadata
-├── index.html               # artifact-relative Vite entry
-├── src/lib/                 # plan-local typed model and validation
-├── src/plan/plan.ts         # plan-local authored content
-└── ...                      # complete custom Svelte application
-```
-
-The artifact owns its complete Svelte pages but shares Artifact Hub's single
-Vite process and dependency installation. Do not add a second full Markdown
-plan or duplicate the app's content into auxiliary documentation.
+Each generated artifact is a complete Svelte application under `~/.agents/artifacts/<id>/`. Use artifact-relative URLs, scope browser storage by artifact ID, and do not add a package manifest, lockfile, local dependency installation, Vite server, or runtime log. Artifact Hub owns the shared toolchain and service.

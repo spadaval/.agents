@@ -3,6 +3,7 @@ export { default as ChangeTree } from "./ChangeTree.svelte";
 export { default as LayerScopeSelect } from "./LayerScopeSelect.svelte";
 export { default as ReviewTopbar } from "./ReviewTopbar.svelte";
 export { default as DiffExcerpt } from "./DiffExcerpt.svelte";
+export { default as DiagramViewer } from "./DiagramViewer.svelte";
 export { default as PierreDiff } from "./PierreDiff.svelte";
 export { default as FileReference } from "./FileReference.svelte";
 export { default as Section } from "./Section.svelte";

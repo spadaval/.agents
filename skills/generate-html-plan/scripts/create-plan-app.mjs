@@ -52,5 +52,5 @@ const output = execFileSync(
 const result = JSON.parse(output);
 
 console.log(`Plan artifact: ${result.path}`);
-console.log(`Author plan: ${join(result.path, "src", "plan", "plan.ts")}`);
+console.log(`Author plan app: ${join(result.path, "src", "App.svelte")}`);
 console.log(`Viewer URL: ${result.url}`);

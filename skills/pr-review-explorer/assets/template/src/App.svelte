@@ -653,9 +653,8 @@
   h1 {
     margin: 7px 0;
     color: #f1f5ef;
-    font:
-      600 clamp(25px, 3vw, 34px)/1.15 Georgia,
-      serif;
+    font: 650 clamp(24px, 3vw, 32px)/1.2 Inter, ui-sans-serif, system-ui,
+      sans-serif;
   }
   .metrics {
     display: flex;
@@ -770,9 +769,7 @@
   .description {
     max-width: 780px;
     color: #d2d9d0;
-    font:
-      18px/1.58 Georgia,
-      serif;
+    font: 16px/1.6 Inter, ui-sans-serif, system-ui, sans-serif;
   }
   .narrative,
   .full-diff {
@@ -812,7 +809,7 @@
   .finding-summary h2 {
     margin: 0;
     color: #eff5ee;
-    font: 600 20px/1.25 Georgia, serif;
+    font: 650 19px/1.3 Inter, ui-sans-serif, system-ui, sans-serif;
   }
   .finding-summary > p {
     margin: 11px 0 0;
@@ -863,7 +860,7 @@
     margin: 0;
     padding: 28px;
     color: #c7d4c8;
-    font: 600 20px/1.4 Georgia, serif;
+    font: 600 18px/1.4 Inter, ui-sans-serif, system-ui, sans-serif;
     text-align: center;
     background: var(--paper);
     border: 1px dashed #465349;

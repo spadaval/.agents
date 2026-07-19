@@ -8,6 +8,9 @@ __pycache__/
 # Shared local dependency installation and Vite caches
 /node_modules/
 
+# Pinned D2 renderer is local tool state; templates commit only source and SVGs
+/bin/d2-v0.7.1
+
 # Finder metadata
 .DS_Store
 ._*

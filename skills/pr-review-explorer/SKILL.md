@@ -95,6 +95,69 @@ extracted data separate from agent-authored review stories.
    not the narrative body's voice: stories may be candid, critical, or emphatic
    when the evidence warrants it.
 
+   Treat the primary story body as the canonical medium-detail account of the
+   complete PR, not only as a longer version of its introductory metadata. It
+   must cover every semantic layer in layer order and let a reviewer understand
+   how the whole change fits together before opening an individual layer. For
+   each layer, summarize its role, its consequential implementation change, and
+   how it connects to the PR's wider behavior; then link to the canonical layer
+   story or exact evidence for the full treatment. The primary story owns
+   cross-layer synthesis: end-to-end flows, contracts between layers,
+   sequencing, dependencies, system-wide tradeoffs, and migration or rollout
+   consequences.
+
+   Start that account with the concrete problem and the resulting behavior,
+   then explain consequential implementation changes, old and new design where
+   relevant, measured evidence, tradeoffs, and the PR's place in a broader
+   delivery sequence. When the PR is one incremental slice, distinguish what
+   this PR delivers from later roadmap work. Keep evidence already obtained
+   separate from planned validation or follow-up.
+
+   Write about the software and its behavior. Do not use slogans, teasers,
+   magazine-style headings, or reviewer-process meta-commentary such as “make
+   this reviewable” or “how to read this PR.” Keep the review shell compact and
+   utilitarian; reserve visual emphasis for evidence, risk, state, and measured
+   change.
+
+   Before validation, reread the complete primary story and remove directions
+   to the reviewer or reader (for example, “open each layer,” “start here,” or
+   “review focus”). Navigation must be self-evident in the shell; the primary
+   story contains only facts, design reasoning, evidence, tradeoffs, and
+   delivery context about the software.
+
+   Do not build that account by mounting, concatenating, or paraphrasing every
+   layer story body. A layer story owns the local implementation mechanics,
+   invariants, detailed file relationships, caveats, and exact diff evidence
+   needed to understand that layer independently. Repeat only the minimum local
+   context needed to make the PR-wide narrative coherent. The primary story
+   should mention every layer, but it should not enumerate every changed file,
+   reproduce every layer excerpt, or become a generated layer index. Use a
+   PR-level excerpt only when it supports a claim about the whole change or a
+   consequential interaction between layers; keep layer-local evidence in the
+   corresponding layer story.
+
+   Use D2 only when a substantial architecture boundary, multi-stage control
+   flow, ownership relationship, or dependency graph is clearer visually. Use
+   native HTML tables or grids for timings, mappings, comparisons, roadmaps,
+   and delivery sequences; omit diagrams when prose or a small table is
+   clearer. Authored diagrams explain the change but are not immutable PR
+   evidence: repository facts and exact diffs remain authoritative.
+
+   Keep D2 source under `src/assets/diagrams/*.d2`, generated SVG under
+   `src/assets/diagrams/generated/`, and render it with the exported
+   `DiagramViewer` primitive. Generate with
+   `D2_BIN=/path/to/d2-v0.7.1 bash ./scripts/generate-diagrams.sh`; the helper pins
+   D2 v0.7.1 and ELK. Use only trusted local D2 sources and local assets—never
+   runtime/user-provided D2 or remote icons. Keep diagram styling
+   source-controlled. Resolve D2 as local tool state; never copy, commit, or
+   bundle the executable into the artifact or skill. Supply an accessible
+   description and retain the viewer's expandable modal rather than making the
+   inline story diagram dominate the diff-first layout.
+
+   Use the supplied `DiagramViewer` primitive unchanged. Configure it through
+   props and CSS variables; do not replace it with a story-local viewer or
+   remove its component tests.
+
    At runtime, the review shell discovers authored layers, stories, and
    findings through the same-origin
    `GET /api/artifacts/<artifact-id>/modules` registry and then dynamically
@@ -176,6 +239,11 @@ extracted data separate from agent-authored review stories.
    destinations; redirect legacy `/map` paths to the root entry point. Artifact
    Hub serves the manifest-declared HTML entry for direct navigation and
    refreshes at every logical route.
+
+   When an authored diagram is present, validate its D2 source and generated
+   SVG, then exercise modal open/close, Escape, focus restoration, keyboard
+   panning, and narrow-width scrolling. Diagram behavior is supplemental; it
+   must not weaken layer coverage, exact anchors, or full-diff access.
 
    Render a persistent, evidence-backed topbar above the viewer. It should make
    the PR identifiable without opening another panel: project and repository
