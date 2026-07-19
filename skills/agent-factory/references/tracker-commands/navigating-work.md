@@ -18,8 +18,7 @@ instructions select the tracker.
 
 ## GitHub Issues
 
-- Use `gh issue status`, `gh issue list`, and focused `gh issue view <number>`;
-  pass `-R owner/repo` when the checkout does not identify the target.
+- Use `gh issue status`, `gh issue list`, and focused `gh issue view <number>`.
 - Request comments or structured JSON only when the task needs them. Inspect
   parents, sub-issues, dependencies, linked pull requests, labels, assignees,
   and project fields as relevant.
@@ -28,3 +27,8 @@ instructions select the tracker.
 - GitHub CLI support for newer issue fields varies by installed version. Check
   `gh issue <command> --help` and use GitHub's API when the CLI does not expose
   a native relationship that the repository uses.
+- `gh api` does not reliably infer a GitHub Enterprise host from the checkout
+  when multiple hosts are configured. Set `GH_HOST` explicitly from the git
+  remote for every raw API call, for example
+  `GH_HOST=<git-origin-host> gh api ...`. Do not use `gh api` for operations
+  already supported by the repository-aware high-level commands.

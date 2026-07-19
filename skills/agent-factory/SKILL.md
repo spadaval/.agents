@@ -28,9 +28,10 @@ tracker command references explain how to realize those concepts there.
   needed to act. Other skill references must be named explicitly.
 - Configure every subagent explicitly with a model, reasoning effort, and
   self-contained prompt. Load [Submodel selection](references/submodel-selection.md)
-  before spawning, select the least expensive capable model, and prefer smaller
-  models for bounded bulk work such as log scanning, file reading, inventory,
-  extraction, and evidence collection. Do not delegate when the runtime cannot
+  before spawning and choose the most cost-effective model/run portfolio that
+  can produce trustworthy proof. Prefer smaller models and multiple independent
+  runs when decomposition, experimentation, or cheap verification makes breadth
+  more valuable than one stronger run. Do not delegate when the runtime cannot
   explicitly set the model and reasoning effort unless a human directs that
   exception.
 - Use fresh subagent context by default. `fork_context` (also called
