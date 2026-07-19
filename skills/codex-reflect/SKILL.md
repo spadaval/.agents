@@ -10,24 +10,36 @@ verify.
 
 ## Default Procedure
 
-1. Locate the relevant transcript, then resolve its lineage to the root
+1. Before locating transcripts or extracting evidence, search Artifact Hub for
+   existing `codex-reflect` artifacts that match the requested session,
+   workstream, repository, project, or topic. Inspect candidate manifests and
+   `markdown/index.md` files to verify their source sessions and analysis
+   windows.
+2. Reuse the newest relevant artifact as the primary evidence and report
+   surface when it covers the request. Do not create a duplicate analysis pack.
+   If its coverage is stale, state the cutoff and extract only the missing
+   delta, updating or refreshing the existing analysis as appropriate.
+3. Only when no suitable artifact exists, or when additional coverage is
+   required, locate the relevant transcript and resolve its lineage to the root
    session before selecting the primary analysis target.
-2. Bound the root analysis window when it spans multiple tasks.
-3. Extract a temporary evidence workspace with `extract_evidence.py`, then
-   create its centralized Artifact Hub app with `create_report_app.py`.
-4. Read the generated `markdown/index.md` and the relevant evidence briefs
+4. Bound the root analysis window when it spans multiple tasks or when only a
+   delta beyond an existing artifact is needed.
+5. Extract a temporary evidence workspace with `extract_evidence.py` only for
+   evidence not already covered, then create a centralized Artifact Hub app
+   with `create_report_app.py` only when no suitable artifact can be reused.
+6. Read the selected artifact's `markdown/index.md` and relevant evidence briefs
    directly. The Svelte viewer is for human exploration, not the agent's
    primary analysis surface.
-5. Verify raw JSONL only around relevant failures, gaps, delegation, handoff,
+7. Verify raw JSONL only around relevant failures, gaps, delegation, handoff,
    and final claims.
-6. Author `<artifact>/src/report/report.ts` from the evidence pack. Identify the
+8. Author `<artifact>/src/report/report.ts` from the evidence pack. Identify the
    actual task, lifecycle, outcome, phases, actions, workstream roles, and
    cross-thread findings; cite normalized evidence IDs for every substantive
    conclusion. Do not ask the viewer to infer these semantics from labels or
    keywords.
-7. Validate with Artifact Hub's shared toolchain, then inspect the live report
+9. Validate with Artifact Hub's shared toolchain, then inspect the live report
    at desktop and narrow widths.
-8. Synthesize a STAR-I retrospective that preserves effective behavior and
+10. Synthesize a STAR-I retrospective that preserves effective behavior and
    identifies concrete improvements. For multi-agent work, use a root-level
    STAR-I with bounded workstream cards rather than a linear child-by-child
    narrative.
