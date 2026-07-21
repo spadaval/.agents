@@ -1,11 +1,15 @@
 ---
 name: generate-html-plan
-description: Explore and resolve a substantial implementation plan, then communicate it as a clear, domain-specific Svelte application in Artifact Hub. Use for feature, refactor, migration, or architecture planning when an interactive visual plan will be easier to understand than a long chat or Markdown document.
+description: Explore and resolve a substantial product, architecture, or implementation plan, then communicate it as a clear, domain-specific Svelte application in Artifact Hub. Use when an interactive visual plan will be easier to understand than a long chat or Markdown document.
 ---
 
 # Generate HTML Plan
 
-Produce a plan that a person can understand quickly and use to guide implementation. Treat the Svelte app as the plan itself, not as a viewer for a prescribed document schema.
+Produce a plan that a person can understand quickly and use to guide
+implementation. Treat the Svelte app as the plan itself while choices are being
+explored, not as a viewer for a prescribed document schema. When a plan is
+published for Agent Factory execution, its
+repository-tracked strategic plan becomes the execution-time authority.
 
 ## Plan collaboratively
 
@@ -14,7 +18,26 @@ Produce a plan that a person can understand quickly and use to guide implementat
 3. Keep scope, success, current behavior, system boundaries, failure handling, compatibility, operations, delivery order, and validation in mind. Apply only the parts that matter to this domain.
 4. Before generation, briefly summarize resolved choices, assumptions, and deferred work. Outside Plan mode, generate immediately. In Plan mode, wait until editing is enabled and the user explicitly asks to generate.
 
-Do not turn the conversation into a long Markdown implementation plan. The app is the canonical handoff.
+Do not turn the conversation into a long Markdown implementation plan. The app
+is the canonical interactive-planning handoff. Publishing an active strategic
+plan for Agent Factory execution is the exception described below; do not
+duplicate its issue and epic graph in prose.
+
+## Publish For Agent Factory Execution
+
+When an HTML plan will guide a substantial Agent Factory mission, use
+`$agent-factory plan` to condense it into a repository-tracked strategic plan
+before execution begins.
+Preserve the intended outcome, target system shape, governing product and
+engineering tradeoffs, boundaries, valuable partial outcomes, adaptation
+guidance, assurance claims, and links to owning product, architecture, or ADR
+sources.
+
+Exclude issue decomposition, Worker assignments, commands, branches, and
+temporary sequencing. Record the source artifact identity and published
+revision, link the strategic plan from the main mission, and treat the
+repository plan as canonical during execution. The HTML app remains the
+deliberation record and richer explanatory reference.
 
 ## Build the plan app
 
@@ -40,7 +63,10 @@ Optimize for the reader:
 - Preserve accessibility, responsive behavior, and Artifact Hub's injected root navigation.
 - Cite relevant repository paths where they help implementation.
 
-The artifact owns its Svelte files, styles, data, and components. There is no required plan-specific file format. Do not add a duplicate Markdown plan.
+The artifact owns its Svelte files, styles, data, and components. There is no
+required plan-specific file format. Do not add a duplicate Markdown
+implementation plan; the approved Agent Factory strategic-plan publication is
+a transfer of authority, not a second tactical plan.
 
 ## Choose and render diagrams
 

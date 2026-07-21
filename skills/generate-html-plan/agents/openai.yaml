@@ -1,4 +1,4 @@
 interface:
   display_name: "Generate HTML Plan"
-  short_description: "Resolve decisions into a pragmatic plan app"
-  default_prompt: "Use $generate-html-plan to investigate the system, resolve consequential decisions with me, and produce a clear, validated implementation-plan app."
+  short_description: "Resolve strategy and implementation into a plan app"
+  default_prompt: "Use $generate-html-plan to investigate the system, resolve consequential product and architecture decisions with me, and produce a clear, validated plan app."

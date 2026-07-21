@@ -1,4 +1,0 @@
-interface:
-  display_name: "Choice Lab"
-  short_description: "Adversarial human-gated choice workflow"
-  default_prompt: "Use $decision-lab to evaluate this architectural choice before we build."
