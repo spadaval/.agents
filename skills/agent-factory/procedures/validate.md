@@ -6,7 +6,9 @@ checks. Validation starts from the intended behavior, not from the diff.
 ## Stance
 
 - Be adversarial about the claim.
-- List the outcome or claim lines you are validating before choosing proof.
+- List the strategic-plan, mission, or issue outcome lines you are validating
+  before choosing proof. Mission validation starts from the strategic outcome,
+  not from whether the planned issues were closed.
 - Prefer observable behavior over internal assumptions.
 - Classify each relevant claim as `pass`, `fail`, `blocked`, `deferred`, or
   `not-applicable`.
@@ -26,12 +28,19 @@ choose the smallest proof that genuinely exercises the claim. Use first-class
 evidence for independent validation, parent-level claims, process policy,
 public contracts, migrations, stale-test risk, and non-pass classifications.
 
+For a completion or readiness claim, identify the exact command or observation
+that proves it, run it fresh after the final relevant change, inspect the full
+result and exit status, and attach that evidence to the classification. A prior
+run, cached result, issue status, or another agent's assertion is insufficient.
+
 ## Failure Handling
 
 For every non-pass result, name the first concrete failure and classify it as an
 in-scope defect, expected migration breakage, environment/tooling failure,
 pre-existing failure, deferred validation with owner, or not applicable.
 Create or identify follow-up work instead of silently broadening scope.
+Report the finding to the orchestrating Manager; validation does not decide by
+itself that a repair becomes part of the mission's critical path.
 
 ## Handoff
 

@@ -16,11 +16,28 @@ well-built and supported by evidence. It is not scenario validation.
   unsupported proof claims, and prohibited compatibility shims.
 - If no issues are found, say so and name residual risk or unrun checks.
 
+## Review Order
+
+Use two explicit lenses in order:
+
+1. **Contract compliance**: compare the diff or artifact with the exact assigned
+   outcome, governing constraints, interfaces, non-scope, and required proof.
+   Identify omissions, unsupported additions, and misleading completion claims.
+2. **Construction quality**: assess correctness, maintainability, architecture,
+   security, test quality, documentation, and operational risk.
+
+Do not let elegant construction excuse a contract miss. For an integrated
+increment, also inspect interactions among individually acceptable changes and
+identify defects visible only at the whole-increment boundary.
+
 ## Output
 
 Use this shape:
 
 ```text
+Contract Compliance
+- pass | fail | blocked - assigned outcome and scope assessment.
+
 Findings
 - Severity: file:line - issue, impact, recommendation.
 

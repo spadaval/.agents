@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Factory"
+  short_description: "Decide, diagnose, and run agent missions"
+  default_prompt: "Use $agent-factory to decide, diagnose, plan, and coordinate this mission through verified delivery."

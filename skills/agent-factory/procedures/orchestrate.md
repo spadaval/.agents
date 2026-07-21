@@ -1,76 +1,114 @@
 # Orchestrate
 
-Use this subskill when you are the primary coordinator for a mission, epic, or
-multi-item workstream. The orchestrator scopes, delegates, integrates, reviews,
-validates, checkpoints, and steers recovery.
+Use this subskill to run a mission, epic, or multi-item workstream. The
+orchestrator delegates, integrates, validates, replans, and closes work against
+the active strategy.
 
 ## Operating Model
 
-One agent, one role. Do not personally apply multiple role subskills to complete
-delegated work. Spawn subagents for complex role-specific work and assign
-exactly one Agent Factory subskill to each.
+Assign one role and one Agent Factory subskill to each subagent. The
+orchestrator may maintain its implementation graph; it does not need a separate
+`plan` assignment for routine expansion or repair.
 
-## Orchestrator Responsibilities
+Establish the mission, strategy path and revision, current graph, worktree
+state, and next coherent increment before dispatching mutating work. Integrate
+results at useful checkpoints and preserve unrelated changes.
 
-- Establish the active mission, epic, or workstream and its durable scope.
-- Check visible work readiness and worktree state before assigning mutating
-  work.
-- Resolve or block high-leverage choices before dependent implementation.
-- Ensure each assigned item has clear scope, proof, evidence destination, and
-  independence requirements.
-- Delegate bounded worker, reviewer, validator, audit, docs, migration, and
-  scout slices early enough that proof is durable.
-- Integrate completed work into coherent checkpoints and preserve unrelated
-  user or agent changes.
-- Route high-risk diffs to `review` and scenario-centered claims to `validate`.
-- Close parent work only after accountable child proof, required review or
-  validation, and clean handoff state are visible through repository-owned
-  product surfaces.
+Load [Workspace Lifecycle](../references/workspace-lifecycle.md) before the first
+mutating increment and at integration or closeout. Continue through ready work
+without asking for routine permission between assignments. Pause only for a
+genuine authority boundary, unresolved ambiguity that changes the result,
+unsafe work, or a blocker that cannot be repaired within the active strategy.
 
-## Assignment Block
+## Replanning Loop
 
-Every delegated worker prompt must include:
+Replan after an integrated increment, material discovery, failed assumption,
+new blocker, or strategic revision:
+
+1. Compare the evidence with the active strategy revision.
+2. Identify demonstrated outcomes and changed assumptions.
+3. Classify the change.
+4. Change only the smallest affected layer.
+5. Reconcile ready, blocked, obsolete, and newly necessary work.
+6. Dispatch the next coherent increment.
+
+| Class | Action |
+| --- | --- |
+| Assignment repair | Clarify, retry, or reassign the same issue. |
+| Implementation replan | Revise issues, dependencies, sequencing, or proof while preserving strategy. |
+| Strategic replan | Pause affected work and route evidence through `decide` and `plan`. |
+| Containment | Stop unsafe work immediately, then replan at the correct layer. |
+
+Decide product and architecture questions that fall within the strategy's
+adaptation authority. A change to outcome, target system, governing tradeoff,
+boundary, assurance gate, adaptation authority, or an accepted ADR is
+strategic. Continue independent work while a strategic question is resolved.
+
+Preserve completed history and failed evidence. Supersede obsolete speculative
+work instead of rewriting it to make the new route appear inevitable.
+
+## Just-In-Time Expansion
+
+Plan ordinary issues only to the nearest evidence boundary. Keep enough ready
+work for current execution and the next coherent handoff without expanding
+distant work prematurely.
+
+Expand an epic when predecessor evidence arrives, an unknown is resolved, its
+expansion condition becomes true, or the ready-work buffer is running low. For
+each expansion:
+
+1. Select an undemonstrated strategic outcome.
+2. Choose the smallest increment that delivers value or reduces important
+   uncertainty.
+3. Confirm its decisions and dependencies are ready.
+4. Create only the implementation, integration, review, and validation work
+   needed for that increment.
+
+If ready work runs out, diagnose whether the cause is missing detail, missing
+evidence, a failed assumption, or a strategic question. Do not manufacture work
+only to keep agents busy.
+
+## Delegation
+
+Every assignment names:
 
 ```text
 Repository: <absolute path>
-Active mission: <mission-id or none>
-Parent epic: <epic-id or none>
-Workspace/branch context: <mission workspace, owner branch, or explicit exception>
-Assigned issue(s): <exact tracker IDs>
-Role/subskill: <exactly one Agent Factory subskill>
-Model: <model choice>
-Model rationale: <complexity, ambiguity, risk, review depth, and proof need>
-Owned files/workflows: <paths, modules, commands, or workflows>
-Out of scope: <files, commands, policies, or adjacent issues>
-Expected proof: <observable command output, file content, test, transcript, or artifact>
-Evidence destination: <issue note or first-class evidence target>
-Independence requirement: <none, independent review, independent validation, epic, or mission>
+Selected tracker: <provider and repository, project, or path>
+Mission and parent: <tracker IDs or none>
+Strategy: <path>@<revision> | compact mission body:<reference> | none
+Workspace/branch: <context>
+Assigned issue(s): <exact IDs>
+Role/subskill: <exactly one>
+Model and reasoning: <choice and rationale>
+Owned scope: <files, modules, commands, or workflows>
+Out of scope: <boundaries>
+Governing constraints: <relevant strategy or ADR constraints>
+Replan trigger: <evidence or changed assumption, when applicable>
+Expected proof: <observable result>
+Evidence destination: <tracker or evidence target>
+Independence: <none, review, validation, epic, or mission>
 Dirty worktree rule: preserve unrelated changes
-Final handoff schema:
-  result:
-  issue ID:
-  subskill:
-  changed files:
-  evidence IDs:
-  commands run:
-  dirty state:
-  branch/commit:
-  blockers:
-  exact follow-up recommendation:
+Handoff: <result, changes, evidence, commands, dirty state, commit, blockers,
+          and exact follow-up>
 ```
 
-Name required docs, ADRs, glossary terms, known breakage, and parent validation
-criteria when they affect the assignment.
+Before delegation, load
+[Submodel Selection](../references/submodel-selection.md). Name required docs,
+ADRs, glossary terms, breakage, and validation criteria when relevant.
 
-## Model Routing
+Route high-risk diffs to `review` and behavior claims to `validate`. Treat
+Worker discoveries as evidence, not automatic mission scope.
 
-Before delegating, load
-[Submodel Selection](../references/submodel-selection.md). Record the selected
-model, reasoning effort, rationale, and any runtime fallback in every assignment
-block.
+When review or validation returns a finding, read the complete result, verify it
+against the diff, outcome, and active strategy, and classify it before changing
+work: repair the assignment, replan implementation, return to strategy, defer
+with an owner, or reject with evidence. Do not accept findings performatively,
+silently broaden scope, or let a validator decide mission critical-path scope.
 
-## Handoff
+## Closeout
 
-Final orchestration handoff names completed work, commits or branches, closed
-items, evidence records, validation commands, residual breakage, follow-up
-items, visible readiness checks, and worktree state.
+Close against demonstrated strategic outcomes and required proof, not issue
+count. Report the active strategy revision, delivered and deferred outcomes,
+graph changes, evidence, commits, residual breakage, paused questions, next
+increment, readiness checks, and worktree state.

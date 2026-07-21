@@ -8,13 +8,18 @@ of correctness.
 
 ### Planning
 
-Work is deliberately planned before it is executed. Planning requires a person
-or assigned planning agent to shape scope, define Outcome and Evidence, and
-verify readiness before workers start.
+Agents may discover, formulate, and decide what should be built. Governing
+strategy makes that intent durable before dependent work begins.
 
-The system does not autonomously discover what to build. It executes what has
-been planned. Scope is the hardest problem. Workers with bounded attention
-cannot reliably define it.
+Strategy may be published or semantically revised only by the primary
+human-facing agent in a commissioned strategic flow. A human commissions the
+flow by asking to establish or reconsider strategy, or by responding to a
+concrete strategic question. Routine task traffic, silence, generic
+continuation, background work, and automatic turns do not commission it.
+
+Other agents may research, challenge, and propose strategy. Managers may
+replan freely within the active strategy and its adaptation authority; they may
+not silently change either.
 
 ### Durable Work
 
@@ -38,6 +43,10 @@ Claims become trustworthy through proof. Tests, static checks, code review,
 behavior validation, and terminal checks answer different questions and are not
 interchangeable. A candidate that fails verification is wrong, regardless of
 how plausible it looks. Failed verification is information to act on.
+
+Unknown failures are diagnosed before repair. A reproducible failing observation
+and a tested root-cause hypothesis are stronger than a plausible patch. Behavior
+changes begin from an oracle that could falsify the claim whenever practical.
 
 Failures are named, classified, and carried forward with the failed operation,
 relevant identifier, and actionable reason.
@@ -64,34 +73,39 @@ Tasks must be decomposed. Work must be checked and verified.
 
 When a mistake happens, treat it as a system signal.
 
-### Roles
+### Classes And Roles
 
-Agent responsibilities are separated by concern:
+Agent classes describe the scope of accountability; roles describe one
+assignment.
 
-- **Managers** direct work. They shape scope, assign bounded roles, integrate
-  handoffs, and steer recovery. Delegation is not fire-and-forget.
-- **Workers** explore solutions. They receive enough scope and proof
-  expectations to act without hidden planning.
-- **Validators** evaluate independently. Their verdict is the signal of whether
-  a solution is correct or merely plausible.
-- **Stewards** preserve system health. They identify drift, stale context, and
-  structural risk.
+- **Managers** are accountable across tasks. They protect strategic interests,
+  translate strategy into the current implementation plan, assign bounded
+  roles, integrate handoffs, replan, and preserve mission or repository health.
+  Delegation is not fire-and-forget. Orchestration and stewardship are Manager
+  roles.
+- **Workers** are accountable for one bounded assignment and its truthful
+  result. They explore, implement, document, review, validate, or audit within
+  supplied scope and proof expectations. They report discoveries that may
+  invalidate the wider plan; they do not decide the mission consequence merely
+  by finding them.
 
-Managers spawn workers and validators, then integrate their output. Validators
-judge worker output independently. Stewards highlight problems for managers to
-assign. A worker is never the sole validator of its own output when
-independent validation is expected.
+Independent review and validation are Worker roles with an independence
+requirement, not separate classes. A Worker is never the sole validator of its
+own output when independent validation is expected.
 
-| Branch      | Role                      | Responsibility                                                                              |
-| ----------- | ------------------------- | ------------------------------------------------------------------------------------------- |
-| Manager     | Epic orchestrator         | Keeps multi-item work coherent by scoping, delegating, unblocking, integrating, and closing |
-| Manager     | Tracker graph manager     | Keeps the tracker graph executable                                                          |
-| Worker      | Implementation worker     | Changes one owned slice and leaves proof and handoff                                        |
-| Worker      | Breaking migration worker | Removes interfaces or migrates with temporary breakage; names and owns breakage             |
-| Validator   | Code reviewer             | Challenges the diff for construction defects and unsupported claims                         |
-| Validator   | Behavior validator        | Proves whether a scenario works from the user, operator, or agent point of view             |
-| Stewardship | Docs refresher            | Keeps durable docs, ADRs, tracker items, and skills aligned                                 |
-| Stewardship | Architecture auditor      | Finds evidence-backed structure, ownership, or process-quality risks                        |
+| Class   | Role                         | Responsibility                                                                                     |
+| ------- | ---------------------------- | -------------------------------------------------------------------------------------------------- |
+| Manager | Mission strategist           | Preserves the intended outcome, target system shape, priorities, boundaries, and adaptation rules |
+| Manager | Mission or epic orchestrator | Keeps multi-item work coherent by delegating, integrating, replanning, and closing                 |
+| Manager | Tracker graph manager        | Keeps the implementation plan executable                                                          |
+| Manager | Repository steward           | Preserves durable guidance, architecture health, and the experience of future agents              |
+| Worker  | Diagnostic investigator      | Reproduces unexplained behavior, tests hypotheses, and establishes root cause before repair        |
+| Worker  | Implementation worker        | Changes one owned slice and leaves proof and handoff                                               |
+| Worker  | Breaking migration worker    | Removes interfaces or migrates with temporary breakage; names and owns breakage                    |
+| Worker  | Docs author or refresher     | Produces one bounded documentation outcome and records drift discovered                            |
+| Worker  | Code reviewer                | Challenges a diff for construction defects and unsupported claims                                 |
+| Worker  | Behavior validator           | Proves and classifies behavior from the user, operator, or agent point of view                     |
+| Worker  | Audit or readiness scout     | Returns bounded evidence about structure, process quality, or operability                          |
 
 ### Agent Scope
 
