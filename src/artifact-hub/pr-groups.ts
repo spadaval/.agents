@@ -23,6 +23,19 @@ export type PrGroupResolution = {
   recordToGroup: Map<string, string>;
 };
 
+export function mergedPrArtifactIds(groups: PrGroup[]): Set<string> {
+  return new Set(
+    groups.flatMap((group) => {
+      const merged =
+        group.summary?.pr.state.toUpperCase() === "MERGED" ||
+        group.records.some((record) => record.status === "merged");
+      return merged
+        ? group.records.map((record) => record.artifact.manifest.id)
+        : [];
+    }),
+  );
+}
+
 function repositoryPath(value: string): string | undefined {
   const normalized = value.replace(/^\/+|\/+$/g, "").replace(/\.git$/i, "");
   return normalized || undefined;

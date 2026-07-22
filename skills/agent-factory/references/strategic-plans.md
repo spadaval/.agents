@@ -2,7 +2,8 @@
 
 Use a strategic plan for a long-running, multi-epic, cross-system, or
 tradeoff-heavy mission. A compact mission body may serve the same purpose for
-small work.
+small work; it must still state the outcome, target shape, boundaries, and
+proof expectations. It omits the ceremony, not the governing content.
 
 ## Responsibility
 
@@ -51,9 +52,10 @@ why, and which work must be reconsidered. Use version control for exact history;
 do not create snapshot files by default.
 
 Only `plan` may publish a semantic revision, and only in a commissioned
-human-interactive strategic flow. Mark all other drafts as non-canonical. After
-publication, surface the revision before affected execution resumes unless the
-commission expressly includes immediate continuation.
+strategy session (defined in the [Constitution](../constitution.md)). Mark all
+other drafts as non-canonical. After publication, surface the revision before
+affected execution resumes unless the commission expressly includes immediate
+continuation.
 
 Assignments name the strategy path and revision they use. After a revision,
 reconcile affected work before dispatching it again.

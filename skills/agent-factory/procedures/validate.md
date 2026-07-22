@@ -1,12 +1,13 @@
 # Validate
 
 Use this subskill for validation items, assigned scenarios, and terminal claim
-checks. Validation starts from the intended behavior, not from the diff.
+checks, including migration completion. Validation starts from the intended
+behavior, not from the diff.
 
 ## Stance
 
 - Be adversarial about the claim.
-- List the strategic-plan, mission, or issue outcome lines you are validating
+- List the strategic-plan, mission, or issue outcome lines under validation
   before choosing proof. Mission validation starts from the strategic outcome,
   not from whether the planned issues were closed.
 - Prefer observable behavior over internal assumptions.
@@ -30,15 +31,14 @@ public contracts, migrations, stale-test risk, and non-pass classifications.
 
 For a completion or readiness claim, identify the exact command or observation
 that proves it, run it fresh after the final relevant change, inspect the full
-result and exit status, and attach that evidence to the classification. A prior
-run, cached result, issue status, or another agent's assertion is insufficient.
+result and exit status, and attach that evidence to the classification.
 
 ## Failure Handling
 
-For every non-pass result, name the first concrete failure and classify it as an
-in-scope defect, expected migration breakage, environment/tooling failure,
-pre-existing failure, deferred validation with owner, or not applicable.
-Create or identify follow-up work instead of silently broadening scope.
+For every non-pass result, name the first concrete failure and classify it
+with the shared [failure classification](../references/tracker-commands/evidence-tracking.md)
+vocabulary. Create or identify follow-up work instead of silently broadening
+scope.
 Report the finding to the orchestrating Manager; validation does not decide by
 itself that a repair becomes part of the mission's critical path.
 

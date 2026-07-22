@@ -10,6 +10,24 @@ Assign one role and one Agent Factory subskill to each subagent. The
 orchestrator may maintain its implementation graph; it does not need a separate
 `plan` assignment for routine expansion or repair.
 
+Roles belong to the two accountability classes defined in the
+[Constitution](../constitution.md): Managers are accountable across tasks;
+Workers are accountable for one bounded assignment and its truthful result.
+
+| Class   | Role                         | Responsibility                                                                                     |
+| ------- | ---------------------------- | -------------------------------------------------------------------------------------------------- |
+| Manager | Mission strategist           | Preserves the intended outcome, target system shape, priorities, boundaries, and adaptation rules |
+| Manager | Mission or epic orchestrator | Keeps multi-item work coherent by delegating, integrating, replanning, and closing                 |
+| Manager | Tracker graph manager        | Keeps the implementation plan executable                                                          |
+| Manager | Repository steward           | Preserves durable guidance, architecture health, and the experience of future agents              |
+| Worker  | Diagnostic investigator      | Reproduces unexplained behavior, tests hypotheses, and establishes root cause before repair        |
+| Worker  | Implementation worker        | Changes one owned slice and leaves proof and handoff                                               |
+| Worker  | Breaking migration worker    | Removes interfaces or migrates with temporary breakage; names and owns breakage                    |
+| Worker  | Docs author or refresher     | Produces one bounded documentation outcome and records drift discovered                            |
+| Worker  | Code reviewer                | Challenges a diff for construction defects and unsupported claims                                 |
+| Worker  | Behavior validator           | Proves and classifies behavior from the user, operator, or agent point of view                     |
+| Worker  | Audit or readiness scout     | Returns bounded evidence about structure, process quality, or operability                          |
+
 Establish the mission, strategy path and revision, current graph, worktree
 state, and next coherent increment before dispatching mutating work. Integrate
 results at useful checkpoints and preserve unrelated changes.
@@ -70,7 +88,7 @@ only to keep agents busy.
 
 ## Delegation
 
-Every assignment names:
+Every assignment preserves unrelated changes in the worktree and names:
 
 ```text
 Repository: <absolute path>
@@ -88,7 +106,6 @@ Replan trigger: <evidence or changed assumption, when applicable>
 Expected proof: <observable result>
 Evidence destination: <tracker or evidence target>
 Independence: <none, review, validation, epic, or mission>
-Dirty worktree rule: preserve unrelated changes
 Handoff: <result, changes, evidence, commands, dirty state, commit, blockers,
           and exact follow-up>
 ```
@@ -97,14 +114,29 @@ Before delegation, load
 [Submodel Selection](../references/submodel-selection.md). Name required docs,
 ADRs, glossary terms, breakage, and validation criteria when relevant.
 
-Route high-risk diffs to `review` and behavior claims to `validate`. Treat
-Worker discoveries as evidence, not automatic mission scope.
+Keep dispatch prompts self-contained but small. Move bulk artifacts such as
+specs, large diffs, and long evidence into files or tracker items and
+reference them by path or ID; pasted bulk stays resident in the
+orchestrator's context and is re-read on every later turn. A dispatch prompt
+carries the assignment, the pointers, and the interfaces the assignee cannot
+know.
+
+Route high-risk diffs to `review` and behavior claims to `validate`. Give
+reviewers and validators their attention lens: the governing constraints
+copied exactly from strategy, ADR, or issue text. Do not pre-judge their
+work: do not instruct a reviewer or validator to ignore a class of findings,
+cap a finding's severity, or treat mandated content as exempt from
+challenge. Treat Worker discoveries as evidence, not automatic mission
+scope.
 
 When review or validation returns a finding, read the complete result, verify it
 against the diff, outcome, and active strategy, and classify it before changing
 work: repair the assignment, replan implementation, return to strategy, defer
-with an owner, or reject with evidence. Do not accept findings performatively,
-silently broaden scope, or let a validator decide mission critical-path scope.
+with an owner, or reject with evidence. A finding that conflicts with what
+the plan or strategy mandates is still evidence: do not dismiss it, and do
+not dispatch a fix that contradicts the mandate without replanning at the
+layer that owns it. Do not accept findings performatively, silently broaden
+scope, or let a validator decide mission critical-path scope.
 
 ## Closeout
 

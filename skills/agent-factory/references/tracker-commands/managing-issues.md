@@ -28,10 +28,8 @@ the record's meaning and required content.
 - Use native parent/sub-issue and blocking relationships. Current GitHub CLI
   versions may expose these on `gh issue create` and `gh issue edit`; check live
   help and use the GitHub API when necessary.
-- `gh api` does not reliably infer a GitHub Enterprise host from the checkout
-  when multiple hosts are configured. Set `GH_HOST` explicitly from the git
-  remote for every raw API call, for example
-  `GH_HOST=<git-origin-host> gh api ...`. Do not use `gh api` for ordinary issue
-  operations supported by `gh issue`.
+- For raw `gh api` calls, follow the `GH_HOST` rule in
+  [Administration and recovery](administration-and-recovery.md); do not use
+  `gh api` for ordinary issue operations supported by `gh issue`.
 - Treat Projects and custom fields as repository-selected enhancements, not as
   prerequisites for using GitHub Issues.

@@ -9,13 +9,9 @@ surfaces.
 
 ## Scope
 
-Check whether a fresh agent can locate:
-
-- repository instructions and tracker identity;
-- product intent and domain language;
-- docs map, architecture docs, validation policy, ADRs, and code standards;
-- current tracker status and role guidance;
-- runnable validation commands and focused role/status commands.
+Apply the Readiness Test in
+[Repository Shape](../references/repository-shape.md): can a fresh agent answer
+its eight questions from the entry map and linked sources?
 
 Do not treat hidden diagnostics, local-state repair, or maintenance commands as
 normal readiness paths.

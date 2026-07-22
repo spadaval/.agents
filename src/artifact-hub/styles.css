@@ -302,6 +302,25 @@ kbd {
     10px ui-monospace,
     monospace;
 }
+.merged-visibility-toggle {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #cbbadd;
+  border-radius: 6px;
+  background: #f7f2fb;
+  color: #67438d;
+  font:
+    700 10px ui-monospace,
+    monospace;
+}
+.merged-visibility-toggle:hover {
+  border-color: #9875bb;
+  background: #f1eafa;
+}
+.merged-visibility-toggle:focus-visible {
+  outline: 3px solid #7651a033;
+  outline-offset: 2px;
+}
 .sort-control {
   display: flex;
   align-items: center;

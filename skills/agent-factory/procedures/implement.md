@@ -16,8 +16,6 @@ breaking migration.
   attributing later failures to the change.
 - Update mapped docs when changing user-visible behavior, contracts,
   architecture, ownership, validation policy, or process guidance.
-- Do not add compatibility aliases, shims, fallback readers, deprecated wrappers,
-  or old-path re-exports unless the assigned issue explicitly requires them.
 - Prefer focused tests or transcripts that prove the assigned outcome. Broader
   suites support proof but do not replace claim-specific evidence.
 
@@ -35,11 +33,11 @@ For each behavior change:
 
 If a failing pre-change observation is impractical for generated output,
 configuration, exploratory work, or a migration boundary, name the reason and
-use the cheapest proof that could still falsify the claim. Do not use an
-exception to justify implementation with no oracle.
+use the cheapest proof that could still falsify the claim. Do not use the
+exception to justify implementing with no oracle.
 
 When review feedback arrives, read it completely, restate or clarify the
-technical requirement, verify it against repository reality, and then accept or
+technical requirement, verify it against repository reality, and accept or
 challenge it with evidence. Apply accepted findings one at a time and re-run the
 relevant focused proof; do not implement feedback through performative agreement.
 

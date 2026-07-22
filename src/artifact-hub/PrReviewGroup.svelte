@@ -147,7 +147,9 @@
       <span>
         {#if number !== undefined}<b>PR #{number}</b>{/if}
         {#if pr}<span>{pr.changedFiles} files</span>{/if}
-        {#if pr?.updatedAt}<span>Updated {relativeTime(pr.updatedAt)}</span
+        {#if pr?.mergedAt}<span>Merged {relativeTime(pr.mergedAt)}</span
+          >{:else if pr?.updatedAt}<span
+            >Updated {relativeTime(pr.updatedAt)}</span
           >{/if}
       </span>
       {#if githubUrl}

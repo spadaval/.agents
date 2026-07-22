@@ -48,5 +48,5 @@ Residual Risk
 - ...
 ```
 
-Reviewers may recommend validation, but they do not close scenario validation
+Reviewers may recommend validation, but do not close scenario validation
 unless separately assigned the `validate` subskill.

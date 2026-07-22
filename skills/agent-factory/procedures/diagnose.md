@@ -18,8 +18,8 @@ reproduction fixtures, or disposable experiments.
 Instrument boundaries when a multi-component system hides where state changes.
 Record inputs and outputs at each boundary instead of guessing from the final
 symptom. Change one experimental variable at a time. After three unsuccessful
-repair hypotheses, stop and question the framing, architecture, or reproduction
-before proposing another patch.
+root-cause hypotheses, stop and question the framing, architecture, or
+reproduction before proposing another patch.
 
 ## Authority
 

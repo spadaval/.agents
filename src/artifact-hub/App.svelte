@@ -10,7 +10,11 @@
     loadPrCatalogSnapshot,
     type PrCatalogSnapshot,
   } from "./pr-summary-api";
-  import { groupPrRecords, type PrGroup } from "./pr-groups";
+  import {
+    groupPrRecords,
+    mergedPrArtifactIds,
+    type PrGroup,
+  } from "./pr-groups";
   import { inferPrStacks, type PrStack } from "./pr-stacks";
 
   type SortOrder = "newest" | "oldest" | "title";
@@ -32,10 +36,21 @@
   let kind = $state("all");
   let project = $state("all");
   let sort = $state<SortOrder>("newest");
+  let showMerged = $state(false);
   let urlReady = $state(false);
   let searchInput = $state<HTMLInputElement>();
 
-  const records = $derived(buildCatalogRecords(artifacts));
+  const allRecords = $derived(buildCatalogRecords(artifacts));
+  const allPrGroupResolution = $derived(groupPrRecords(allRecords, prSnapshot));
+  const mergedIds = $derived(mergedPrArtifactIds(allPrGroupResolution.groups));
+  const records = $derived(
+    showMerged
+      ? allRecords
+      : allRecords.filter(
+          (record) => !mergedIds.has(record.artifact.manifest.id),
+        ),
+  );
+  const mergedArtifactCount = $derived(mergedIds.size);
   const invalid = $derived(artifacts.filter((artifact) => !artifact.valid));
   const projects = $derived(
     [...new Set(records.map((record) => record.project))].sort(),
@@ -132,6 +147,7 @@
       requestedSort === "oldest" || requestedSort === "title"
         ? requestedSort
         : "newest";
+    showMerged = params.get("merged") === "show";
   }
 
   function writeUrlState(): void {
@@ -144,6 +160,7 @@
     set("kind", kind);
     set("project", project);
     set("sort", sort, "newest");
+    set("merged", showMerged ? "show" : "", "");
     history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
@@ -152,6 +169,7 @@
     kind;
     project;
     sort;
+    showMerged;
     if (urlReady) writeUrlState();
   });
 
@@ -269,7 +287,12 @@
         <span class="brand-mark" aria-hidden="true">A</span>
         <span><strong>Artifact Hub</strong><small>Local workbench</small></span>
       </a>
-      <span class="catalog-total">{records.length} artifacts</span>
+      <span class="catalog-total">
+        {records.length} artifacts
+        {#if mergedArtifactCount && !showMerged}
+          · {mergedArtifactCount} merged hidden
+        {/if}
+      </span>
     </header>
 
     <main class="catalog">
@@ -364,6 +387,17 @@
                 {matchingPrGroups.length === 1 ? "PR" : "PRs"}
               {/if}</span
             >
+            {#if mergedArtifactCount}
+              <button
+                class="merged-visibility-toggle"
+                aria-pressed={showMerged}
+                onclick={() => (showMerged = !showMerged)}
+              >
+                {showMerged
+                  ? "Hide merged"
+                  : `Show ${mergedArtifactCount} merged`}
+              </button>
+            {/if}
             <label class="sort-control"
               >Sort
               <select bind:value={sort}>

@@ -15,6 +15,7 @@ export type PrCatalogSummary = {
     isDraft: boolean;
     headRepository: string;
     number: number;
+    mergedAt?: string;
     reviewDecision?: GitHubReviewDecision;
     reviewComments: number;
     baseRepository: string;

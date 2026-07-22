@@ -4,6 +4,26 @@ Use this reference to record, attach, inspect, or classify durable proof. Agent
 Factory procedures decide what deserves evidence and whether independence is
 required.
 
+## First-Class Evidence
+
+First-class evidence is a durable receipt recorded in the tracker itself — an
+`atelier evidence record` or a structured issue comment with claim, action,
+result, and artifact links — not prose inside a status update. When a procedure
+requires first-class evidence, create the receipt and cite its ID or URL.
+
+## Failure Classification
+
+Classify every non-pass validation or migration result with exactly one of:
+
+- in-scope defect
+- expected migration breakage
+- environment/tooling failure
+- pre-existing failure
+- deferred with owner
+- not applicable
+
+Use these terms verbatim so evidence stays searchable across trackers.
+
 ## Atelier
 
 - Use `atelier evidence record` for manual proof or captured command output.

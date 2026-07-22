@@ -20,14 +20,15 @@ unavailable, use visibly separated passes and disclose the loss of independent
 review.
 
 Scale the roles to the decision. Skip roles that add ceremony without changing
-confidence. Follow Agent Factory's normal delegation and model-selection rules.
+confidence. Use the delegation template in [Orchestrate](orchestrate.md) and
+load [Submodel Selection](../references/submodel-selection.md) before spawning.
 
 ## Authority
 
-Inside a commissioned human-interactive strategic flow, the primary agent may
-make the decision and hand it to `plan` for publication. Outside such a flow,
-return a non-canonical proposal and stop before changing strategy or dependent
-work.
+Inside a commissioned strategy session (defined in the
+[Constitution](../constitution.md)), the primary agent may make the decision
+and hand it to `plan` for publication. Outside one, return a non-canonical
+proposal and stop before changing strategy or dependent work.
 
 Record mission-local decisions in the strategic plan. Record decisions that
 outlive the mission in the owning product or architecture document and, when

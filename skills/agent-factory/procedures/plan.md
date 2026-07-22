@@ -54,8 +54,8 @@ authorized update.
 
 ## Strategic Revision
 
-Publish semantic revisions only in a commissioned human-interactive strategic
-flow:
+Publish semantic revisions only in a commissioned strategy session (defined in
+the [Constitution](../constitution.md)):
 
 1. Compare evidence with the active strategy and applicable ADRs.
 2. State why implementation replanning is insufficient.

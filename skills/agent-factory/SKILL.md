@@ -1,6 +1,6 @@
 ---
 name: agent-factory
-description: "Coordinate consequential decisions and bounded agent work through strategy, planning, diagnosis, incremental replanning, orchestration, implementation, review, validation, documentation, audit, and readiness. Use when Codex needs to decide, publish or execute mission strategy, manage epics or issues, diagnose unexplained failures, delegate work, or integrate evidence."
+description: "Use when Codex needs to decide a consequential product, architecture, or strategy choice, publish or execute mission strategy, manage missions, epics, issues, or dependencies, orchestrate or delegate bounded work to subagents, diagnose unexplained failures, or review, validate, audit, or integrate evidence."
 ---
 
 # Agent Factory
@@ -12,6 +12,12 @@ Agent Factory deliberately keeps useful coordination concepts such as missions,
 epics, evidence, and independent validation even when a repository's tracker
 does not model them directly. Repository instructions select the tracker;
 tracker command references explain how to realize those concepts there.
+
+The [Constitution](constitution.md) declares the intent this skill
+operationalizes and is the final arbiter when procedures conflict, are silent,
+or a judgment call exceeds any single procedure. Load it to arbitrate between
+rules, to handle a situation no procedure covers, or before changing Agent
+Factory itself.
 
 ## Coordination Rules
 
@@ -25,7 +31,10 @@ tracker command references explain how to realize those concepts there.
   as far as current evidence supports. Mission completion is judged against the
   strategic outcome and proof, not merely against issue closure.
 - Publish or semantically revise strategy only through `plan` in a commissioned
-  human-interactive strategic flow. Other agents may research and propose.
+  strategy session: a human asks to establish or reconsider strategy, or
+  answers a concrete strategic question. Routine task traffic, silence, generic
+  continuation, and automatic turns do not commission one. Other agents may
+  research and propose.
 - Use `$generate-html-plan` when a visual, interactive planning surface would
   materially improve deliberation. Publish its result through `plan` before
   Agent Factory execution.
@@ -33,27 +42,22 @@ tracker command references explain how to realize those concepts there.
   load the matching tracker command reference and use the section for the
   repository's selected tracker. Treat live command help as authoritative for
   current syntax.
+- Announce the selected or assigned subskill and its purpose before acting on
+  it. When it defines a checklist or fixed method, track the items as they
+  complete.
 - Assign exactly one subskill to each role-specific subagent.
 - A subagent loads the assigned subskill and only the tracker command references
-  needed to act. Other skill references must be named explicitly.
+  needed to act. Other skill references must be named explicitly, either in the
+  assignment prompt or in the subskill itself.
 - Configure every subagent explicitly with a model, reasoning effort, and
   self-contained prompt. Load [Submodel selection](references/submodel-selection.md)
-  before spawning and choose the most cost-effective model/run portfolio that
-  can produce trustworthy proof. Prefer smaller models and multiple independent
-  runs when decomposition, experimentation, or cheap verification makes breadth
-  more valuable than one stronger run. Do not delegate when the runtime cannot
-  explicitly set the model and reasoning effort unless a human directs that
-  exception.
-- Use fresh subagent context by default. `fork_context` (also called
-  `fork_turns`) should almost never be used because it increases cost, weakens
-  role isolation, and imports stale context. Fork only when required context
-  cannot be summarized safely; record that specific justification before the
-  spawn.
-- Delegated assignments must include repository path, selected tracker, mission
-  or issue IDs, branch/workspace context, assigned subskill, owned files or
-  workflows, expected proof, evidence destination, independence requirements,
-  explicit model and reasoning choices with rationale, and a prompt that states
-  scope, sources, output, prohibitions, and completion conditions.
+  before spawning and choose the model/run portfolio per its guidance. Do not
+  delegate when the runtime cannot explicitly set the model and reasoning
+  effort unless a human directs that exception.
+- Use fresh subagent context by default; fork only per the
+  [Submodel selection](references/submodel-selection.md) policy.
+- Give every delegated assignment the full assignment template in
+  [Orchestrate](procedures/orchestrate.md).
 - Planning and execution are separate at the Worker assignment level. Workers
   do not reshape tracker scope while implementing unless graph management is
   their assigned work; the orchestrating Manager may revise the implementation
@@ -65,8 +69,9 @@ tracker command references explain how to realize those concepts there.
   proof that establishes the claim, run it fresh, inspect the complete result,
   and report the claim with that evidence. A prior run, delegated assertion, or
   broad green suite is not fresh claim-specific proof.
-- Do not preserve obsolete commands, compatibility aliases, shims, or fallback
-  behavior unless a human explicitly asks for that compatibility window.
+- Do not preserve obsolete commands, compatibility aliases, shims, deprecated
+  wrappers, or fallback behavior unless a human or the governing tracker item
+  explicitly makes compatibility the deliverable.
 
 ## References
 
@@ -107,8 +112,7 @@ mechanics, not a second procedure or a substitute for repository policy.
 
 ## Selection Rules
 
-1. If the first argument is a subskill, load that subskill reference and follow
-   it.
+1. If the first argument is a subskill, load that subskill and follow it.
 2. If no subskill is named and none of the rules below clearly applies, ask for
    the assigned subskill.
 3. If a consequential unresolved choice has multiple plausible paths, use
@@ -129,3 +133,10 @@ mechanics, not a second procedure or a substitute for repository policy.
 9. If the work intentionally permits breakage, closes a migration, or asks for
    demolition/reconnect classification, use `migrate`.
 10. If the user asks to set up Agent Factory bindings, use `install`.
+11. If the user asks for evidence-backed architecture, process, or operability
+    findings without designing or implementing fixes, use `audit`.
+12. If the user asks whether a repository is legible and operable by agents,
+    use `readiness`.
+13. If documentation or guidance freshness is the primary deliverable, use
+    `docs`.
+14. `implement` is reached through assignment (rules 1 and 2).

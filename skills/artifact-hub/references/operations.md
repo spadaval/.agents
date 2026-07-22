@@ -87,6 +87,11 @@ PR's exact head ref uniquely matches another PR's exact base ref. It presents
 that graph as catalog grouping only; closed, ambiguous, or unresolved reviews
 remain standalone and artifact manifests remain unchanged.
 
+Live GitHub metadata distinguishes merged PRs from other closed PRs. Review
+artifacts for merged PRs are hidden from the catalog by default and can be
+revealed with the catalog's merged-artifact control; they remain on disk and
+their manifests are not modified.
+
 ```bash
 ./bin/artifact-hub create review-123 --title "Review #123" \
   --kind pr-review --tag review --from /absolute/prepared-template \

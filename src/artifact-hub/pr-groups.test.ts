@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ArtifactRecord } from "./catalog";
-import { groupPrRecords, prIdentity } from "./pr-groups";
+import { groupPrRecords, mergedPrArtifactIds, prIdentity } from "./pr-groups";
 import type { PrCatalogSnapshot, PrCatalogSummary } from "./pr-summary-api";
 
 const record = (
@@ -112,6 +112,32 @@ describe("PR review grouping", () => {
     const result = groupPrRecords(records, value);
     expect(result.groups).toHaveLength(1);
     expect(result.groups[0].records).toHaveLength(2);
+  });
+
+  it("hides every artifact in a merged PR review collection", () => {
+    const records = [
+      record("live", undefined, 42, "bbbb"),
+      record("snapshot", undefined, 42, "aaaa"),
+      record("open", undefined, 43, "cccc"),
+    ];
+    const groups = groupPrRecords(
+      records,
+      snapshot({ live: summary(42, "MERGED"), open: summary(43, "OPEN") }),
+    ).groups;
+
+    expect([...mergedPrArtifactIds(groups)].sort()).toEqual([
+      "live",
+      "snapshot",
+    ]);
+  });
+
+  it("uses an irreversible merged manifest snapshot when live data is unavailable", () => {
+    const merged = record("merged");
+    merged.status = "merged";
+
+    expect([
+      ...mergedPrArtifactIds(groupPrRecords([merged], null).groups),
+    ]).toEqual(["merged"]);
   });
 
   it("leaves reviews without a strong PR identity standalone", () => {

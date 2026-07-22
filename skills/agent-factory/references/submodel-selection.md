@@ -13,23 +13,28 @@ delegation surface cannot set both values, keep the work local unless a human
 explicitly directs an exception. Record any such exception rather than
 inventing a selection.
 
-The current GPT-5.6 routing tiers are:
+Map the exposed models to three tiers:
 
-| Model | Default effort | Use when |
-| --- | --- | --- |
-| `gpt-5.6-luna` | `low` | Residual ambiguity, complexity, and risk are low; the task is bounded and its output is cheap to verify. Use `medium` only for a real multi-step dependency inside that bounded task. |
-| `gpt-5.6-terra` | `medium` | One or more dimensions are moderate, or initially high dimensions have been contained through decomposition, concrete acceptance criteria, reversibility, tests, or independent review. Use `high` for difficult but still bounded reasoning. |
-| `gpt-5.6-sol` | `high` | Residual ambiguity is high, complexity is irreducible, risk remains materially uncontained, or several dimensions are high at once. Use `max` only for the hardest long-chain reasoning when the runtime supports it. |
+| Tier | Use when |
+| --- | --- |
+| Cheapest | Residual ambiguity, complexity, and risk are low; the task is bounded and its output is cheap to verify. Raise effort only for a real multi-step dependency inside that bounded task. |
+| Mid | One or more dimensions are moderate, or initially high dimensions have been contained through decomposition, concrete acceptance criteria, reversibility, tests, or independent review. Raise effort for difficult but still bounded reasoning. |
+| Strongest | Residual ambiguity is high, complexity is irreducible, risk remains materially uncontained, or several dimensions are high at once. Reserve the maximum effort for the hardest long-chain reasoning or primary orchestration of a genuinely complex multi-agent workstream. |
 
-Reserve `gpt-5.6-sol` with `ultra` for primary orchestration of a genuinely
-complex multi-agent workstream, and only when the runtime exposes that effort.
-It is not a substitute for a bounded, single-role assignment.
+The strongest tier is not a substitute for a bounded, single-role assignment.
 
-Domain labels do not select the model by themselves. A bounded persistence,
-security, migration, or public-contract change can use Terra when the decision
-is already resolved and strong proof contains the risk. Conversely, a small
-diff can require Sol when its meaning is ambiguous and subtle errors lack a
-cheap detection oracle.
+Domain labels do not select the tier by themselves. A bounded persistence,
+security, migration, or public-contract change can use the mid tier when the
+decision is already resolved and strong proof contains the risk. Conversely, a
+small diff can require the strongest tier when its meaning is ambiguous and
+subtle errors lack a cheap detection oracle.
+
+Price per token understates the cost of a tier. Weaker models routinely need
+more turns to finish multi-step work, and elapsed time and context cost scale
+with turns. When in doubt, treat the mid tier as the floor for review and for
+implementation from prose descriptions; the cheapest tier fits
+transcription-like assignments, where the exact content to produce is already
+in the prompt, and single-file mechanical changes.
 
 ## Decision Space
 
@@ -53,15 +58,16 @@ First assess the raw task, then reduce each dimension where possible:
 
 Select the tier from the **residual ambiguity, irreducible complexity, and
 uncontained risk**. As any residual dimension increases, move toward more
-capable models; when several are high, prefer Sol. Do not use a larger model to
-compensate for missing scope, context, acceptance criteria, or proof design.
+capable models; when several are high, prefer the strongest tier. Do not use a
+larger model to compensate for missing scope, context, acceptance criteria, or
+proof design.
 
 ## Quantity Versus Capability
 
-Model runs are a portfolio. As a planning heuristic, roughly two Terra runs can
-often be purchased for one Sol run, and many more Luna runs can fit in the same
-budget. Use that exchange rate when breadth or independence has higher expected
-value than deeper reasoning in a single run.
+Model runs are a portfolio. As a planning heuristic, roughly two mid-tier runs
+can often be purchased for one strongest-tier run, and many more cheapest-tier
+runs can fit in the same budget. Use that exchange rate when breadth or
+independence has higher expected value than deeper reasoning in a single run.
 
 Prefer multiple smaller runs when:
 
@@ -81,11 +87,12 @@ Prefer a stronger single run when:
 - coordination cost approaches the cost of doing the work; or
 - a plausible mistake remains both high-impact and hard to reverse.
 
-Do not assume that independent review automatically requires Sol. Two
-independent Terra runs can be stronger than one Sol run when evidence is
-objective. A useful portfolio for uncertain work is many Luna or Terra
-explorations, Terra convergence and implementation, then Sol synthesis or
-validation only if residual difficulty still warrants it.
+Do not assume that independent review automatically requires the strongest
+tier. Two independent mid-tier runs can be stronger than one strongest-tier run
+when evidence is objective. A useful portfolio for uncertain work is many
+cheapest- or mid-tier explorations, mid-tier convergence and implementation,
+then strongest-tier synthesis or validation only if residual difficulty still
+warrants it.
 
 ## Escalation
 

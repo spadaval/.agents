@@ -101,7 +101,8 @@
         </span>
       {/if}
       <span class="metrics-line">
-        {#if pr?.author}<span
+        {#if pr?.mergedAt}<span><b>Merged</b> {relativeTime(pr.mergedAt)}</span
+          >{:else if pr?.author}<span
             ><b>{pr.author.login}</b> updated {relativeTime(pr.updatedAt)}</span
           >{:else}<span
             >Created {relativeTime(record.artifact.manifest.createdAt)}</span

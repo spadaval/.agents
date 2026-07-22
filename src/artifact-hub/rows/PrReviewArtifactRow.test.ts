@@ -88,4 +88,26 @@ describe("PR review artifact row", () => {
         .getAttribute("href"),
     ).toBe(record.sourceUrl);
   });
+
+  it("shows merged status and merge time from live GitHub data", () => {
+    const mergedSummary: PrCatalogSummary = {
+      ...summary,
+      pr: {
+        ...summary.pr,
+        state: "MERGED",
+        mergedAt: "2026-07-20T12:00:00Z",
+      },
+    };
+
+    render(PrReviewArtifactRow, {
+      record,
+      prSummary: mergedSummary,
+      relativeTime: () => "yesterday",
+    });
+
+    expect(screen.getByText("MERGED")).toBeTruthy();
+    expect(screen.getByText("Merged").parentElement?.textContent).toContain(
+      "yesterday",
+    );
+  });
 });

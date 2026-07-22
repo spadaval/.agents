@@ -4,22 +4,33 @@ Use this reference when installing Agent Factory or assessing whether a fresh
 agent can orient, act, and validate work from durable repository sources.
 Names may vary, but each responsibility needs one discoverable owner.
 
-## Entry Map
+## Entry Map and Baseline
 
-A short root instruction file should point to, rather than duplicate:
+A repository that expects durable, multi-person or multi-agent work makes its
+governing knowledge visible in version control. A short root instruction file
+(such as `AGENTS.md`) points to — rather than duplicates — one discoverable
+owner per responsibility:
 
-- tracker identity, location, and live workflow/status entry points;
-- product intent and domain language;
-- the documentation index;
-- product behavior and operator contracts;
-- architecture boundaries and dependency direction;
-- architecture decision records (ADRs);
-- code and quality standards;
-- validation routing and executable checks; and
-- durable versus ignored/rebuildable state.
+| Responsibility | Typical home | Keep it good by |
+| --- | --- | --- |
+| Tracker identity, location, and workflow entry points | `## Agent Factory` in `AGENTS.md` (see below) | Selecting and linking, not copying command cookbooks |
+| Product intent: purpose, users, outcomes, non-goals | `PRODUCT_INTENT.md` | Changing it only when product direction changes |
+| Domain language and resolved vocabulary | `CONTEXT.md` | Defining terms precisely; removing or marking obsolete vocabulary |
+| Documentation front door | `docs/index.md` | Naming which document owns each concern, not merely listing files |
+| Product behavior, workflows, public contracts | `docs/product/` | Explaining what the product does, not module layout or internals |
+| Boundaries, dependency direction, data ownership | `docs/architecture/` | Explaining how the system is shaped, not user-visible behavior |
+| Durable decisions and rationale | `docs/adr/` | Stable identifiers and status; supersede, never silently rewrite accepted history |
+| Standards and validation routing | Quality and validation docs | Mapping each claim to its check, proof destination, independence trigger, and result classification |
+| Current work: scope, outcomes, dependencies, lifecycle, evidence links | The selected tracker | Encoding Agent Factory concepts the tracker lacks in provider-owned configuration |
+| Durable versus rebuildable state | The entry map or validation docs | Giving derived state one documented repair owner |
 
-Keep this entry map compact. Repository-specific command cookbooks and product
-policy belong in their owning executable help or documentation.
+Small repositories may begin with fewer files, but split a document when it
+starts serving conflicting owners or audiences. Product, architecture, and
+context knowledge answer different questions — what users can expect, how the
+implementation is constrained, and what the shared words mean. Cross-links are
+expected; duplicating a contract across all three is not. When the boundary is
+unclear, choose the document a future contributor would consult to decide
+whether a proposed change is correct, then link from the others.
 
 ## Agent Factory Binding
 
@@ -41,45 +52,7 @@ workflow docs. `AGENTS.md` selects and links those sources instead of copying
 them. In a monorepo, use the nearest scoped `AGENTS.md`; add a nested binding
 only when that subtree genuinely uses different tracker or workflow conventions.
 
-## Opinionated Baseline
-
-A repository that expects durable, multi-person or multi-agent work should make
-its governing knowledge visible in version control. A good default is:
-
-| Location | Purpose | Keep it good by |
-| --- | --- | --- |
-| `AGENTS.md` (or equivalent root entry map) | Orient a fresh contributor, declare the Agent Factory tracker binding, and link every governing source. | Keeping it short, navigational, scoped, and free of copied workflow manuals. |
-| `PRODUCT_INTENT.md` (or equivalent) | State the product's enduring purpose, users, desired outcomes, non-goals, and direction. | Changing it only when the product direction changes; link detailed behavior instead of growing a second product manual. |
-| `CONTEXT.md` | Provide a glossary of domain terms, important distinctions, and resolved vocabulary used by plans, docs, and code. | Defining terms precisely, recording ambiguities, and removing or marking obsolete vocabulary. It is a reference, not a chronological decision log. |
-| `docs/index.md` | Give the documentation tree a maintained, human-readable front door. | Explaining which document owns each concern and linking to the current source, not merely listing files. |
-| `docs/product/` | Own product behavior, user and operator workflows, public contracts, and observable semantics. | Explaining what the product does without silently prescribing module layout, storage internals, or algorithms. |
-| `docs/architecture/` | Own system boundaries, dependency direction, data ownership, implementation constraints, and recovery boundaries. | Explaining how the system is shaped without redefining user-visible behavior. |
-| `docs/adr/` | Preserve durable decisions whose rationale would otherwise be rediscovered or contested. | Using stable identifiers and a status; keeping accepted decisions immutable and superseding them with a new ADR rather than silently rewriting history. |
-| Quality and validation docs | Route standards, checks, proof expectations, and result interpretation. | Mapping claims to appropriate checks instead of treating one broad green suite as universal proof. |
-
-Names and directories may differ. What matters is that each responsibility has
-one obvious, durable home. Small repositories may begin with fewer files, but
-should split a document when it starts serving conflicting owners or audiences.
-
-### Product, Architecture, and Context
-
-Keep the three forms of knowledge distinct:
-
-- Product documentation answers what users and operators can expect, including
-  behavior, workflows, and externally visible contracts.
-- Architecture documentation answers how the implementation is constrained:
-  component boundaries, dependency direction, durable versus derived state,
-  and recovery or migration rules.
-- `CONTEXT.md` supplies shared language. It defines the nouns and distinctions
-  that make product requirements, architecture choices, tracker items, and code
-  mean the same thing to different contributors.
-
-Cross-links are expected. Duplicating a contract across all three is not. When
-the boundary is unclear, choose the document that a future contributor would
-consult to decide whether a proposed change is correct, then link from the
-others.
-
-### ADR Discipline
+## ADR Discipline
 
 Create an ADR when a decision is costly to reverse, non-obvious, likely to be
 revisited, spans boundaries, changes a public or persistence contract, or
@@ -97,7 +70,7 @@ product and architecture indexes explain what is currently true. Do not use an
 ADR as an unindexed dumping ground for implementation notes, and do not rewrite
 accepted history to conceal a changed decision.
 
-### Documentation as a Maintained System
+## Documentation as a Maintained System
 
 Treat documentation as a set of owned contracts, not a collection of notes.
 Every durable document should have a discoverable route from the entry map or a
@@ -112,38 +85,14 @@ the corresponding documentation or ADR update in the accountable work. A
 separate follow-up is appropriate only when the repository records its owner
 and dependency explicitly.
 
-## Documentation Responsibilities
-
-| Source | Owns |
-| --- | --- |
-| Product intent | The product's purpose, users, desired outcomes, and non-goals. |
-| Domain language | Stable terms and distinctions that plans and code must use consistently. |
-| Product docs | Observable behavior, operator workflows, public contracts, and user-facing semantics: what the product does. |
-| Architecture docs | System boundaries, components, data ownership, dependency direction, and implementation constraints: how the product is shaped. |
-| ADRs | Costly, surprising, or repeatedly contested decisions, including context, choice, consequences, and supersession state. |
-| Quality standards | Language, code, testing, review, and repository conventions that apply across changes. |
-| Validation router | Which checks prove which claims, where proof is recorded, independence triggers, and result classification. |
-| Tracker | Durable scope, outcomes, dependencies, lifecycle state, and evidence links for current work; provider-owned configuration encodes Agent Factory concepts when needed. |
-
-Product and architecture docs may cross-link, but they should not silently own
-each other's contracts. ADRs explain why a durable choice was made; they do not
-replace the current product or architecture description.
-
 ## Durable State and Local State
 
 Make the source of truth unambiguous. State that must survive a fresh clone,
 review, or handoff belongs in tracked records. Caches, indexes, locks, command
-diagnostics, generated output, and machine-local configuration should be
-identified as derived or local, ignored when appropriate, and repairable from a
-documented owner or command. Never make private machine state the only route to
+diagnostics, generated output, and machine-local configuration are derived or
+local: identify them as such, ignore them when appropriate, and give each a
+documented repair owner. Never make private machine state the only route to
 current scope, decisions, or validation evidence.
-
-## State Boundary
-
-Identify canonical tracked records separately from local projections, caches,
-locks, logs, and generated state. Rebuildable state should be ignored and have
-one documented repair owner. A fresh agent must not need private machine state
-to discover current scope or the repository's governing decisions.
 
 ## Readiness Test
 

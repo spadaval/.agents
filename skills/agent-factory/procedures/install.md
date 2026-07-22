@@ -26,8 +26,6 @@ Verify or create concise repository instructions that name:
 - Prefer existing equivalent docs over new files.
 - When a missing source matters, create tracker work for the artifact update
   instead of hiding the gap in private notes.
-- Do not install compatibility shims or old command aliases unless explicitly
-  requested by a human.
 
 ## Handoff
 

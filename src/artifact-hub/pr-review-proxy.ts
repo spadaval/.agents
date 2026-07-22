@@ -207,6 +207,12 @@ function repositoryCoordinates(source: RuntimeSource) {
   return { host: url.hostname, owner, repository };
 }
 
+export function pullRequestState(metadata: Record<string, unknown>): string {
+  return metadata.merged_at
+    ? "MERGED"
+    : String(metadata.state ?? "").toUpperCase();
+}
+
 function prSummary(
   metadata: Record<string, any>,
   source: RuntimeSource,
@@ -215,6 +221,7 @@ function prSummary(
   fallbackChangedFiles = 0,
   reviewDecision?: GitHubReviewDecision,
 ) {
+  const mergedAt = metadata.merged_at ? String(metadata.merged_at) : undefined;
   return {
     schemaVersion: 1 as const,
     repository: `${owner}/${repository}`,
@@ -236,13 +243,14 @@ function prSummary(
         metadata.head?.repo?.full_name ?? `${owner}/${repository}`,
       ),
       isDraft: Boolean(metadata.draft),
+      mergedAt,
       number: Number(metadata.number),
       reviewDecision,
       reviewComments: Number(metadata.review_comments ?? 0),
       baseRepository: String(
         metadata.base?.repo?.full_name ?? `${owner}/${repository}`,
       ),
-      state: String(metadata.state ?? "").toUpperCase(),
+      state: pullRequestState(metadata),
       title: String(metadata.title ?? ""),
       updatedAt: String(metadata.updated_at ?? ""),
       url: String(metadata.html_url ?? source.url ?? ""),

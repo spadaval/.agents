@@ -61,6 +61,10 @@ neutral starter and safe copy mechanics.
   is revision metadata within that collection, not part of PR identity. Strong
   manifest URL identity may preserve collections when live data is unavailable;
   uncertain identities remain standalone.
+- The Hub distinguishes merged PRs from merely closed PRs using live GitHub
+  metadata. Merged PR review artifacts are hidden from the catalog by default;
+  use the catalog's merged-artifact control to reveal them and their merge
+  status without changing or removing their manifests.
 - The Hub may group open PR review collections into live stacks when a unique
   same-repository head-ref to base-ref chain exists. Stack topology is derived
   from one atomic live summary snapshot, never declared by or written back to

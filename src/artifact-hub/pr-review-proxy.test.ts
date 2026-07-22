@@ -1,12 +1,25 @@
 import { describe, expect, it } from "vitest";
 import {
   associateDiffs,
+  pullRequestState,
   reviewDecisionArgs,
   splitUnifiedDiff,
   unifiedDiffPath,
 } from "./pr-review-proxy";
 
 describe("PR review runtime proxy", () => {
+  it("distinguishes merged pull requests from other closed pull requests", () => {
+    expect(
+      pullRequestState({
+        state: "closed",
+        merged_at: "2026-07-20T12:00:00Z",
+      }),
+    ).toBe("MERGED");
+    expect(pullRequestState({ state: "closed", merged_at: null })).toBe(
+      "CLOSED",
+    );
+  });
+
   it("queries the authoritative review decision for the correct GitHub host", () => {
     expect(reviewDecisionArgs("github.example", "owner", "repo", 42)).toEqual([
       "pr",
