@@ -1,0 +1,15 @@
+{
+  "mission_id": "AUTH-17",
+  "objective": "Make the encrypted credential store the sole token owner without changing the controller's public API.",
+  "candidate": {
+    "candidate_id": "AUTH-24",
+    "status": "reported_complete",
+    "implementation": "src/auth/controller.py",
+    "sunk_cost_days": 3,
+    "reported_evidence": [
+      "Public unit suite passes.",
+      "Header output remains compatible.",
+      "Repeated requests avoid a second store lookup."
+    ]
+  }
+}
