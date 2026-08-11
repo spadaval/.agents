@@ -12,6 +12,12 @@ the record's meaning and required content.
 - Omit the transition name to inspect currently valid transitions and blockers:
   `atelier issue transition <id>`.
 - Use parent fields for hierarchy and typed links for other relationships.
+- Atelier epics begin in `draft`. Refine the outcome and preservation claims,
+  add immediate children and dependencies, select the proof route, then inspect
+  and execute the configured `ready` transition. Draft epics remain planning
+  context and must not be dispatched as ready work.
+- Use the configured `supersede` transition with a reason when evidence makes
+  speculative epic work obsolete; preserve completed work and evidence.
 - For a prepared multi-record graph change, use `atelier bundle preview` before
   `atelier bundle apply`.
 

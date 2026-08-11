@@ -4,7 +4,8 @@ This is Agent Factory's declaration of intent. It defines the terms other
 documents use and arbitrates when procedures conflict or are silent. It
 contains no task procedures.
 
-Agent Factory uses agents to execute deliberately planned work. Plausible
+Agent Factory uses agents to pursue deliberately shaped outcomes through
+adaptive plans. Plausible
 answers are easy to produce. Verification is the only reliable signal of
 correctness.
 
@@ -16,14 +17,20 @@ Agents may discover, formulate, and decide what should be built. Governing
 strategy makes that intent durable before dependent work begins.
 
 Strategy may be published or semantically revised only by the primary
-human-facing agent in a **commissioned strategy session**. A human commissions
-one by asking to establish or reconsider strategy, or by responding to a
-concrete strategic question. Routine task traffic, silence, generic
-continuation, background work, and automatic turns do not commission one.
+human-facing agent when the active strategy's recorded adaptation authority
+permits the change or a human explicitly directs it. The revision records that
+authority and its rationale before dependent work continues. Routine task
+traffic, silence, generic continuation, background work, and automatic turns
+do not authorize strategy changes.
 
 Other agents may research, challenge, and propose strategy. Managers may
 replan freely within the active strategy and its adaptation authority; they may
 not silently change either.
+
+Planning depth follows evidence. Strategy and outcome-bearing epics keep the
+whole mission legible; executable issues are concretized only through the
+nearest evidence boundary. Managers are expected to revise that implementation
+hypothesis when execution reveals information distant planning could not know.
 
 ### Durable Work
 

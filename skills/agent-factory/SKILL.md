@@ -28,13 +28,16 @@ Factory itself.
   system shape, governing tradeoffs, boundaries, and adaptation guidance; the
   mission's epics, issues, and dependencies are its implementation plan.
 - Plan the whole mission strategically, but elaborate implementation work only
-  as far as current evidence supports. Mission completion is judged against the
-  strategic outcome and proof, not merely against issue closure.
-- Publish or semantically revise strategy only through `plan` in a commissioned
-  strategy session: a human asks to establish or reconsider strategy, or
-  answers a concrete strategic question. Routine task traffic, silence, generic
-  continuation, and automatic turns do not commission one. Other agents may
-  research and propose.
+  as far as current evidence supports. Keep later product-facing and internal
+  outcomes as draft epics; refine the outcome, immediate work, dependencies,
+  and proof route together before making an epic executable. Mission completion
+  is judged against the strategic outcome and proof, not merely against issue
+  closure.
+- Publish or semantically revise strategy only through `plan` when the active
+  strategy's recorded adaptation authority permits the change or a human
+  explicitly directs it. Record the authority and rationale in the revision.
+  Routine task traffic, silence, generic continuation, and automatic turns do
+  not authorize strategy changes. Other agents may research and propose.
 - Use `$generate-html-plan` when a visual, interactive planning surface would
   materially improve deliberation. Publish its result through `plan` before
   Agent Factory execution.

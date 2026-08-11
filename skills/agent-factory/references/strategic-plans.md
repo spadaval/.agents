@@ -51,11 +51,11 @@ boundary, assurance gate, or adaptation authority changes. Record what changed,
 why, and which work must be reconsidered. Use version control for exact history;
 do not create snapshot files by default.
 
-Only `plan` may publish a semantic revision, and only in a commissioned
-strategy session (defined in the [Constitution](../constitution.md)). Mark all
-other drafts as non-canonical. After publication, surface the revision before
-affected execution resumes unless the commission expressly includes immediate
-continuation.
+Only `plan` may publish a semantic revision, and only when the active strategy
+explicitly delegates that class of change or a human explicitly directs it, as
+defined in the [Constitution](../constitution.md). Record the authority and
+rationale in the revision, mark all other drafts as non-canonical, and surface
+the revision before affected execution resumes.
 
 Assignments name the strategy path and revision they use. After a revision,
 reconcile affected work before dispatching it again.
@@ -85,7 +85,9 @@ Plan the whole mission as outcomes, but expand ordinary issues only to the
 nearest evidence boundary: the point beyond which unfinished work, validation,
 or an unresolved decision could change the route.
 
-Keep distant work as outcome-oriented epics with constraints, unknowns, and an
-expansion condition. Expand, revise, defer, or supersede work as evidence
-arrives. Close the mission against demonstrated strategic outcomes, not issue
-count.
+Keep distant work as draft outcome-bearing epics with meaningful preliminary
+outcomes, constraints, and unknowns. When evidence justifies the next
+increment, refine its outcome and preservation claims, create immediate work
+and dependencies, choose proof, and make it ready. Expand, revise, defer, or
+supersede work as evidence arrives. Close the mission against demonstrated
+strategic outcomes, not issue count.

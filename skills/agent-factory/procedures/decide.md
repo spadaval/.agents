@@ -25,10 +25,11 @@ load [Submodel Selection](../references/submodel-selection.md) before spawning.
 
 ## Authority
 
-Inside a commissioned strategy session (defined in the
-[Constitution](../constitution.md)), the primary agent may make the decision
-and hand it to `plan` for publication. Outside one, return a non-canonical
-proposal and stop before changing strategy or dependent work.
+When the active strategy's recorded adaptation authority permits the decision,
+or a human explicitly directs it, the primary agent may hand the decision to
+`plan` for publication under the [Constitution](../constitution.md). Otherwise,
+return a non-canonical proposal and stop before changing strategy or dependent
+work.
 
 Record mission-local decisions in the strategic plan. Record decisions that
 outlive the mission in the owning product or architecture document and, when

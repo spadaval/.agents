@@ -71,20 +71,43 @@ Plan ordinary issues only to the nearest evidence boundary. Keep enough ready
 work for current execution and the next coherent handoff without expanding
 distant work prematurely.
 
-Expand an epic when predecessor evidence arrives, an unknown is resolved, its
-expansion condition becomes true, or the ready-work buffer is running low. For
-each expansion:
+Expand a draft epic when predecessor evidence arrives, a material unknown is
+resolved, or the ready-work buffer is running low. For each expansion:
 
 1. Select an undemonstrated strategic outcome.
 2. Choose the smallest increment that delivers value or reduces important
    uncertainty.
-3. Confirm its decisions and dependencies are ready.
-4. Create only the implementation, integration, review, and validation work
-   needed for that increment.
+3. Refine the epic outcome and any behavior-preservation claims.
+4. Confirm its decisions and dependencies are ready.
+5. Create only the immediate implementation and integration work needed for
+   that increment.
+6. Choose focused proof and any independent review or validation justified by
+   the claim and risk.
+7. Move the epic through the repository's ordinary draft-to-ready transition.
 
 If ready work runs out, diagnose whether the cause is missing detail, missing
 evidence, a failed assumption, or a strategic question. Do not manufacture work
 only to keep agents busy.
+
+## Graph And Branch Reconciliation
+
+Use direct tracker and Git changes; no separate replanning record is required.
+
+- Rescope an issue when its route changes but its outcome and review boundary
+  remain coherent. Split it when a partial result is independently valuable or
+  needs different ownership, proof, or sequencing.
+- Defer work when it remains valuable but is unnecessary for the current
+  outcome or unsafe to specify now. Keep the outcome, reason, owner or trigger,
+  and dependency consequence durable; remove it from the executable horizon.
+- Supersede speculative work when evidence makes its outcome obsolete. Preserve
+  completed work, failed evidence, and rationale instead of rewriting history.
+- Keep a discovered bug in the current branch only when repairing it is needed
+  to deliver or prove the assigned outcome and fits the governing boundary. If
+  it is adjacent, independently shippable, or would broaden review risk, create
+  follow-up work and fix it on its own repository-appropriate owner branch.
+- Return to strategy when the proposed change alters the outcome, target
+  system, governing tradeoff, boundary, assurance, adaptation authority, or an
+  accepted ADR.
 
 ## Delegation
 
@@ -125,8 +148,10 @@ Route high-risk diffs to `review` and behavior claims to `validate`. Give
 reviewers and validators their attention lens: the governing constraints
 copied exactly from strategy, ADR, or issue text. Do not pre-judge their
 work: do not instruct a reviewer or validator to ignore a class of findings,
-cap a finding's severity, or treat mandated content as exempt from
-challenge. Treat Worker discoveries as evidence, not automatic mission
+cap a finding's severity, treat mandated content as exempt from challenge,
+or settle a conflict between governing requirements on their behalf.
+Conflicting requirements are handed over together, not adjudicated in the
+dispatch. Treat Worker discoveries as evidence, not automatic mission
 scope.
 
 When review or validation returns a finding, read the complete result, verify it

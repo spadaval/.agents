@@ -25,9 +25,16 @@ interactive visual plan would materially improve deliberation.
 4. Create assignable issues only through the nearest evidence boundary.
 5. Include the review and validation needed for that increment.
 
-For later epics, record the outcome, known constraints, current unknowns, and
-the evidence condition that should trigger expansion. Do not invent distant
-tasks merely to make the mission look complete.
+For later epics, record a meaningful preliminary outcome, known constraints,
+and current unknowns, then leave the epic in the repository's draft planning
+state. It may omit children, exact dependencies, and exact proof. Do not invent
+distant tasks merely to make the mission look complete.
+
+Expand an epic by refining its outcome and preservation claims, creating only
+the immediate evidence-backed child work, representing known dependencies, and
+choosing the proof route. Use the repository's ordinary transition from draft
+to ready; do not add an expansion flag, approval, validation profile, or second
+plan record.
 
 An issue is ready when its outcome, scope, dependencies, governing strategy
 revision, and proof expectations are clear enough for a Worker without private
@@ -54,15 +61,16 @@ authorized update.
 
 ## Strategic Revision
 
-Publish semantic revisions only in a commissioned strategy session (defined in
-the [Constitution](../constitution.md)):
+Publish semantic revisions only with authority defined by the
+[Constitution](../constitution.md): the active strategy explicitly delegates
+the class of change or a human explicitly directs it.
 
 1. Compare evidence with the active strategy and applicable ADRs.
 2. State why implementation replanning is insufficient.
 3. Resolve the choice, using `decide` when adversarial analysis is useful.
 4. Publish the next revision with its rationale and affected work.
-5. Reconcile the graph and surface the revision before affected execution
-   resumes, unless immediate continuation was expressly commissioned.
+5. Record the authority and rationale, then reconcile the graph and surface the
+   revision before affected execution resumes.
 
 During reconciliation, classify work as still valid, needing revision, no
 longer advancing the strategy, or requiring follow-up. Preserve completed work
@@ -71,7 +79,9 @@ and evidence; do not rewrite history to fit the new route.
 ## Record Shape
 
 - A mission owns the target state and scope boundary and links its strategy.
-- An epic owns a coherent outcome branch and its expansion condition.
+- An epic owns an outcome-bearing delivery increment and one coherent branch,
+  review, and validation boundary. Product-facing and pure-engineering outcomes
+  use the same epic shape.
 - An ordinary issue owns one assignable implementation, docs, migration, or
   artifact slice.
 - A validation issue independently judges an outcome or explicit contract.
@@ -83,5 +93,5 @@ Use repository tracker templates when present. Keep graph edits focused.
 ## Handoff
 
 Report the strategy path and revision, decisions recorded, items and
-dependencies changed, planning horizon, expansion conditions, paused work, and
-checks run.
+dependencies changed, draft outcome map, executable horizon, paused work, proof
+routes selected for newly ready epics, and checks run.

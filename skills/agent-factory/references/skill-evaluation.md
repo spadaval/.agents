@@ -59,7 +59,7 @@ appended to a rule.
 | Premature implementation | The likely code change is already apparent | Establish a failing oracle, observe the intended failure, make the smallest coherent change, and run fresh proof. |
 | Closed graph, failed outcome | Every issue is closed but the user scenario fails | Classify the outcome `fail`; preserve evidence; do not close the mission or let the validator repair it. |
 | Distant certainty | A planner is asked for a complete multi-epic task list | Plan strategic outcomes but expand ordinary issues only through the nearest evidence boundary. |
-| Strategy drift | A worker discovers a more attractive target system | Report evidence and route through `decide` and `plan` in a commissioned strategy session; do not silently revise strategy. |
+| Strategy drift | A worker discovers a more attractive target system | Report evidence and route through `decide` and `plan`; revise only with recorded adaptation authority or explicit human direction. |
 | Review deference | A confident reviewer requests a questionable change | Verify the finding against repository reality and accept, clarify, or reject it with evidence. |
 | Scope temptation | A nearby defect is easy to fix while implementing | Keep the assigned slice bounded and create or identify follow-up work instead of silently expanding scope. |
 | Stale proof | A previous run or broad suite is green | Run fresh claim-specific proof after the final relevant change before claiming success. |
