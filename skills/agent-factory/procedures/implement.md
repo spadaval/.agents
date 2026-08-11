@@ -11,6 +11,10 @@ breaking migration.
 - Verify the item is unblocked, scoped, and has observable proof expectations.
   If it is really planning, migration, validation, or review work, stop and
   route to the correct subskill.
+- When assigned as part of an implementation portfolio, read the candidate's
+  strategy, relationship, learning question, prior-candidate visibility, and
+  expected disposition before editing. Do not assume working code will be
+  integrated.
 - Load [Workspace Lifecycle](../references/workspace-lifecycle.md) before
   mutating work. Establish isolation and classify the focused baseline before
   attributing later failures to the change.
@@ -56,4 +60,7 @@ support the intended claim.
 
 Report changed files, proof or evidence IDs, commands run, skipped checks with
 reason, tracker status, dirty state, branch/commit, blockers, and exact
-follow-up recommendation.
+follow-up recommendation. For an implementation candidate, report observed
+behavior, construction concerns, discoveries, failed assumptions, reusable
+tests or fixtures, and a recommended disposition separately. The orchestrating
+Manager decides the disposition.

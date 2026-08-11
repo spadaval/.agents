@@ -83,6 +83,7 @@ Load these only when the assignment needs the named cross-cutting guidance:
 | Reference | Load when |
 | --- | --- |
 | [Submodel selection](references/submodel-selection.md) | Required before every delegation to choose and record the model and reasoning effort. |
+| [Implementation portfolios](references/implementation-portfolios.md) | Using code to reduce uncertainty, running spikes or competing implementations, or deciding whether to integrate, refactor, reimplement, retain, or discard a candidate. |
 | [Strategic plans](references/strategic-plans.md) | Creating, publishing, executing, or materially replanning a substantial mission. |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory, mapping durable repository guidance, or auditing agent readiness. |
 | [Workspace lifecycle](references/workspace-lifecycle.md) | Starting mutating work, selecting isolation, checking a baseline, integrating, or closing a workspace. |

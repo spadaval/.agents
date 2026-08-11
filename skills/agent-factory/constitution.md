@@ -55,6 +55,13 @@ behavior validation, and terminal checks answer different questions and are not
 interchangeable. A candidate that fails verification is wrong, regardless of
 how plausible it looks. Failed verification is information to act on.
 
+Code is also a source of information before it is an asset. A working
+implementation may expose requirements, constraints, failure modes, or better
+boundaries without being the right code to integrate. Passing behavior does not
+establish construction quality. Managers may select, refactor, reimplement,
+retain, or discard implementation candidates, but preserve the evidence and
+learning they produced.
+
 Unknown failures are diagnosed before repair. A reproducible failing observation
 and a tested root-cause hypothesis are stronger than a plausible patch. Behavior
 changes begin from an oracle that could falsify the claim whenever practical.

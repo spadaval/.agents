@@ -109,6 +109,26 @@ Use direct tracker and Git changes; no separate replanning record is required.
   system, governing tradeoff, boundary, assurance, adaptation authority, or an
   accepted ADR.
 
+## Implementation Portfolios
+
+Treat produced code as an implementation candidate until the Manager selects
+its disposition. Passing proof establishes observed behavior, not that the
+candidate has the right construction or should be integrated.
+
+The orchestrator may use direct implementation, an exploratory spike,
+in-place refactoring, reimplementation informed by an earlier candidate,
+parallel implementations, or a hybrid of these. Load [Implementation
+Portfolios](../references/implementation-portfolios.md) when code is being used
+to reduce uncertainty, when materially different constructions could be
+informative, or when deciding whether a candidate should survive.
+
+After a candidate returns, assess its behavior, construction, and learning
+separately. Then classify its disposition as integrate, refactor, reimplement,
+retain for comparison or follow-up, discard, or blocked. A green candidate does
+not default to integration. Preserve decision-relevant evidence and learning
+before superseding or discarding code, and follow workspace and human authority
+for any destructive action.
+
 ## Delegation
 
 Every assignment preserves unrelated changes in the worktree and names:
@@ -122,6 +142,13 @@ Workspace/branch: <context>
 Assigned issue(s): <exact IDs>
 Role/subskill: <exactly one>
 Model and reasoning: <choice and rationale>
+Implementation portfolio: <not-applicable, or
+  Strategy: <strategy>
+  Candidate relationship: <relationship>
+  Learning question: <question>
+  Prior-candidate visibility: <full | evidence only | none>
+  Expected disposition: <disposition>
+  Disposition owner: <orchestrating Manager>>
 Owned scope: <files, modules, commands, or workflows>
 Out of scope: <boundaries>
 Governing constraints: <relevant strategy or ADR constraints>
@@ -143,6 +170,10 @@ reference them by path or ID; pasted bulk stays resident in the
 orchestrator's context and is re-read on every later turn. A dispatch prompt
 carries the assignment, the pointers, and the interfaces the assignee cannot
 know.
+
+Use `not-applicable` for assignments outside an implementation portfolio. Do
+not let a spike silently become production code or let a replacement inherit an
+earlier candidate's structure when structural independence is the point.
 
 Route high-risk diffs to `review` and behavior claims to `validate`. Give
 reviewers and validators their attention lens: the governing constraints

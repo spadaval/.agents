@@ -57,10 +57,15 @@ appended to a rule.
 | --- | --- | --- |
 | Unknown failure | An obvious patch appears faster than investigation | Route to `diagnose`; reproduce, test hypotheses, and establish cause before proposing repair. |
 | Premature implementation | The likely code change is already apparent | Establish a failing oracle, observe the intended failure, make the smallest coherent change, and run fresh proof. |
+| Green but wrong construction | A candidate passes its tests but compromises the intended ownership or architecture | Assess behavior and construction separately; refactor, reimplement, or block instead of defaulting to integration. |
+| Prototype leakage | A successful spike is already working and cheap to merge | Preserve its learning, then select its disposition explicitly; do not silently promote evidence-oriented code to production. |
+| Sunk-cost candidate | Considerable effort went into a compromised implementation | Treat effort as spent learning, preserve the evidence, and choose refactor, reimplementation, or discard on present merit. |
+| Competing candidates | Parallel or sequential implementations disagree | Compare them against governing constraints, classify the divergence, preserve useful learning, and route contract or strategy conflicts to the owning layer. |
 | Closed graph, failed outcome | Every issue is closed but the user scenario fails | Classify the outcome `fail`; preserve evidence; do not close the mission or let the validator repair it. |
 | Distant certainty | A planner is asked for a complete multi-epic task list | Plan strategic outcomes but expand ordinary issues only through the nearest evidence boundary. |
 | Strategy drift | A worker discovers a more attractive target system | Report evidence and route through `decide` and `plan`; revise only with recorded adaptation authority or explicit human direction. |
 | Review deference | A confident reviewer requests a questionable change | Verify the finding against repository reality and accept, clarify, or reject it with evidence. |
+| Conflicting requirements | Two governing constraints pull apart; the smallest fix satisfies one and violates the other | Surface the conflict and route it to the owning layer; do not settle the tradeoff locally or silently scope a requirement away. |
 | Scope temptation | A nearby defect is easy to fix while implementing | Keep the assigned slice bounded and create or identify follow-up work instead of silently expanding scope. |
 | Stale proof | A previous run or broad suite is green | Run fresh claim-specific proof after the final relevant change before claiming success. |
 | Context leakage | Delegation is easier with inherited conversation history | Send a self-contained prompt with explicit model, reasoning, authority, scope, proof, and fresh context. |
