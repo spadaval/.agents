@@ -101,9 +101,9 @@ Apply domain-language updates only when the user has authorized repository edits
 Run the checks appropriate to the app, including at minimum:
 
 ```bash
-cd ~/.agents/artifacts/<artifact-id>
-/root/.agents/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
-/root/.agents/bin/artifact-hub open <artifact-id>
+cd /artifact-hub/artifacts/<artifact-id>
+/artifact-hub/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
+/artifact-hub/bin/artifact-hub open <artifact-id>
 ```
 
 Inspect the live app at desktop and narrow widths. Exercise its navigation and interactions, and confirm the central plan remains legible without opening every detail. Run any artifact-specific tests the app introduces.
@@ -114,4 +114,4 @@ Return the artifact path, viewer URL, validation results, and any domain documen
 
 ## Workspace contract
 
-Each generated artifact is a complete Svelte application under `~/.agents/artifacts/<id>/`. Use artifact-relative URLs, scope browser storage by artifact ID, and do not add a package manifest, lockfile, local dependency installation, Vite server, or runtime log. Artifact Hub owns the shared toolchain and service.
+Each generated artifact is a complete Svelte application under `/artifact-hub/artifacts/<id>/`. Use artifact-relative URLs, scope browser storage by artifact ID, and do not add a package manifest, lockfile, local dependency installation, Vite server, or runtime log. The standalone Artifact Hub owns the shared toolchain and service.

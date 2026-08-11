@@ -218,11 +218,11 @@ extracted data separate from agent-authored review stories.
 
    ```bash
    cd <artifact>
-   /root/.agents/node_modules/.bin/vite-node scripts/validate-review.ts
-   /root/.agents/node_modules/.bin/vitest run \
-     --config /root/.agents/vitest.config.ts --root . --passWithNoTests
-   /root/.agents/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
-   /root/.agents/bin/artifact-hub open <artifact-id>
+   /artifact-hub/node_modules/.bin/vite-node scripts/validate-review.ts
+   /artifact-hub/node_modules/.bin/vitest run \
+     --config /artifact-hub/vitest.config.ts --root . --passWithNoTests
+   /artifact-hub/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
+   /artifact-hub/bin/artifact-hub open <artifact-id>
    ```
 
    The validator statically reads module metadata; it does not execute Svelte
@@ -313,7 +313,7 @@ extracted data separate from agent-authored review stories.
 ## Workspace contract
 
 ```text
-~/.agents/artifacts/<artifact-id>/
+/artifact-hub/artifacts/<artifact-id>/
 ├── manifest.json
 ├── index.html
 ├── runtime/source.json             # live: repo/PR identity + Hub proxy endpoint

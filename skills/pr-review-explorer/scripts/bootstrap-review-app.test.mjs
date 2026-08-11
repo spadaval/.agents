@@ -56,6 +56,7 @@ test("infers PR from the current branch and records the authenticated proxy cont
         env: {
           ...process.env,
           PATH: `${join(root, "bin")}:${process.env.PATH}`,
+          ARTIFACT_HUB_CLI: join(root, "bin/artifact-hub"),
         },
       },
     );
@@ -93,6 +94,7 @@ test("passes an explicit PR override to gh", () => {
         env: {
           ...process.env,
           PATH: `${join(root, "bin")}:${process.env.PATH}`,
+          ARTIFACT_HUB_CLI: join(root, "bin/artifact-hub"),
         },
       },
     );

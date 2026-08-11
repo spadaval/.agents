@@ -68,6 +68,10 @@ test("creates an immutable evidence artifact and consumes extraction only after 
       ],
       {
         encoding: "utf8",
+        env: {
+          ...process.env,
+          ARTIFACT_HUB_CLI: join(root, "bin/artifact-hub"),
+        },
       },
     );
     assert.equal(result.status, 0, result.stderr);

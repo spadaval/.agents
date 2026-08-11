@@ -2287,7 +2287,7 @@ def write_analysis_pack(
         "",
         "## Artifact Hub viewer",
         "",
-        "The Svelte viewer is user-facing. From this workspace, run `python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py .. --id <artifact-id> --consume`, then open it with `/root/.agents/bin/artifact-hub open <artifact-id>`. Analyze this Markdown/evidence pack directly; regenerate the artifact after extractor or template changes.",
+        "The Svelte viewer is user-facing. From this workspace, run `python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py .. --id <artifact-id> --consume`, then open it with `/artifact-hub/bin/artifact-hub open <artifact-id>`. Analyze this Markdown/evidence pack directly; regenerate the artifact after extractor or template changes.",
         "",
         "Raw rollout JSONL remains authoritative. These files are bounded summaries and evidence guides, not final conclusions.",
     ])

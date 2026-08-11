@@ -61,8 +61,7 @@ if (repositoryParts.length !== 2)
   );
 const repositoryUrl = prUrl.origin + "/" + repositoryParts.join("/");
 const skill = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const agentsRoot = resolve(skill, "..", "..");
-const hub = join(agentsRoot, "bin", "artifact-hub");
+const hub = process.env.ARTIFACT_HUB_CLI ?? "/artifact-hub/bin/artifact-hub";
 const template = join(skill, "assets", "template");
 if (!existsSync(hub)) throw new Error("Artifact Hub CLI is missing: " + hub);
 

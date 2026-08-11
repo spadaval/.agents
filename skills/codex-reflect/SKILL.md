@@ -61,13 +61,13 @@ python3 /root/.agents/skills/codex-reflect/scripts/create_report_app.py <new-wor
 
 The first command writes an owner-only temporary evidence workspace and prints
 the path to `index.md`. The second copies that evidence and the specialized
-template into `~/.agents/artifacts/<artifact-id>/`, then removes the temporary
+template into `/artifact-hub/artifacts/<artifact-id>/`, then removes the temporary
 workspace when `--consume` is used.
 It first merges every rollout file whose metadata has the same session ID, so
 resumed transcripts form one logical-session pack. Its structure is:
 
 ```text
-~/.agents/artifacts/<artifact-id>/
+/artifact-hub/artifacts/<artifact-id>/
 ├── manifest.json         # minimal Artifact Hub catalog metadata
 ├── index.html            # complete app entry point
 ├── evidence/             # helper-owned normalized facts and source excerpts
@@ -83,11 +83,11 @@ Artifact Hub CLI. It does not create a package, dependency installation, Vite
 configuration, PID, log, or private server. Validate and open the artifact with:
 
 ```bash
-cd ~/.agents/artifacts/<artifact-id>
-/root/.agents/node_modules/.bin/vite-node scripts/validate-report.ts
-/root/.agents/node_modules/.bin/vitest run --config /root/.agents/vitest.config.ts --root .
-/root/.agents/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
-/root/.agents/bin/artifact-hub open <artifact-id>
+cd /artifact-hub/artifacts/<artifact-id>
+/artifact-hub/node_modules/.bin/vite-node scripts/validate-report.ts
+/artifact-hub/node_modules/.bin/vitest run --config /artifact-hub/vitest.config.ts --root .
+/artifact-hub/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
+/artifact-hub/bin/artifact-hub open <artifact-id>
 ```
 
 Artifact Hub owns the one Vite server and binds it to `0.0.0.0` for the trusted

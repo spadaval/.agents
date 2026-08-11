@@ -1,6 +1,6 @@
 ---
 name: artifact-hub
-description: Create, customize, discover, open, validate, or manage complete local Svelte artifact applications in the shared Artifact Hub. Use when Codex needs a one-off visualizer, when a producer skill needs to scaffold its own specialized app under ~/.agents/artifacts, or when operating or diagnosing the single local Artifact Hub service.
+description: Create, customize, discover, open, validate, or manage complete local Svelte artifact applications in the standalone Artifact Hub. Use when Codex needs a one-off visualizer, when a producer skill needs to scaffold its own specialized app under /artifact-hub/artifacts, or when operating or diagnosing the single local Artifact Hub service.
 ---
 
 # Artifact Hub
@@ -8,12 +8,16 @@ description: Create, customize, discover, open, validate, or manage complete loc
 Keep each artifact a complete application. Share only the Vite/Svelte toolchain,
 dependency pool, catalog, and systemd-owned process.
 
+Artifact Hub is installed at `/artifact-hub`; this skill contains operating
+guidance only. Do not place Hub runtime source, dependencies, or generated
+artifacts in the skills repository.
+
 ## Create an artifact
 
 Use the generic starter for an ad hoc visualizer:
 
 ```bash
-/root/.agents/bin/artifact-hub create <id> --title "<title>" \
+/artifact-hub/bin/artifact-hub create <id> --title "<title>" \
   --description "<short catalog summary>" --kind visualizer
 ```
 
@@ -25,7 +29,7 @@ For a producer-owned UI, assemble a complete template directory and pass it to
 the same command:
 
 ```bash
-/root/.agents/bin/artifact-hub create <id> --title "<title>" \
+/artifact-hub/bin/artifact-hub create <id> --title "<title>" \
   --kind <kind> --from <template-directory> \
   --source-json '{"repository":"/absolute/source/path"}' --json
 ```
@@ -45,7 +49,7 @@ neutral starter and safe copy mechanics.
   HTML. Do not duplicate that control in artifact source or producer templates.
 - Do not include `package.json`, lockfiles, `node_modules`, Vite configuration,
   viewer launchers, PID files, or runtime logs.
-- Extend `/root/.agents/tsconfig.json` from an artifact-local `tsconfig.json`
+- Extend `/artifact-hub/tsconfig.json` from an artifact-local `tsconfig.json`
   when a check needs an application-scoped include set.
 - Scope `localStorage` and other browser state by artifact ID because every app
   shares one origin.
@@ -75,7 +79,7 @@ neutral starter and safe copy mechanics.
 
 The CLI creates owner-only content in a temporary sibling, writes the manifest
 last, and atomically renames the complete directory into
-`/root/.agents/artifacts/<id>`. Never hand-create a second artifact root or
+`/artifact-hub/artifacts/<id>`. Never hand-create a second artifact root or
 start an artifact-local Vite process.
 
 The Hub catalog discovers manifests through `GET /api/artifacts` at page load.
@@ -89,11 +93,11 @@ removed.
 Use the CLI rather than PID files or direct Vite processes:
 
 ```bash
-/root/.agents/bin/artifact-hub list
-/root/.agents/bin/artifact-hub open [<id>]
-/root/.agents/bin/artifact-hub doctor
-/root/.agents/bin/artifact-hub status
-/root/.agents/bin/artifact-hub logs
+/artifact-hub/bin/artifact-hub list
+/artifact-hub/bin/artifact-hub open [<id>]
+/artifact-hub/bin/artifact-hub doctor
+/artifact-hub/bin/artifact-hub status
+/artifact-hub/bin/artifact-hub logs
 ```
 
 Read [references/operations.md](references/operations.md) before installing the

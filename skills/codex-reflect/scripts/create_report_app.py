@@ -13,9 +13,8 @@ from pathlib import Path
 
 
 SKILL_DIR = Path(__file__).resolve().parents[1]
-AGENTS_ROOT = SKILL_DIR.parents[1]
 TEMPLATE_DIR = SKILL_DIR / "template"
-HUB_CLI = AGENTS_ROOT / "bin" / "artifact-hub"
+HUB_CLI = Path(os.environ.get("ARTIFACT_HUB_CLI", "/artifact-hub/bin/artifact-hub"))
 
 
 def remove_tree(path: Path) -> None:

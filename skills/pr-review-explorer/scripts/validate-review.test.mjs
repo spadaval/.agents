@@ -17,8 +17,9 @@ const validator = resolve(
   here,
   "../assets/template/scripts/validate-review.ts",
 );
-const viteNode = resolve(here, "../../../node_modules/.bin/vite-node");
-const artifacts = resolve(here, "../../../artifacts");
+const viteNode =
+  process.env.ARTIFACT_HUB_VITE_NODE ??
+  "/artifact-hub/node_modules/.bin/vite-node";
 const cleanups = [];
 
 test.afterEach(() => {
@@ -27,8 +28,7 @@ test.afterEach(() => {
 });
 
 function fixture() {
-  mkdirSync(artifacts, { recursive: true });
-  const root = mkdtempSync(join(artifacts, "pr-review-validator-"));
+  const root = mkdtempSync("/artifact-hub/.pr-review-validator-");
   cleanups.push(root);
   mkdirSync(join(root, "src/review/layers"), { recursive: true });
   return root;

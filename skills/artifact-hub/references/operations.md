@@ -1,6 +1,6 @@
 # Artifact Hub operations
 
-Artifact Hub runs one Vite development server rooted at `/root/.agents`. A
+Artifact Hub runs one Vite development server rooted at `/artifact-hub`. A
 systemd user unit owns the process. The CLI delegates lifecycle operations to
 systemd and logs to the journal; it never maintains PID or log files.
 
@@ -9,10 +9,14 @@ systemd and logs to the journal; it never maintains PID or log files.
 Install dependencies and the user unit once:
 
 ```bash
-cd /root/.agents
+cd /artifact-hub
 npm install
 ./bin/artifact-hub service install --now
 ```
+
+The standalone package pins Node 24.13.0 through Volta. Run package commands
+from `/artifact-hub` so the pin applies; the service and CLI use the same
+runtime.
 
 The service binds to `0.0.0.0` and the default URL output uses
 `http://<hostname>:5173/`. Choose a different stable port at installation time
@@ -21,7 +25,7 @@ the port only on a trusted internal network.
 
 The CLI recognizes three environment overrides. `ARTIFACT_HUB_ROOT` changes
 the artifact root for isolated tests (the default remains
-`/root/.agents/artifacts`). `ARTIFACT_HUB_PORT` changes the default service port
+`/artifact-hub/artifacts`). `ARTIFACT_HUB_PORT` changes the default service port
 used by URL output and doctor. `ARTIFACT_HUB_BASE_URL` replaces the URL prefix
 printed by create, list, and open—for example when a human interface forwards
 the service or clients use a preferred DNS name. These do not change the
@@ -121,12 +125,12 @@ or importer.
 
 ## Shared dependencies and validation
 
-Add a library to `/root/.agents/package.json` and update the root lockfile when
+Add a library to `/artifact-hub/package.json` and update the Hub lockfile when
 an artifact genuinely needs it. Do not add an artifact-local package manifest.
 Run root validation after dependency changes:
 
 ```bash
-cd /root/.agents
+cd /artifact-hub
 npm test
 npm run check
 ```
@@ -135,9 +139,9 @@ Run producer validators and Svelte checks against the artifact-local config
 using root executables, for example:
 
 ```bash
-cd /root/.agents/artifacts/<id>
-/root/.agents/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
-/root/.agents/node_modules/.bin/vitest run --config /root/.agents/vitest.config.ts --root .
+cd /artifact-hub/artifacts/<id>
+/artifact-hub/node_modules/.bin/svelte-check --tsconfig ./tsconfig.json
+/artifact-hub/node_modules/.bin/vitest run --config /artifact-hub/vitest.config.ts --root .
 ```
 
 Vite discovers raw manifests through its module graph. It transforms an
