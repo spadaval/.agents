@@ -29,6 +29,10 @@ Make the first executable increment prove a representative user outcome. Put
 assurance-only work first only when a current constraint or concrete hazard
 requires it.
 
+Do not turn a consequential choice required by the current outcome into a
+future implementation issue. If evidence is missing, create only the evidence
+work and name when the choice returns.
+
 For later epics, record a meaningful preliminary outcome, known constraints,
 and current unknowns, then leave the epic in the repository's draft planning
 state. It may omit children, exact dependencies, and exact proof. Do not invent
