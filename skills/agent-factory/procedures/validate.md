@@ -37,10 +37,12 @@ result and exit status, and attach that evidence to the classification.
 
 For every non-pass result, name the first concrete failure and classify it
 with the shared [failure classification](../references/tracker-commands/evidence-tracking.md)
-vocabulary. Create or identify follow-up work instead of silently broadening
-scope.
+vocabulary. Give the Manager enough evidence to create or identify follow-up
+work instead of silently broadening scope.
 Report the finding to the orchestrating Manager; validation does not decide by
-itself that a repair becomes part of the mission's critical path.
+itself that a repair becomes part of the mission's critical path. The Manager
+uses [Finding Disposition](../references/finding-disposition.md) to decide what
+happens next.
 
 ## Handoff
 

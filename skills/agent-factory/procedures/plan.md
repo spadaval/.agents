@@ -25,6 +25,10 @@ interactive visual plan would materially improve deliberation.
 4. Create assignable issues only through the nearest evidence boundary.
 5. Include the review and validation needed for that increment.
 
+Make the first executable increment prove a representative user outcome. Put
+assurance-only work first only when a current constraint or concrete hazard
+requires it.
+
 For later epics, record a meaningful preliminary outcome, known constraints,
 and current unknowns, then leave the epic in the repository's draft planning
 state. It may omit children, exact dependencies, and exact proof. Do not invent
@@ -36,9 +40,9 @@ choosing the proof route. Use the repository's ordinary transition from draft
 to ready; do not add an expansion flag, approval, validation profile, or second
 plan record.
 
-An issue is ready when its outcome, scope, dependencies, governing strategy
-revision, and proof expectations are clear enough for a Worker without private
-planning context.
+An issue is ready when its outcome, scope, non-scope, actual target environment,
+dependencies, governing strategy revision, and proof expectations are clear
+enough for a Worker without private planning context.
 
 For issues inside the current evidence horizon, name exact owned surfaces where
 known, consumed and produced interfaces, focused proof, validation commands or
@@ -46,6 +50,7 @@ scenarios, dependencies, and prohibited scope. Do not use placeholders such as
 `TBD`, "add validation," "handle edge cases," or "similar to another issue."
 Do not invent code or distant details merely to satisfy this rule; unresolved
 information marks an evidence boundary, spike, decision, or blocked issue.
+Do not plan a moving part whose only reason is possible future work.
 
 Before handoff, check current-horizon issues for outcome coverage, placeholder
 language, interface consistency, and an observable failure or success oracle.

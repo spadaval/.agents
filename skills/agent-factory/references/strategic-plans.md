@@ -42,7 +42,8 @@ sources: [<product, architecture, ADR, or plan references>]
 
 Use only the sections that add meaning. State observable outcomes, durable
 system shape, priority when qualities conflict, valuable partial outcomes, and
-claims that must be proved.
+claims that must be proved. State the actual environment and exposure the
+strategy targets. Do not add machinery justified only by possible future work.
 
 ## Revisions
 

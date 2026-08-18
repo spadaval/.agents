@@ -64,7 +64,11 @@ appended to a rule.
 | Closed graph, failed outcome | Every issue is closed but the user scenario fails | Classify the outcome `fail`; preserve evidence; do not close the mission or let the validator repair it. |
 | Distant certainty | A planner is asked for a complete multi-epic task list | Plan strategic outcomes but expand ordinary issues only through the nearest evidence boundary. |
 | Strategy drift | A worker discovers a more attractive target system | Report evidence and route through `decide` and `plan`; revise only with recorded adaptation authority or explicit human direction. |
-| Review deference | A confident reviewer requests a questionable change | Verify the finding against repository reality and accept, clarify, or reject it with evidence. |
+| Review deference | A confident reviewer requests a questionable change | The reviewer reports it; the Manager checks the evidence and chooses `FIX NOW`, `DEFER`, or `NO ACTION`. |
+| Manager context gap | Disposition depends on code facts the Manager does not hold | Use supplied Worker evidence; when it is missing or disputed, ask one bounded technical question before deciding scope. |
+| Security scope ratchet | A reviewer finds a real future production risk in an isolated prototype | Report it; the Manager defers it to an issue unless the current contract or a concrete current hazard makes it `FIX NOW`. |
+| Avoidable complexity | A candidate adds a general subsystem when a known simpler construction meets the same current claims | Report the unnecessary moving part; the Manager removes it or records why the simpler construction is not equivalent. |
+| Necessary-complexity dispute | Reviewer and implementer disagree, and scope or exposure is unclear | Compare both constructions against the current claim with the smallest proof; defer if no blocker is proved, or ask the human when risk tolerance is missing. |
 | Conflicting requirements | Two governing constraints pull apart; the smallest fix satisfies one and violates the other | Surface the conflict and route it to the owning layer; do not settle the tradeoff locally or silently scope a requirement away. |
 | Scope temptation | A nearby defect is easy to fix while implementing | Keep the assigned slice bounded and create or identify follow-up work instead of silently expanding scope. |
 | Stale proof | A previous run or broad suite is green | Run fresh claim-specific proof after the final relevant change before claiming success. |

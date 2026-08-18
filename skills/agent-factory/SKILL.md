@@ -65,9 +65,13 @@ Factory itself.
   do not reshape tracker scope while implementing unless graph management is
   their assigned work; the orchestrating Manager may revise the implementation
   plan as evidence changes.
+- Pursue the current outcome before assurance completeness. Preserve current
+  claims and constraints, then prefer the solution with the least total system
+  complexity. Treat review findings as evidence, not automatic scope.
 - Important product, architecture, persistence, security, migration, or
-  public-contract choices must be resolved durably before dependent
-  implementation proceeds.
+  public-contract choices that the current outcome depends on must be resolved
+  durably before dependent implementation proceeds. Do not invent choices for
+  deferred or absent surfaces.
 - Before claiming that work is fixed, passing, complete, or ready, identify the
   proof that establishes the claim, run it fresh, inspect the complete result,
   and report the claim with that evidence. A prior run, delegated assertion, or
@@ -85,6 +89,8 @@ Load these only when the assignment needs the named cross-cutting guidance:
 | [Submodel selection](references/submodel-selection.md) | Required before every delegation to choose and record the model and reasoning effort. |
 | [Implementation portfolios](references/implementation-portfolios.md) | Using code to reduce uncertainty, running spikes or competing implementations, or deciding whether to integrate, refactor, reimplement, retain, or discard a candidate. |
 | [Strategic plans](references/strategic-plans.md) | Creating, publishing, executing, or materially replanning a substantial mission. |
+| [Finding disposition](references/finding-disposition.md) | Reviewing findings or deciding whether a finding changes current work. |
+| [Finding disposition pressure tests](references/finding-disposition-pressure-tests.md) | Forward-testing finding evidence, authority, and scope decisions. |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory, mapping durable repository guidance, or auditing agent readiness. |
 | [Workspace lifecycle](references/workspace-lifecycle.md) | Starting mutating work, selecting isolation, checking a baseline, integrating, or closing a workspace. |
 | [Skill evaluation](references/skill-evaluation.md) | Modifying Agent Factory guidance or testing whether its behavioral controls work. |

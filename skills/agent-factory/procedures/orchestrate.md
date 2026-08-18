@@ -36,7 +36,12 @@ Load [Workspace Lifecycle](../references/workspace-lifecycle.md) before the firs
 mutating increment and at integration or closeout. Continue through ready work
 without asking for routine permission between assignments. Pause only for a
 genuine authority boundary, unresolved ambiguity that changes the result,
-unsafe work, or a blocker that cannot be repaired within the active strategy.
+a concrete current hazard, or a blocker that cannot be repaired within the
+active strategy.
+
+For every implementation, integration, disposition, and replan choice, preserve
+the current claims and constraints, then prefer fewer moving parts. Defer
+machinery whose only reason is possible future work.
 
 ## Replanning Loop
 
@@ -55,7 +60,7 @@ new blocker, or strategic revision:
 | Assignment repair | Clarify, retry, or reassign the same issue. |
 | Implementation replan | Revise issues, dependencies, sequencing, or proof while preserving strategy. |
 | Strategic replan | Pause affected work and route evidence through `decide` and `plan`. |
-| Containment | Stop unsafe work immediately, then replan at the correct layer. |
+| Containment | Stop work that creates a concrete current hazard, then replan at the correct layer. |
 
 Decide product and architecture questions that fall within the strategy's
 adaptation authority. A change to outcome, target system, governing tradeoff,
@@ -185,14 +190,20 @@ Conflicting requirements are handed over together, not adjudicated in the
 dispatch. Treat Worker discoveries as evidence, not automatic mission
 scope.
 
-When review or validation returns a finding, read the complete result, verify it
-against the diff, outcome, and active strategy, and classify it before changing
-work: repair the assignment, replan implementation, return to strategy, defer
-with an owner, or reject with evidence. A finding that conflicts with what
-the plan or strategy mandates is still evidence: do not dismiss it, and do
-not dispatch a fix that contradicts the mandate without replanning at the
-layer that owns it. Do not accept findings performatively, silently broaden
-scope, or let a validator decide mission critical-path scope.
+When review or validation returns a finding, read the complete result, compare
+its evidence with the outcome and active strategy, then load
+[Finding Disposition](../references/finding-disposition.md) and choose
+`FIX NOW`, `DEFER`, or `NO ACTION`. The orchestrating Manager owns the scope
+decision, not code-level fact-finding. Use the evidence supplied by code-context
+Workers. If a needed fact is missing or disputed, ask the reviewer or
+implementer for proof or assign one bounded `review` or `diagnose` question.
+Do not reread the whole subsystem or create a standing adjudication role.
+
+Record the decision on the accountable issue. File each actionable deferred
+finding as a normal bug or enhancement, link it, and keep it off the current
+critical path unless the rubric says it blocks. A finding that conflicts with
+the plan is still evidence; replan at the layer that owns the conflict instead
+of dispatching a contradictory fix.
 
 ## Closeout
 

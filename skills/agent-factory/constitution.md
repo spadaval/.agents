@@ -42,6 +42,12 @@ commits. Work is not complete until the next agent can continue safely.
 
 ### Execution And Proof
 
+Demonstrated user value comes before assurance completeness. Preserve the
+current outcome and constraints, then choose the solution with the least total
+system complexity. Security, resilience, and other quality work enter the
+critical path only when the current contract or a concrete current hazard
+requires them.
+
 Agent work naturally drifts toward convenient local patterns: shallow fixes,
 stale docs, lost scope, debris, and search paths that go off course. Agent
 Factory expects drift and counteracts it through mandatory review, validation,
@@ -106,6 +112,10 @@ assignment.
   supplied scope and proof expectations. They report discoveries that may
   invalidate the wider plan; they do not decide the mission consequence merely
   by finding them.
+
+Review and validation findings are evidence. Workers supply code evidence; the
+accountable Manager decides whether those facts change current scope. The
+Manager need not become another code reviewer.
 
 Independent review and validation are Worker roles with an independence
 requirement, not separate classes. A Worker is never the sole validator of its

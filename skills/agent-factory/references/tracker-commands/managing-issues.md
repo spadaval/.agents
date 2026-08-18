@@ -39,3 +39,7 @@ the record's meaning and required content.
   `gh api` for ordinary issue operations supported by `gh issue`.
 - Treat Projects and custom fields as repository-selected enhancements, not as
   prerequisites for using GitHub Issues.
+- Put review findings and the Manager's disposition in comments on the
+  accountable issue. For an actionable deferred finding, create a normal bug
+  or enhancement, link it from the comment, and add a blocking relationship
+  only when the Manager explicitly says it blocks current work.

@@ -35,15 +35,24 @@ For each behavior change:
 4. Re-run the focused proof and inspect the complete result.
 5. Refactor or remove residue while keeping the proof green.
 
+Every new moving part must support a current claim or constraint. Do not add
+generality, fallback paths, configuration, or safeguards only for possible
+future work.
+
 If a failing pre-change observation is impractical for generated output,
 configuration, exploratory work, or a migration boundary, name the reason and
 use the cheapest proof that could still falsify the claim. Do not use the
 exception to justify implementing with no oracle.
 
-When review feedback arrives, read it completely, restate or clarify the
-technical requirement, verify it against repository reality, and accept or
-challenge it with evidence. Apply accepted findings one at a time and re-run the
-relevant focused proof; do not implement feedback through performative agreement.
+When review feedback arrives, read it completely and verify it against
+repository reality. The Manager assigns each finding a disposition under
+[Finding Disposition](../references/finding-disposition.md). Fix only `FIX NOW`
+findings. Challenge a disposition with evidence when needed, but do not expand
+scope or silently defer a finding yourself. Apply fixes one at a time and rerun
+the relevant focused proof.
+
+When challenging technical evidence, name the concrete code fact and proof.
+Do not argue from schedule, confidence, or severity.
 
 ## Completion
 
