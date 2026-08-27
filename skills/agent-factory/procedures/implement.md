@@ -15,6 +15,8 @@ breaking migration.
   strategy, relationship, learning question, prior-candidate visibility, and
   expected disposition before editing. Do not assume working code will be
   integrated.
+- For non-trivial production code, load [Good Code](../references/good-code.md)
+  and confirm the assigned design constraints before editing.
 - Load [Workspace Lifecycle](../references/workspace-lifecycle.md) before
   mutating work. Establish isolation and classify the focused baseline before
   attributing later failures to the change.
@@ -33,11 +35,13 @@ For each behavior change:
    crashes earlier, or exercises the wrong path is not a useful red state.
 3. Make the smallest coherent change that satisfies the assigned outcome.
 4. Re-run the focused proof and inspect the complete result.
-5. Refactor or remove residue while keeping the proof green.
+5. Reassess ownership, boundaries, simplicity, and residue; improve the design
+   while keeping the proof green.
 
-Every new moving part must support a current claim or constraint. Do not add
-generality, fallback paths, configuration, or safeguards only for possible
-future work.
+Every new moving part must support a current claim or constraint. The smallest
+coherent change is the smallest change coherent with the target design, not the
+smallest diff. Do not add generality, fallback paths, configuration, or
+safeguards only for possible future work.
 
 If a failing pre-change observation is impractical for generated output,
 configuration, exploratory work, or a migration boundary, name the reason and
@@ -70,6 +74,6 @@ support the intended claim.
 Report changed files, proof or evidence IDs, commands run, skipped checks with
 reason, tracker status, dirty state, branch/commit, blockers, and exact
 follow-up recommendation. For an implementation candidate, report observed
-behavior, construction concerns, discoveries, failed assumptions, reusable
+behavior, design concerns, discoveries, failed assumptions, reusable
 tests or fixtures, and a recommended disposition separately. The orchestrating
 Manager decides the disposition.

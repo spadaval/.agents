@@ -1,124 +1,71 @@
 # Submodel Selection
 
-Use this reference to allocate model capability and run quantity for delegated
-Agent Factory work. Optimize for the total expected cost and elapsed time of
-reaching a trustworthy result, not the quality of one run in isolation.
+Choose the least expensive model that makes the whole workflow likely to
+succeed. Account for attempts, verification, elapsed time, and the consequence
+of accepting a mistake—not just the quality of one run.
 
-## Capability Source
+## Tiers
 
-Treat the runtime model catalog as authoritative. Select only models and
-reasoning efforts that the current environment exposes. Every delegation must
-set both values explicitly; never rely on inheritance or defaults. If the
-delegation surface cannot set both values, keep the work local unless a human
-explicitly directs an exception. Record any such exception rather than
-inventing a selection.
+Map the runtime's available models to three tiers:
 
-Map the exposed models to three tiers:
-
-| Tier | Use when |
+| Tier | Default use |
 | --- | --- |
-| Cheapest | Residual ambiguity, complexity, and risk are low; the task is bounded and its output is cheap to verify. Raise effort only for a real multi-step dependency inside that bounded task. |
-| Mid | One or more dimensions are moderate, or initially high dimensions have been contained through decomposition, concrete acceptance criteria, reversibility, tests, or independent review. Raise effort for difficult but still bounded reasoning. |
-| Strongest | Residual ambiguity is high, complexity is irreducible, risk remains materially uncontained, or several dimensions are high at once. Reserve the maximum effort for the hardest long-chain reasoning or primary orchestration of a genuinely complex multi-agent workstream. |
+| Cheap | Drafts, experiments, reconnaissance, mechanical changes, and other cheaply verified outputs |
+| Balanced | Integration-ready implementation, review, and synthesis |
+| Strong | Consequential decisions, difficult synthesis or orchestration, and results that are costly to verify or reverse |
 
-The strongest tier is not a substitute for a bounded, single-role assignment.
+Set both model and reasoning effort explicitly. Use only combinations exposed
+by the runtime; if none can be set, keep the work local unless a human directs
+an exception.
 
-Domain labels do not select the tier by themselves. A bounded persistence,
-security, migration, or public-contract change can use the mid tier when the
-decision is already resolved and strong proof contains the risk. Conversely, a
-small diff can require the strongest tier when its meaning is ambiguous and
-subtle errors lack a cheap detection oracle.
+## Routing
 
-Price per token understates the cost of a tier. Weaker models routinely need
-more turns to finish multi-step work, and elapsed time and context cost scale
-with turns. When in doubt, treat the mid tier as the floor for review and for
-implementation from prose descriptions; the cheapest tier fits
-transcription-like assignments, where the exact content to produce is already
-in the prompt, and single-file mechanical changes.
+Use cheap models freely for disposable work. A cheap agent may explore an
+important or difficult problem when its output is contained, may be discarded,
+and will be checked before it carries authority. Prefer cheap attempts for
+reconnaissance, hypotheses, spikes, draft implementations, mechanical edits,
+test generation, and parallel experiments with a reliable verifier.
 
-## Decision Space
+Use balanced models when an agent must produce an integration-ready change,
+interpret meaningful requirements, review semantic correctness, or combine
+evidence into a reliable recommendation.
 
-Assess three dimensions before selecting a model:
+Use strong models when capability materially protects the outcome: the result
+carries consequential decision authority, reasoning is tightly coupled,
+subtle mistakes lack a reliable verifier, or a mistake would be costly to
+reverse.
 
-1. **Ambiguity:** How uncertain are the problem, constraints, evidence, or
-   correct approach?
-2. **Complexity:** How much interconnected reasoning must remain coherent, and
-   how much of it is genuinely indivisible?
-3. **Risk:** What is the impact of a plausible mistake, and how likely is that
-   mistake to escape detection?
+Verification can justify a cheaper attempt. Tests, narrow scope, reversibility,
+independent review, and observable acceptance claims reduce the cost of being
+wrong. Domain labels such as security, persistence, migration, or public API do
+not by themselves prohibit a cheap exploratory run.
 
-First assess the raw task, then reduce each dimension where possible:
+A cheap candidate is not automatically a trusted result. Apply review and
+proof proportional to the consequence of accepting it. Important work may
+begin with cheap exploration while a balanced or strong agent owns integration,
+validation, or the final decision.
 
-- Reduce ambiguity with reconnaissance, competing hypotheses, prototypes, or
-  targeted experiments.
-- Reduce complexity with clean decomposition, explicit ownership, stable
-  interfaces, and staged integration.
-- Reduce risk with reversibility, deterministic tests, bounded blast radius,
-  independent review, and observable acceptance claims.
+## Portfolios And Escalation
 
-Select the tier from the **residual ambiguity, irreducible complexity, and
-uncontained risk**. As any residual dimension increases, move toward more
-capable models; when several are high, prefer the strongest tier. Do not use a
-larger model to compensate for missing scope, context, acceptance criteria, or
-proof design.
+Prefer several cheap attempts when approaches can be explored independently
+and compared cheaply. Prefer a stronger run when synthesis requires one
+coherent reasoning chain or verification would cost more than stronger
+generation. A common portfolio is cheap exploration, automated rejection,
+balanced integration or review, and strong synthesis only if consequential
+uncertainty remains. Skip stages that add no confidence.
 
-## Quantity Versus Capability
+Start cheap when attempts and verification are cheap. Escalate after failed
+attempts, inconclusive verification, inability to maintain the required
+reasoning, or evidence that synthesis—not generation—is the hard part. Do not
+escalate merely because the assignment is called implementation or review.
 
-Model runs are a portfolio. As a planning heuristic, roughly two mid-tier runs
-can often be purchased for one strongest-tier run, and many more cheapest-tier
-runs can fit in the same budget. Use that exchange rate when breadth or
-independence has higher expected value than deeper reasoning in a single run.
+## Assignment
 
-Prefer multiple smaller runs when:
+Start subagents with fresh context. Fork only when essential context cannot be
+summarized safely. Give each agent a bounded, self-contained, role-specific
+prompt with its scope, authority, evidence, expected output, proof, and
+completion condition.
 
-- the work decomposes cleanly or several hypotheses can be explored in
-  parallel;
-- experiments are cheap, reversible, and informative;
-- outputs can be compared with an objective or inexpensive verifier;
-- independent attempts reduce correlated mistakes; or
-- discovery breadth matters more than maintaining one long reasoning chain.
-
-Prefer a stronger single run when:
-
-- the problem is tightly coupled and decomposition would discard essential
-  context;
-- the difficult part is synthesis rather than generation;
-- subtle errors cannot be recognized cheaply;
-- coordination cost approaches the cost of doing the work; or
-- a plausible mistake remains both high-impact and hard to reverse.
-
-Do not assume that independent review automatically requires the strongest
-tier. Two independent mid-tier runs can be stronger than one strongest-tier run
-when evidence is objective. A useful portfolio for uncertain work is many
-cheapest- or mid-tier explorations, mid-tier convergence and implementation,
-then strongest-tier synthesis or validation only if residual difficulty still
-warrants it.
-
-## Escalation
-
-Start with the smallest credible portfolio when iteration and verification are
-cheap. Escalate capability when experiments fail to reduce ambiguity, bounded
-agents cannot maintain the required reasoning, review repeatedly exposes
-semantic defects, or the remaining risk lacks a reliable verifier. Escalate
-quantity when the next useful step is broader search, independent replication,
-or competing experiments.
-
-## Assignment Record
-
-Record the explicitly selected model, reasoning effort, routing rationale, and
-any runtime fallback in the delegated assignment. State the residual ambiguity,
-complexity, and risk that justify the choice, plus why one stronger run or
-several smaller runs is the better portfolio. If the preferred combination is
-unavailable, choose the nearest portfolio that can still produce trustworthy
-proof and state the constraint.
-
-The assignment prompt must be self-contained and role-specific. State the
-repository and workspace, assigned subskill, scope and ownership, evidence
-sources, required output and proof, prohibitions, independence requirements,
-and completion condition. Do not use inherited conversation context to repair
-an underspecified prompt.
-
-Start subagents with fresh context. `fork_context` (or `fork_turns`) should
-almost never be enabled: it increases context cost, weakens role isolation, and
-can import stale instructions or conclusions. Fork only when essential context
-cannot be summarized safely, and record the concrete reason before spawning.
+Record the model, effort, why it is sufficient, whether the result is
+disposable or authoritative, and how it will be checked. If the preferred
+combination is unavailable, record the fallback.

@@ -42,11 +42,12 @@ commits. Work is not complete until the next agent can continue safely.
 
 ### Execution And Proof
 
-Demonstrated user value comes before assurance completeness. Preserve the
-current outcome and constraints, then choose the solution with the least total
-system complexity. Security, resilience, and other quality work enter the
+Demonstrated user value comes before assurance completeness, but working code
+is not necessarily fit to integrate. Preserve the current outcome and
+constraints, require sound ownership and boundaries, then choose the solution
+with the least total system complexity. Additional assurance enters the
 critical path only when the current contract or a concrete current hazard
-requires them.
+requires it.
 
 Agent work naturally drifts toward convenient local patterns: shallow fixes,
 stale docs, lost scope, debris, and search paths that go off course. Agent
@@ -64,7 +65,7 @@ how plausible it looks. Failed verification is information to act on.
 Code is also a source of information before it is an asset. A working
 implementation may expose requirements, constraints, failure modes, or better
 boundaries without being the right code to integrate. Passing behavior does not
-establish construction quality. Managers may select, refactor, reimplement,
+establish good design. Managers may select, refactor, reimplement,
 retain, or discard implementation candidates, but preserve the evidence and
 learning they produced.
 

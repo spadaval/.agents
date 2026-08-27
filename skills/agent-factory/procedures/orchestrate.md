@@ -39,9 +39,10 @@ genuine authority boundary, unresolved ambiguity that changes the result,
 a concrete current hazard, or a blocker that cannot be repaired within the
 active strategy.
 
-For every implementation, integration, disposition, and replan choice, preserve
-the current claims and constraints, then prefer fewer moving parts. Defer
-machinery whose only reason is possible future work.
+For non-trivial implementation, load [Good Code](../references/good-code.md).
+Preserve the current claims and constraints, require sound ownership and
+boundaries, then prefer fewer moving parts. Defer machinery whose only reason
+is possible future work.
 
 ## Replanning Loop
 
@@ -122,12 +123,23 @@ candidate has the right construction or should be integrated.
 
 The orchestrator may use direct implementation, an exploratory spike,
 in-place refactoring, reimplementation informed by an earlier candidate,
-parallel implementations, or a hybrid of these. Load [Implementation
+parallel spikes, or a hybrid of these. Load [Implementation
 Portfolios](../references/implementation-portfolios.md) when code is being used
 to reduce uncertainty, when materially different constructions could be
 informative, or when deciding whether a candidate should survive.
 
-After a candidate returns, assess its behavior, construction, and learning
+Use a disposable spike when it can cheaply reduce meaningful uncertainty in a
+complex or unclear implementation. Go direct when the path is understood or a
+spike is unlikely to change the approach. A spike may prioritize learning over
+production design; mark it evidence only by default, contain its side effects,
+and follow it with a fresh implementation when its shape is unsuitable.
+
+When several plausible approaches cannot be compared reliably without code,
+run isolated parallel spikes against the same constraints and proof. Compare
+what they demonstrate, then choose the production approach; do not integrate a
+winning prototype by default.
+
+After a candidate returns, assess its behavior, design, and learning
 separately. Then classify its disposition as integrate, refactor, reimplement,
 retain for comparison or follow-up, discard, or blocked. A green candidate does
 not default to integration. Preserve decision-relevant evidence and learning
@@ -157,6 +169,8 @@ Implementation portfolio: <not-applicable, or
 Owned scope: <files, modules, commands, or workflows>
 Out of scope: <boundaries>
 Governing constraints: <relevant strategy or ADR constraints>
+Design constraints: <owner, boundaries, state authority, prohibited residue,
+  repository conventions, or none>
 Replan trigger: <evidence or changed assumption, when applicable>
 Expected proof: <observable result>
 Evidence destination: <tracker or evidence target>

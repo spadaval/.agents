@@ -6,6 +6,8 @@ working candidate may not be suitable for integration. The orchestrating
 Manager chooses the portfolio; this reference does not prescribe a model or a
 default number of implementations.
 
+Load [Good Code](good-code.md) before selecting a production candidate.
+
 ## Principle
 
 Treat implementation as both production work and an evidence-producing act.
@@ -20,13 +22,19 @@ candidate can succeed at one and fail at another.
 | Exploratory spike | Answer a feasibility, behavior, performance, or integration question; production use is not presumed. |
 | Refactor candidate | Preserve a sound behavioral and structural core while improving construction in place. |
 | Reimplement | Carry forward evidence and discoveries while abandoning an unsuitable construction. |
-| Parallel implementations | Explore materially different approaches or reduce anchoring on one candidate. |
-| Hybrid portfolio | Combine strategies, such as parallel spikes followed by one production candidate. |
+| Parallel spikes | Compare plausible approaches that cannot be resolved without constructing them. |
+| Hybrid portfolio | Combine strategies, such as parallel spikes followed by a fresh production implementation. |
 
 Choose based on the uncertainty being reduced, the expected information value,
 the cost and reversibility of candidates, external side effects, available
 oracles, and whether the current structure is salvageable. Do not manufacture
 alternatives when another candidate would not change the decision.
+
+Spikes optimize for learning and demonstrated behavior, not production design.
+Contain their side effects and treat them as evidence only by default. When a
+spike reveals the right behavior through the wrong shape, preserve its learning
+and assign a fresh production implementation. Cheap models are preferred when
+attempts and verification are cheap.
 
 ## Candidate Contract
 
@@ -34,7 +42,7 @@ For every implementation candidate dispatched under this reference, add these
 fields to its assignment, using `none` where a relationship does not apply:
 
 ```text
-Implementation strategy: <direct | spike | refactor | reimplement | parallel | hybrid>
+Implementation strategy: <direct | spike | refactor | reimplement | parallel-spike | hybrid>
 Candidate relationship: <none | follows candidate or evidence | parallel with candidates>
 Learning question: <what constructing this candidate should establish>
 Prior-candidate visibility: <full | evidence only | none>
@@ -52,8 +60,8 @@ another. Name the boundary; do not claim independence after crossing it.
 Assess each candidate on three axes:
 
 1. **Behavior**: what the candidate demonstrably does.
-2. **Construction**: whether its boundaries, ownership, simplicity,
-   maintainability, safety, and residue fit the target system.
+2. **Design**: whether it meets [Good Code](good-code.md) and fits the target
+   system.
 3. **Learning**: what building it established, falsified, or made newly
    uncertain.
 

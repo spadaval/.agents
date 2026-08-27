@@ -59,6 +59,8 @@ appended to a rule.
 | Premature implementation | The likely code change is already apparent | Establish a failing oracle, observe the intended failure, make the smallest coherent change, and run fresh proof. |
 | Green but wrong construction | A candidate passes its tests but compromises the intended ownership or architecture | Assess behavior and construction separately; refactor, reimplement, or block instead of defaulting to integration. |
 | Prototype leakage | A successful spike is already working and cheap to merge | Preserve its learning, then select its disposition explicitly; do not silently promote evidence-oriented code to production. |
+| Spike-shaped production | A fresh implementation copies the spike's shortcuts and ownership | Carry forward evidence, not accidental structure; assess the production candidate under Good Code. |
+| Duplicate authority | A small tested patch creates a second source of truth | Fail design quality and repair the ownership boundary before integration. |
 | Sunk-cost candidate | Considerable effort went into a compromised implementation | Treat effort as spent learning, preserve the evidence, and choose refactor, reimplementation, or discard on present merit. |
 | Competing candidates | Parallel or sequential implementations disagree | Compare them against governing constraints, classify the divergence, preserve useful learning, and route contract or strategy conflicts to the owning layer. |
 | Closed graph, failed outcome | Every issue is closed but the user scenario fails | Classify the outcome `fail`; preserve evidence; do not close the mission or let the validator repair it. |

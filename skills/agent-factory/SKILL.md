@@ -87,6 +87,7 @@ Load these only when the assignment needs the named cross-cutting guidance:
 | Reference | Load when |
 | --- | --- |
 | [Submodel selection](references/submodel-selection.md) | Required before every delegation to choose and record the model and reasoning effort. |
+| [Good code](references/good-code.md) | Planning, producing, reviewing, or deciding the disposition of non-trivial implementation code. |
 | [Implementation portfolios](references/implementation-portfolios.md) | Using code to reduce uncertainty, running spikes or competing implementations, or deciding whether to integrate, refactor, reimplement, retain, or discard a candidate. |
 | [Strategic plans](references/strategic-plans.md) | Creating, publishing, executing, or materially replanning a substantial mission. |
 | [Finding disposition](references/finding-disposition.md) | Reviewing findings or deciding whether a finding changes current work. |

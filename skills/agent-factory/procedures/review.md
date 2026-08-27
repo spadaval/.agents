@@ -9,6 +9,7 @@ well-built and supported by evidence. It is not scenario validation.
 - Be read-only unless explicitly asked to fix issues.
 - Read changed files plus the relevant tracker item, parent scope, product docs,
   architecture docs, ADRs, code standards, and validation policy.
+- For non-trivial implementation, load [Good Code](../references/good-code.md).
 - Load [Finding Disposition](../references/finding-disposition.md). Report all
   supported findings and recommend a disposition when useful. The Manager
   decides it.
@@ -27,8 +28,9 @@ Use two explicit lenses in order:
 1. **Contract compliance**: compare the diff or artifact with the exact assigned
    outcome, governing constraints, interfaces, non-scope, and required proof.
    Identify omissions, unsupported additions, and misleading completion claims.
-2. **Construction quality**: assess correctness, maintainability, architecture,
-   security, test quality, documentation, and operational risk.
+2. **Design quality**: decide whether the code is fit to integrate under
+   [Good Code](../references/good-code.md), including correctness,
+   maintainability, architecture, test quality, and operational risk.
 
 Report complexity as a defect only when you can name an unnecessary moving part
 and a materially simpler construction that meets the same current claims and
@@ -50,6 +52,9 @@ Use this shape:
 ```text
 Contract Compliance
 - pass | fail | unable to assess - assigned outcome and scope assessment.
+
+Design Quality
+- pass | fail | unable to assess - whether the code is fit to integrate.
 
 Findings
 - R1: file:line - issue, impact, recommendation.

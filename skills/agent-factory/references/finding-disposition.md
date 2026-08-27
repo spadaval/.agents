@@ -31,9 +31,14 @@ Use `FIX NOW` only when evidence proves at least one of these:
 3. **Concrete current hazard:** in the actual target environment, the change
    allows unauthorized access, execution, or writes; exposes real secrets or
    customer data; or can corrupt or irreversibly destroy real state.
+4. **Design-integrity fault:** the change introduces conflicting ownership,
+   duplicate state authority, a broken dependency boundary, uncontained
+   temporary code, or another defect that makes current behavior materially
+   harder to test, change, or diagnose.
 
-A label such as security, correctness, or high severity is not enough by
-itself. Show the current surface and failure.
+A label such as security, maintainability, or high severity is not enough by
+itself. Name the concrete defect, the current boundary or responsibility it
+harms, and its consequence. Style preferences do not qualify.
 
 If a blocking finding cannot be repaired within the active strategy, simplify
 or remove the affected surface, reimplement it, or return to strategy or a
