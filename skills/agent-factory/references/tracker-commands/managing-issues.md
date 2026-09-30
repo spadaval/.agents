@@ -2,7 +2,8 @@
 
 Use this reference to create, classify, relate, update, transition, or close
 missions, epics, issues, and validation work. Agent Factory procedures define
-what the records mean and contain.
+what the records mean, and [Tracker Records](../tracker-records.md) defines
+what they contain.
 
 ## Atelier
 
@@ -30,8 +31,9 @@ what the records mean and contain.
   repository's configured issue types when suitable; otherwise use durable
   labels such as `agent-factory:mission`, `agent-factory:epic`, and
   `agent-factory:validation`.
-- Preserve the procedure's Outcome, scope, non-scope, and dependency content in
-  the issue body. Do not reduce a mission to a title and label.
+- Write bodies using the [Tracker Records](../tracker-records.md) templates.
+  Link to the strategy instead of copying it into the mission. Do not reduce
+  a mission to a title and label either.
 - Use native parent/sub-issue and blocking relationships. Current GitHub CLI
   versions may expose these on `gh issue create` and `gh issue edit`; check live
   help and use the GitHub API when necessary.

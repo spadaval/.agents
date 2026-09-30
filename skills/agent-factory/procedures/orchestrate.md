@@ -10,7 +10,7 @@ current, and closes against demonstrated outcomes.
 Know the outcome you are driving toward and what governs it: the strategic
 plan for a mission, or the issue or user request for smaller work. Check the
 workspace state and a representative baseline before any mutating work (see
-[Workspace Lifecycle](../references/workspace-lifecycle.md)). If a substantial
+[Branches and Worktrees](../references/branches-and-worktrees.md)). If a substantial
 mission has no agreed outcome or strategy, run `plan` first.
 
 Keep going through ready work without asking permission between steps. Stop
@@ -43,8 +43,10 @@ it and what it can pull from the repository. Include:
   been learned so far that the assignee cannot discover alone. Point to large
   artifacts by path or ID instead of pasting them.
 - **Scope:** what it may change, and what it must leave alone.
-- **Workspace:** where to work (branch or worktree). Tell it to preserve
-  changes it did not make, especially when agents run in parallel.
+- **Workspace:** the branch to work on, which you create or choose, and a
+  worktree only if it must write at the same time as another agent.
+  Read-only roles get none. Tell it to preserve changes it did not make and
+  to list anything it creates in its handoff.
 - **Proof expected:** the observable result that would show the goal is met.
 - **Handoff:** anything beyond the standard handoff you need back.
 
@@ -132,8 +134,12 @@ Close against demonstrated outcomes, not issue count:
 1. Run the proof for each acceptance claim fresh, with independent validation
    where the scaling rules call for it.
 2. Confirm all non-trivial code has been independently reviewed.
-3. Confirm no debug residue, temporary breakage, or orphaned paths remain.
+3. Confirm no debug residue, temporary breakage, or orphaned paths remain,
+   and that branches and worktrees created for the work are removed or
+   archived.
 4. Update the docs and tracker items or plan file the work affected.
 
 In the handoff, also report delivered and deferred outcomes, plan changes,
-paused questions, and workspace state.
+paused questions, and workspace state, including every branch and worktree
+created during the work and whether it was removed, archived, or kept (and
+why).

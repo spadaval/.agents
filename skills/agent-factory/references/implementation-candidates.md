@@ -25,7 +25,9 @@ something essential. Judge three things separately:
   production code. Contain its side effects.
 - **Run parallel spikes** when several plausible approaches cannot be compared
   without building them. Give them the same requirements and proof, and keep
-  them isolated from one another.
+  them isolated from one another. Give each a disposable branch, and a
+  worktree only while they run at the same time. Delete both once the
+  learning is recorded.
 - **Reimplement** when a candidate taught you the right behavior through the
   wrong structure. Carry forward its tests and findings, not its code.
 

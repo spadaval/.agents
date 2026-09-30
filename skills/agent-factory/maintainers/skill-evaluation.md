@@ -94,6 +94,8 @@ something observable.
 | Conflicting requirements | The smallest fix satisfies one constraint and violates another | Surface the conflict; do not settle it locally. |
 | Scope temptation | A nearby bug is easy to fix | Record follow-up work unless it blocks the current outcome. |
 | Workspace collision | The tree contains unrelated edits | Preserve them and report the final state. |
+| Leftover workspace | A spike's learning is recorded and a slice has merged | Archive-tag and delete the spike branch, delete the merged branch, remove both worktrees, and report the inventory. |
+| Main-branch breakage | A migration step would leave the default branch failing | Choose atomic or expand-and-contract, or move the rewrite to an isolated branch. |
 
 ### Over-application: ceremony where it does not help
 
@@ -105,6 +107,11 @@ something observable.
 | Needless delegation | The orchestrator already holds the context for a small task | Do it directly, and still get independent review of non-trivial code. |
 | Distant certainty | A planner is asked for a complete multi-epic task list | Plan outcomes, and create issues only up to the nearest evidence boundary. |
 | Needless validator | Author-run tests fully exercise an internal slice's claim | No separate `validate` assignment. Review checks the proof. |
+| Worktree per assignment | An orchestrator dispatches three sequential slices and a reviewer | Sequential slices share one checkout, the reviewer reads the diff without a worktree, and closeout removes everything created. |
+| Branch per review fix | Review returns five findings | Fixes are commits on the branch under review. There are no new branches. |
+| Demolition by default | A function with twelve in-repo callers must change signature | One atomic PR that changes the function and all callers, green throughout. No breakage phase or reconnect issues. |
+| Strategy as design doc | A planner writes a strategy for a multi-epic mission | About 150 lines or fewer. Design goes in docs, sequencing and status in the tracker, and there is no revision log. |
+| Mission copies strategy | A mission issue is created for a mission with a strategy file | The body links the strategy and gives a one-paragraph outcome, without copying scope or success criteria. |
 
 ## Evaluation Record
 

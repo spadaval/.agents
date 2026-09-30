@@ -30,7 +30,7 @@ Classify each claim:
 
 For each `fail`, state the likely cause using the
 [shared vocabulary](../references/tracker-commands/evidence-tracking.md#shared-vocabulary):
-`defect in this change`, `expected migration breakage`, `environment/tooling`,
+`defect in this change`, `expected breakage`, `environment/tooling`,
 or `pre-existing`. Include reproduction steps and expected versus actual results.
 Findings go to the accountable agent, who decides what happens next using
 [Finding Disposition](../references/finding-disposition.md).

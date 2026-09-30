@@ -7,10 +7,10 @@ strategic revisions.
 
 ## Layers
 
-- **Strategy** is the governing intent: outcome, target system shape,
-  boundaries, tradeoffs, and what counts as done. For a substantial mission,
-  write it down (see [Strategic Plans](../references/strategic-plans.md)).
-  For smaller work, the issue or PR description can serve.
+- **Strategy** is the governing intent: why, outcome, success criteria,
+  shape, scope, and authority. For a substantial mission, write it as a short
+  file (see [Strategic Plans](../references/strategic-plans.md)). For smaller
+  work, the mission issue or PR description can serve.
 - **Epics** are outcome-bearing increments that make the whole mission
   visible. A good epic is also a natural unit for one branch, one review
   batch, and, where needed, one validation pass.
@@ -19,7 +19,10 @@ strategic revisions.
 - **Validation issues**, when the tracker is used, hold an independent
   `validate` assignment for an epic or mission outcome.
 
-Do not keep a second, central implementation-plan document alongside the
+Each record has one job; see [Tracker Records](../references/tracker-records.md)
+for what goes in each. Detailed design goes in architecture docs or design
+docs linked from epics, not in the strategy. Do not keep a separate
+implementation-plan document, work briefs, or status tables alongside the
 tracker.
 
 ## Initial Planning
@@ -44,16 +47,10 @@ execution.
 
 ## Ready Issues
 
-An issue is ready when a worker without your context could execute it. It
-states:
-
-- the outcome and why it matters;
-- scope and non-scope;
-- the actual target environment and exposure, which decide whether a later
-  finding is a current hazard;
-- known interfaces, files, or modules;
-- dependencies;
-- the proof that will show it is done.
+An issue is ready when a worker without your context could execute it. Use
+the [issue template](../references/tracker-records.md#issue): the goal and why
+it matters, how you will know it is done, scope, context (including the target
+environment when it affects risk), and dependencies.
 
 Avoid placeholders such as "TBD", "handle edge cases", or "similar to #12".
 If you cannot state something concretely, you have found an evidence
@@ -76,8 +73,10 @@ tradeoff must change:
    authority, write the revision as a proposal and stop.
 2. Explain why replanning within the current strategy is not enough.
 3. Resolve the choice, using `decide` if the options are contested.
-4. Update the strategy with what changed, why, and on whose authority. Update
-   or supersede any affected ADR.
+4. Edit the strategy in place and record what changed, why, and on whose
+   authority, as described in
+   [Strategic Plans](../references/strategic-plans.md#changing-it). Supersede
+   any affected ADR.
 5. Reconcile the tracker. Mark each affected item as still valid, needing
    revision, or obsolete. Preserve completed work and its evidence.
 

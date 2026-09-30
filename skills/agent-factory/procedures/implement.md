@@ -11,7 +11,7 @@ Use this subskill to build one bounded slice and prove it works.
   where the responsibility and state should live before you write it.
 - Check the workspace and run a focused baseline so later failures are not
   wrongly blamed on your change (see
-  [Workspace Lifecycle](../references/workspace-lifecycle.md)).
+  [Branches and Worktrees](../references/branches-and-worktrees.md)).
 - If you were assigned an implementation candidate, read its purpose,
   question, and visibility (see
   [Implementation Candidates](../references/implementation-candidates.md)).
@@ -68,6 +68,7 @@ review too.
 
 ## Handoff
 
-Also report the branch or commit. For
+Also report the branch or commit, and any branch or worktree you created and
+its cleanup state. For
 an implementation candidate, report observed behavior, design concerns, and
 what you learned separately, with a recommended disposition.

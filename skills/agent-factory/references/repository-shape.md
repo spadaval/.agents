@@ -37,7 +37,7 @@ records only what a capable agent could not work out alone:
 - the tracker and its location;
 - how missions, epics, validation, and evidence are represented if the tracker
   does not model them directly;
-- links to review, validation, and workflow policy;
+- links to review, validation, workflow, and branch policy;
 - unusual setup, permission, or recovery constraints.
 
 Keep tracker configuration with its owner. For example, GitHub templates and

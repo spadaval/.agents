@@ -17,8 +17,10 @@ links to transcripts or artifacts. Cite the receipt's ID or URL.
 Use these terms verbatim so evidence stays searchable across trackers:
 
 - Claim results: `pass`, `fail`, `blocked`, `not-applicable`.
-- Cause of a failure: `defect in this change`, `expected migration breakage`,
-  `environment/tooling`, `pre-existing`.
+- Cause of a failure: `defect in this change`, `expected breakage`,
+  `environment/tooling`, `pre-existing`. `expected breakage` applies only on
+  an isolated rewrite branch declared in the plan, never on the default
+  branch.
 - Finding dispositions: `FIX NOW`, `DEFER`, `NO ACTION`.
 
 ## Atelier

@@ -36,8 +36,9 @@ one of the following:
 1. **Contract failure:** the change misses a current requirement, violates a
    constraint or non-scope boundary, or relies on proof that does not show
    what it claims.
-2. **Regression:** the change breaks something that worked, and the strategy
-   does not authorize the breakage.
+2. **Regression:** the change breaks something that worked. Breakage is
+   acceptable only on an isolated rewrite branch declared in the plan (see
+   `migrate`), never on the default branch.
 3. **Current hazard:** in the actual target environment, the change allows
    unauthorized access or writes, exposes secrets or user data, or can
    corrupt or destroy real state. "Only admins can reach it" and "the release

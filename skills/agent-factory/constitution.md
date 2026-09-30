@@ -59,11 +59,12 @@ review, and fresh verification, not with more paperwork.
 
 ### Process is a moving part
 
-Every checkpoint, artifact, handoff, and template costs attention, time, and
-context, just as every component and configuration option in code carries
-ongoing cost. Ceremony scales with stakes, irreversibility, duration, and the
-number of agents involved. A one-file fix and a multi-week migration do not
-deserve the same process.
+Every checkpoint, artifact, handoff, template, branch, and worktree costs
+attention, time, and context, just as every component and configuration option
+in code carries ongoing cost. The agent accountable for the work removes them
+once they have served their purpose. Ceremony scales with stakes,
+irreversibility, duration, and the number of agents involved. A one-file fix
+and a multi-week migration do not deserve the same process.
 
 When a rule's purpose is already served, or cannot be served in the situation
 at hand, skip it and say so. Do not skip a rule because it is inconvenient.
@@ -93,6 +94,11 @@ machinery whose only justification is a possible future. Do not preserve
 obsolete paths, shims, or compatibility layers unless compatibility is the
 explicit deliverable.
 
+Change keeps the main line working. Breaking changes land atomically where
+possible. Where they cannot, the old path survives only temporarily, with a
+removal trigger and an owner. Deliberately broken states stay on isolated
+branches.
+
 ### Code is information
 
 An implementation can reveal hidden requirements, failure modes, or better
@@ -120,6 +126,10 @@ tests, and tracker state. The amount of durable state should match how likely
 the work is to be resumed or handed off. A single-session change needs a clear
 commit and PR description; a multi-week mission needs a written strategy and a
 tracked plan.
+
+Each fact has one home. Intent lives in the strategy, design in docs and
+decision records, and status and sequencing in the tracker. Link to the home
+instead of copying; copies drift until no one can tell which one is true.
 
 ### Push and pull context
 

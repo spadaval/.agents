@@ -30,6 +30,11 @@ reason from the Constitution.
   component, abstraction, option, or fallback must serve a current need. Remove
   temporary code, obsolete paths, and shims unless compatibility is the
   explicit goal.
+- **Keep the default branch working and the repository tidy.** Land breaking
+  changes without breaking the default branch (see `migrate`). Create as few
+  branches and worktrees as the work needs, and remove the ones created for
+  your work once it is merged or recorded (see
+  [Branches and Worktrees](references/branches-and-worktrees.md)).
 - **Keep state where the next agent can find it.** How much you write down
   should depend on how likely the work is to be resumed or handed off (see
   [Scaling](#scaling-the-process)).
@@ -141,7 +146,7 @@ apply.
 | `diagnose` | Finding the cause of a bug, failing check, regression, or unexplained behavior | [diagnose.md](procedures/diagnose.md) |
 | `review` | Independent review of code or other changes someone else produced | [review.md](procedures/review.md) |
 | `validate` | Independently checking scenarios or acceptance claims | [validate.md](procedures/validate.md) |
-| `migrate` | Removing interfaces, intentional temporary breakage, and migration closeout | [migrate.md](procedures/migrate.md) |
+| `migrate` | Breaking changes: choosing atomic, expand-and-contract, or rewrite, and removing the old path | [migrate.md](procedures/migrate.md) |
 | `docs` | Work where documentation accuracy is the main deliverable | [docs.md](procedures/docs.md) |
 | `audit` | Evidence-backed findings about architecture or process, without fixing them | [audit.md](procedures/audit.md) |
 | `readiness` | Assessing whether a repository is easy for agents to work in | [readiness.md](procedures/readiness.md) |
@@ -160,9 +165,10 @@ Load these only when the work needs them.
 | [Good code](references/good-code.md) | Planning, writing, or reviewing non-trivial code |
 | [Finding disposition](references/finding-disposition.md) | Deciding what to do about review or validation findings |
 | [Implementation candidates](references/implementation-candidates.md) | Running spikes or competing implementations, or deciding whether working code should be kept |
-| [Strategic plans](references/strategic-plans.md) | Writing or revising a mission strategy |
+| [Strategic plans](references/strategic-plans.md) | Writing or changing a mission strategy |
 | [Submodel selection](references/submodel-selection.md) | Choosing models and reasoning effort for subagents |
-| [Workspace lifecycle](references/workspace-lifecycle.md) | Starting, isolating, integrating, or closing out mutating work |
+| [Branches and worktrees](references/branches-and-worktrees.md) | Deciding where to work, creating or cleaning up branches and worktrees, integrating |
+| [Tracker records](references/tracker-records.md) | Writing missions, epics, issues, validation items, or tracker comments |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory or assessing repository readiness |
 | Tracker commands: [navigating](references/tracker-commands/navigating-work.md), [managing issues](references/tracker-commands/managing-issues.md), [evidence](references/tracker-commands/evidence-tracking.md), [integrating](references/tracker-commands/integrating-changes.md), [admin](references/tracker-commands/administration-and-recovery.md) | Operating the repository's tracker (Atelier or GitHub Issues) |
 

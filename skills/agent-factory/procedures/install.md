@@ -18,9 +18,19 @@ link to:
 - where product intent, domain vocabulary, architecture, decisions, and code
   standards live;
 - how to build and run the checks;
+- where strategy files live, if the repository keeps them in a particular
+  place;
+- branch naming, the default and integration branches, and where worktrees
+  go, when these differ from
+  [Branches and Worktrees](../references/branches-and-worktrees.md);
 - anything unusual an agent must know first, such as setup steps,
   permissions, generated state that should be rebuilt rather than edited, or
   review and merge policy.
+
+Do not copy record templates into `AGENTS.md`. Agent Factory's
+[Tracker Records](../references/tracker-records.md) define issue contents.
+Record only where the repository deliberately differs, or point to the
+repository's own issue templates.
 
 Keep `AGENTS.md` short. It is a map and a list of repository-specific
 constraints, not a command cookbook. Prefer linking existing docs over
