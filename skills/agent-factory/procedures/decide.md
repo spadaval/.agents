@@ -1,43 +1,45 @@
 # Decide
 
-Use this subskill for a consequential product, architecture, or strategy choice
-with multiple plausible paths. Do not use the full workflow for routine,
-reversible implementation decisions.
+Use this subskill for a consequential product, architecture, or strategy
+choice with more than one credible path, especially one that is costly to
+reverse. Routine, reversible implementation choices belong to whoever is doing
+the work.
 
 ## Method
 
-Prefer evidence over confidence, expose bad framing, and preserve material
-dissent. Use separate roles when independence improves the result:
+1. **Frame it.** State the decision, what is at stake, the hard constraints,
+   the unknowns, and how reversible each outcome is. Bad framing is the most
+   common cause of bad decisions, so check it first.
+2. **Gather evidence.** Read the relevant code, docs, and ADRs. Consult
+   external sources and user constraints where they matter. Prefer evidence
+   over confident assertion.
+3. **Lay out options.** Give two or three credible options. For each, state
+   its assumptions, benefits, costs, risks, and how many moving parts it adds
+   to the system.
+4. **Recommend.** Choose the simplest option that satisfies every hard
+   constraint. State what is being traded away and what uncertainty remains.
 
-1. Frame the choice, stakes, constraints, unknowns, and reversibility.
-2. Research code, docs, ADRs, external sources, and user constraints.
-3. Propose credible options with assumptions, benefits, costs, and risks.
-4. Assign isolated Advocates and Critics for serious options.
-5. Assign an independent Judge to recommend a choice and retain uncertainty.
+For high-stakes or contested choices, get independent perspectives. Have
+separate agents argue for the strongest options and against them, and have
+another agent judge. No agent should both advocate and judge the same option.
+If subagents are unavailable, do the passes separately and say that
+independence was limited. Skip this for decisions where it would not change
+your confidence.
 
-Do not let one subagent both advocate and judge an option. If subagents are
-unavailable, use visibly separated passes and disclose the loss of independent
-review.
+## Authority and Recording
 
-Scale the roles to the decision. Skip roles that add ceremony without changing
-confidence. Use the delegation template in [Orchestrate](orchestrate.md) and
-load [Submodel Selection](../references/submodel-selection.md) before spawning.
+If the decision changes strategy, it needs the authority described in the
+[Constitution](../constitution.md#strategy-changes-deliberately). Without it,
+return a recommendation, not a decision.
 
-## Authority
+Record the decision where its rationale will be needed:
 
-When the active strategy's recorded adaptation authority permits the decision,
-or a human explicitly directs it, the primary agent may hand the decision to
-`plan` for publication under the [Constitution](../constitution.md). Otherwise,
-return a non-canonical proposal and stop before changing strategy or dependent
-work.
+- mission-scoped decisions go in the strategic plan or issue;
+- decisions that outlast the mission go in the owning product or architecture
+  doc, plus an ADR when the rationale would otherwise be lost or re-argued.
 
-Record mission-local decisions in the strategic plan. Record decisions that
-outlive the mission in the owning product or architecture document and, when
-the rationale matters, an ADR. Leave reversible implementation choices to the
-tracker or Worker.
+## Handoff
 
-## Output
-
-Report the framing, options, evidence, strongest arguments, recommendation,
-dissent, decision authority, and correct durable destination. Do not implement
-the choice.
+Also report the framing, options considered and why they were rejected, the
+strongest dissent, the authority for the decision, and where it is recorded.
+Do not implement the choice as part of this subskill.

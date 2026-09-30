@@ -1,29 +1,30 @@
 # Readiness
 
-Use this subskill to assess whether a repository is legible and operable by
-agents. It evaluates the agent operating environment, not product code quality.
+Use this subskill to assess how easily agents can work in a repository. It
+looks at the environment agents operate in, such as docs, instructions,
+tracker, checks, and build, not at product code quality.
 
-Load [Repository Shape](../references/repository-shape.md) as the portable
-readiness baseline, then apply the repository's own instructions and product
-surfaces.
+## Approach
 
-## Scope
+Apply the readiness test in
+[Repository Shape](../references/repository-shape.md#readiness-test): can a
+fresh agent answer its questions from the repository's entry points and the
+sources they link to? Then try the basics a new agent would need: find the
+instructions, build, run the checks, and locate current work.
 
-Apply the Readiness Test in
-[Repository Shape](../references/repository-shape.md): can a fresh agent answer
-its eight questions from the entry map and linked sources?
-
-Do not treat hidden diagnostics, local-state repair, or maintenance commands as
-normal readiness paths.
+Judge by whether the answers exist and can be found, not by whether particular
+files exist. A clear README can satisfy what a larger repository splits across
+several docs.
 
 ## Report
 
 Report conversationally:
 
-1. Overall readiness judgment.
-2. Strengths with evidence.
-3. Gaps with concrete evidence.
-4. Recommended fixes and the subskill that should own each.
+1. An overall judgment.
+2. Strengths, with evidence.
+3. Gaps, with evidence and why each matters to an agent.
+4. Recommended fixes, ordered by value, and the subskill that should handle
+   each.
 
-If the user asks to record findings, create or update tracker items instead of
-checking in a private report.
+If the user wants the findings recorded, put them in the tracker, or in a
+plan file if there is no tracker.

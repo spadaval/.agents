@@ -1,94 +1,79 @@
 # Strategic Plans
 
-Use a strategic plan for a long-running, multi-epic, cross-system, or
-tradeoff-heavy mission. A compact mission body may serve the same purpose for
-small work; it must still state the outcome, target shape, boundaries, and
-proof expectations. It omits the ceremony, not the governing content.
+Use a written strategic plan for a mission that is long-running, spans
+several epics or systems, or involves contested tradeoffs. For smaller work,
+the mission or epic description can do the same job, provided it still states
+the outcome, target shape, boundaries, and how success will be proven.
 
-## Responsibility
+## What It Owns
 
-The strategic plan is the mission's governing contract. It owns the outcome,
-target system, tradeoffs, boundaries, adaptation authority, and assurance. The
-tracker graph is the current implementation hypothesis.
+The strategy is the mission's governing intent. It covers what must be true
+when the mission is done, the shape of the target system, the tradeoffs that
+govern choices, and the boundaries. The tracker holds the current plan for
+getting there: files, assignments, sequencing, and commands.
 
-Keep files, assignments, commands, and temporary sequencing in the tracker. If
-the issue graph could be rebuilt without changing a statement, that statement
-probably belongs in strategy.
+To decide whether a statement belongs in the strategy, ask whether the issue
+graph could be rebuilt without changing it. If it could not, the statement is
+strategy.
 
-## Format
+## Shape
 
-Use one stable repository path and this compact shape:
+Keep it in one stable file in the repository, and include only the sections
+that carry meaning:
 
 ```md
 ---
-strategy: <stable-id>
-mission: <mission-id>
-revision: <integer>
 status: draft | active | completed | superseded
-sources: [<product, architecture, ADR, or plan references>]
+mission: <tracker id>
 ---
 
 # Outcome
+What must be true when this is done, stated observably, including any
+valuable partial outcomes.
+
 # Target System
-# Governing Decisions
+The durable shape: components, ownership, boundaries.
+
+# Decisions and Tradeoffs
+Governing choices, what wins when qualities conflict, and links to ADRs.
+
 # Boundaries
+In scope, out of scope, and the actual environment and exposure targeted.
+
 # Adaptation
-## Must Preserve
-## Managers May Change
-## Return To Strategy When
-# Assurance
-# Revision History
+What must be preserved, what the orchestrator may change freely, and what
+must come back to a human.
+
+# Proof
+Which claims must be demonstrated, and how, before the mission closes.
+
+# Changes
+Dated entries: what changed, why, and on whose authority.
 ```
 
-Use only the sections that add meaning. State observable outcomes, durable
-system shape, priority when qualities conflict, valuable partial outcomes, and
-claims that must be proved. State the actual environment and exposure the
-strategy targets. Do not add machinery justified only by possible future work.
+State the real environment and exposure the mission targets. Do not add
+machinery justified only by possible future work.
 
-## Revisions
+## Changing It
 
-Increment the revision when the outcome, target system, governing tradeoff,
-boundary, assurance gate, or adaptation authority changes. Record what changed,
-why, and which work must be reconsidered. Use version control for exact history;
-do not create snapshot files by default.
+The strategy changes only with the authority described in the
+[Constitution](../constitution.md#strategy-changes-deliberately): a human
+directs the change, or the Adaptation section grants it. Record each change in
+the Changes section. Git keeps the exact history, so do not create snapshot
+files. After a change, reconcile affected tracker work before dispatching
+more.
 
-Only `plan` may publish a semantic revision, and only when the active strategy
-explicitly delegates that class of change or a human explicitly directs it, as
-defined in the [Constitution](../constitution.md). Record the authority and
-rationale in the revision, mark all other drafts as non-canonical, and surface
-the revision before affected execution resumes.
+Summarize and link product docs, architecture docs, and ADRs rather than
+copying them. If the strategy changes an accepted ADR, supersede that ADR
+explicitly.
 
-Assignments name the strategy path and revision they use. After a revision,
-reconcile affected work before dispatching it again.
+## Planning Incrementally
 
-## ADRs And Other Sources
+Plan the whole mission as outcomes, but create executable issues only up to
+the nearest evidence boundary. That is the point beyond which unfinished
+work, validation results, or an open decision could change the route. Keep
+later epics as drafts with a preliminary outcome, constraints, and unknowns.
+Expand each one when evidence justifies it.
 
-Strategy is current and mission-scoped. ADRs preserve the rationale for
-durable decisions; product and architecture docs describe what is currently
-true across missions.
-
-- Summarize and link governing sources instead of copying them.
-- Record a mission-local decision in the plan.
-- Record a decision that outlives the mission in its owning docs and use an ADR
-  when its rationale would otherwise be lost or contested.
-- Do not override an accepted ADR silently. Supersede it as part of the
-  strategic revision.
-
-## Interactive Plans
-
-Use `$generate-html-plan` when visual, interactive deliberation is valuable.
-The app may own the discussion; before execution, `plan` publishes its governing
-content into the repository strategic plan and records the source revision.
-
-## Incremental Planning
-
-Plan the whole mission as outcomes, but expand ordinary issues only to the
-nearest evidence boundary: the point beyond which unfinished work, validation,
-or an unresolved decision could change the route.
-
-Keep distant work as draft outcome-bearing epics with meaningful preliminary
-outcomes, constraints, and unknowns. When evidence justifies the next
-increment, refine its outcome and preservation claims, create immediate work
-and dependencies, choose proof, and make it ready. Expand, revise, defer, or
-supersede work as evidence arrives. Close the mission against demonstrated
-strategic outcomes, not issue count.
+Close the mission against demonstrated outcomes, not the number of issues
+closed.

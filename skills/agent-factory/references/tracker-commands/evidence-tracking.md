@@ -1,47 +1,41 @@
 # Evidence Tracking
 
-Use this reference to record, attach, inspect, or classify durable proof. Agent
-Factory procedures decide what deserves evidence and whether independence is
-required.
+Use this reference to record or inspect proof in the tracker. The procedures
+decide what needs recording. As a rule of thumb, record evidence in the tracker
+when later work or a later agent will rely on it, for example epic or mission
+acceptance, independent validation, migrations, and non-pass results. For
+ordinary slices, proof in the PR or handoff is enough.
 
-## First-Class Evidence
+## Evidence Receipts
 
-First-class evidence is a durable receipt recorded in the tracker itself — an
-`atelier evidence record` or a structured issue comment with claim, action,
-result, and artifact links — not prose inside a status update. When a procedure
-requires first-class evidence, create the receipt and cite its ID or URL.
+An evidence receipt is a durable record in the tracker, not prose buried in a
+status update. It states the claim, what was done to check it, the result, and
+links to transcripts or artifacts. Cite the receipt's ID or URL.
 
-## Failure Classification
+## Shared Vocabulary
 
-Classify every non-pass validation or migration result with exactly one of:
+Use these terms verbatim so evidence stays searchable across trackers:
 
-- in-scope defect
-- expected migration breakage
-- environment/tooling failure
-- pre-existing failure
-- deferred with owner
-- not applicable
-
-Use these terms verbatim so evidence stays searchable across trackers.
+- Claim results: `pass`, `fail`, `blocked`, `not-applicable`.
+- Cause of a failure: `defect in this change`, `expected migration breakage`,
+  `environment/tooling`, `pre-existing`.
+- Finding dispositions: `FIX NOW`, `DEFER`, `NO ACTION`.
 
 ## Atelier
 
 - Use `atelier evidence record` for manual proof or captured command output.
-- Use `atelier evidence show` and `list` to inspect receipts, and `attach` only
-  when reusing an existing receipt on another accountable target.
-- Associate evidence with the mission, epic, or issue it actually supports and
-  record the producer, role, kind, summary, path, or URI when relevant.
-- Consult `atelier help evidence` and focused subcommand help for current fields.
+- Use `atelier evidence show` and `list` to inspect receipts. Use `attach` only
+  when reusing an existing receipt on another item.
+- Attach evidence to the mission, epic, or issue it actually supports, and
+  record the producer, role, kind, summary, and path or URI where relevant.
+- Check `atelier help evidence` for current fields.
 
 ## GitHub Issues
 
-- Record an evidence receipt as a structured comment on the accountable issue
-  with the claim, action, result, and transcript or artifact links. Use
+- Record a receipt as a structured comment on the relevant issue, using
   `gh issue comment <number> --body-file <file>` for non-interactive capture.
-- Use the stable comment URL as the evidence reference. Link Actions runs,
-  check results, commits, pull requests, screenshots, or other durable artifacts
-  rather than pasting large transcripts into the issue body.
-- For independent validation, identify the validator and classify each relevant
-  claim as `pass`, `fail`, `blocked`, `deferred`, or `not-applicable`.
-- Append a correction or superseding receipt instead of silently rewriting
-  evidence on which later work may rely.
+- Use the comment URL as the evidence reference. Link Actions runs, checks,
+  commits, PRs, and screenshots rather than pasting long transcripts.
+- For independent validation, name the validator and give each claim a result.
+- Correct evidence by appending a new receipt. Do not silently edit evidence
+  that later work may rely on.

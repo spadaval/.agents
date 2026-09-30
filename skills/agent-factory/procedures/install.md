@@ -1,34 +1,37 @@
 # Install
 
-Use this subskill to connect Agent Factory to a repository. Installation should
-identify durable sources and tracker entry points; it should not copy a second
-workflow manual into the skill.
+Use this subskill to connect Agent Factory to a repository: identify, or
+create where missing, the durable sources and tracker entry points agents
+need. Installation points agents at existing sources. It does not copy a
+workflow manual into the repository.
 
-Load [Repository Shape](../references/repository-shape.md) before evaluating or
-creating the repository entry map.
+Read [Repository Shape](../references/repository-shape.md) first.
 
-## Scope
+## Approach
 
-Verify or create concise repository instructions that name:
+Make sure the repository's agent instructions (usually `AGENTS.md`) say, or
+link to:
 
-- the tracker and its normal help/status entry points;
-- durable product intent, domain language, architecture docs, ADRs, validation
-  policy, and code standards;
-- which local runtime/cache state is ignored and rebuildable, and which admin
-  repair command owns it;
-- any repository-specific constraints that an agent must know before invoking
-  the tracker.
+- which tracker the repository uses, where it is, and how Agent Factory
+  concepts such as missions, epics, and evidence map onto it when it does not
+  model them natively;
+- where product intent, domain vocabulary, architecture, decisions, and code
+  standards live;
+- how to build and run the checks;
+- anything unusual an agent must know first, such as setup steps,
+  permissions, generated state that should be rebuilt rather than edited, or
+  review and merge policy.
 
-## Rules
+Keep `AGENTS.md` short. It is a map and a list of repository-specific
+constraints, not a command cookbook. Prefer linking existing docs over
+creating new ones. Create a new doc only when the information is needed and
+has no home.
 
-- Keep `AGENTS.md` short. It is a table of contents and repository-specific
-  constraint list, not a command cookbook.
-- Prefer existing equivalent docs over new files.
-- When a missing source matters, create tracker work for the artifact update
-  instead of hiding the gap in private notes.
+When an important source is missing and you cannot create it now, such as a
+product intent nobody has written down, record it as follow-up work rather
+than inventing the content.
 
 ## Handoff
 
-Report the sources found or created, admin setup/repair checks used, remaining
-gaps, follow-up tracker IDs, and the commands or docs an agent should use to
-orient in the repository.
+Also report the sources found or created, gaps remaining, and how a new agent
+should orient in the repository.

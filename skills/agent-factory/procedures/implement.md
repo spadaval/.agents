@@ -1,79 +1,73 @@
 # Implement
 
-Use this subskill for one assigned implementation slice. Do not use it for
-graph planning, independent validation, read-only review, or intentional
-breaking migration.
+Use this subskill to build one bounded slice and prove it works.
 
-## Stance
+## Before Editing
 
-- Read the assigned tracker item and only enough parent, sibling, doc, ADR, and
-  code context to execute the slice safely.
-- Verify the item is unblocked, scoped, and has observable proof expectations.
-  If it is really planning, migration, validation, or review work, stop and
-  route to the correct subskill.
-- When assigned as part of an implementation portfolio, read the candidate's
-  strategy, relationship, learning question, prior-candidate visibility, and
-  expected disposition before editing. Do not assume working code will be
-  integrated.
-- For non-trivial production code, load [Good Code](../references/good-code.md)
-  and confirm the assigned design constraints before editing.
-- Load [Workspace Lifecycle](../references/workspace-lifecycle.md) before
-  mutating work. Establish isolation and classify the focused baseline before
-  attributing later failures to the change.
-- Update mapped docs when changing user-visible behavior, contracts,
-  architecture, ownership, validation policy, or process guidance.
-- Prefer focused tests or transcripts that prove the assigned outcome. Broader
-  suites support proof but do not replace claim-specific evidence.
+- Read the assignment and enough surrounding code, docs, and ADRs to do it
+  safely. Check that the scope and expected proof are clear. If the work is
+  really a diagnosis, migration, or planning problem, say so and route it.
+- For non-trivial code, read [Good Code](../references/good-code.md) and know
+  where the responsibility and state should live before you write it.
+- Check the workspace and run a focused baseline so later failures are not
+  wrongly blamed on your change (see
+  [Workspace Lifecycle](../references/workspace-lifecycle.md)).
+- If you were assigned an implementation candidate, read its purpose,
+  question, and visibility (see
+  [Implementation Candidates](../references/implementation-candidates.md)).
+  Working code is not automatically kept.
 
-## Falsification-First Loop
+## Building and Proving
 
-For each behavior change:
+**Bug fixes:** write a test or reproduction that fails for the reported
+reason, watch it fail, then fix the bug and watch it pass. The failing test
+proves you fixed the real problem and guards against regression.
 
-1. Establish the smallest failing observation before editing: a focused test,
-   reproduction, contract check, snapshot, transcript, or equivalent oracle.
-2. Run it and confirm it fails for the intended reason. A test that passes,
-   crashes earlier, or exercises the wrong path is not a useful red state.
-3. Make the smallest coherent change that satisfies the assigned outcome.
-4. Re-run the focused proof and inspect the complete result.
-5. Reassess ownership, boundaries, simplicity, and residue; improve the design
-   while keeping the proof green.
+**New behavior:** decide up front what observation would show the behavior is
+missing or wrong, and make sure your proof could actually fail. A test you
+have never seen fail may not test anything. Test-first is often the easiest
+way to guarantee this, but the order is your call.
 
-Every new moving part must support a current claim or constraint. The smallest
-coherent change is the smallest change coherent with the target design, not the
-smallest diff. Do not add generality, fallback paths, configuration, or
-safeguards only for possible future work.
+**Declarative, configuration, UI, or docs changes:** use the most direct
+check available, such as a build, typecheck, schema validation, dry run,
+rendering, or screenshot. These still count as code for review purposes when
+they change behavior.
 
-If a failing pre-change observation is impractical for generated output,
-configuration, exploratory work, or a migration boundary, name the reason and
-use the cheapest proof that could still falsify the claim. Do not use the
-exception to justify implementing with no oracle.
+When a failing observation before the change is impractical, name the reason
+and use the cheapest proof that could still show the change is wrong. That is
+not a license to ship with no check at all.
 
-When review feedback arrives, read it completely and verify it against
-repository reality. The Manager assigns each finding a disposition under
-[Finding Disposition](../references/finding-disposition.md). Fix only `FIX NOW`
-findings. Challenge a disposition with evidence when needed, but do not expand
-scope or silently defer a finding yourself. Apply fixes one at a time and rerun
-the relevant focused proof.
+Throughout:
 
-When challenging technical evidence, name the concrete code fact and proof.
-Do not argue from schedule, confidence, or severity.
+- Make the smallest change that is coherent with the target design. That is
+  not the same as the smallest diff.
+- Do not add configuration, abstraction, fallbacks, or safeguards for
+  hypothetical futures.
+- Update docs when you change user-visible behavior, contracts, architecture,
+  or ownership.
+- Remove debug code, scratch files, and anything the change made obsolete.
+- After the final edit, run the focused proof and relevant regression checks
+  fresh, and read the complete output.
 
-## Completion
+## Review
 
-Record proof in the tracker-owned place named by the issue or repository
-validation policy. Use first-class evidence for non-trivial, risky, broad,
-public-contract, process-policy, parent-level, migration, docs/help parity, or
-stale-test claims.
+Non-trivial code goes to an independent reviewer (see
+[Independent Review](../SKILL.md#independent-review)). Under an orchestrator,
+the orchestrator arranges review, so report your review status as
+outstanding. Working alone, spawn a reviewer yourself and give it the diff,
+the requirements, and your proof, but not your rationale. If you cannot, leave
+the change unmerged and say review is outstanding.
 
-Before reporting success, run fresh assignment proof after the final edit and
-read its full output and exit status. Report the actual result when it does not
-support the intended claim.
+When findings arrive, check each one against the code. Fix the `FIX NOW`
+findings one at a time, re-running the relevant proof. Working alone, treat
+every finding the reviewer recommended as `FIX NOW` that way unless a reviewer
+accepts your rebuttal. If you believe a finding is wrong, answer with a code
+fact or a test. Schedule, severity, and confidence are not rebuttals. Do not
+silently drop a finding or expand scope to address it. Non-trivial fixes need
+review too.
 
 ## Handoff
 
-Report changed files, proof or evidence IDs, commands run, skipped checks with
-reason, tracker status, dirty state, branch/commit, blockers, and exact
-follow-up recommendation. For an implementation candidate, report observed
-behavior, design concerns, discoveries, failed assumptions, reusable
-tests or fixtures, and a recommended disposition separately. The orchestrating
-Manager decides the disposition.
+Also report the branch or commit. For
+an implementation candidate, report observed behavior, design concerns, and
+what you learned separately, with a recommended disposition.

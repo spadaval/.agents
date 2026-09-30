@@ -30,10 +30,10 @@ read [adr-format.md](adr-format.md) before writing one.
 When the artifact will guide a substantial Agent Factory mission, use
 `$agent-factory plan` to condense it into a repository-tracked strategic plan
 before execution. Preserve the outcome, target system, governing tradeoffs,
-boundaries, valuable partial outcomes, adaptation guidance, assurance claims,
-and links to owning sources.
+boundaries, valuable partial outcomes, adaptation guidance, proof
+expectations, and links to owning sources.
 
-Exclude issue decomposition, Worker assignments, commands, branches, and
+Exclude issue decomposition, agent assignments, commands, branches, and
 temporary sequencing. Record the artifact identity and revision, link the plan
 from the main mission, and treat the repository plan as execution-time
 authority. The HTML artifact remains the deliberation record; do not create a

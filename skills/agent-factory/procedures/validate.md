@@ -1,51 +1,41 @@
 # Validate
 
-Use this subskill for validation items, assigned scenarios, and terminal claim
-checks, including migration completion. Validation starts from the intended
-behavior, not from the diff.
+Use this subskill to check independently whether a system actually delivers
+the claimed outcome, whether that is an acceptance scenario, an epic outcome,
+a mission's success criteria, or a migration's completion. Validation starts
+from intended behavior, not from the diff.
 
 ## Stance
 
-- Be adversarial about the claim.
-- List the strategic-plan, mission, or issue outcome lines under validation
-  before choosing proof. Mission validation starts from the strategic outcome,
-  not from whether the planned issues were closed.
-- Prefer observable behavior over internal assumptions.
-- Classify each relevant claim as `pass`, `fail`, `blocked`, `deferred`, or
-  `not-applicable`.
-- Capture reproducible proof: command transcript, file content, test result,
-  screenshot, manual step record, artifact path, or evidence ID.
-- Inspect ignored, skipped, or stale tests when test freshness is part of the
-  claim or when passing tests are used as proof.
-- Check docs/help consistency when public commands, workflow policy, or Agent
-  Factory guidance are part of the claim.
-- Do not fix defects unless the tracker item explicitly assigns implementation
-  work.
+- Be skeptical of the claim. Your job is to find out whether it is true, not
+  to confirm it.
+- List the claims you are checking before choosing how to check them. For a
+  mission, start from the strategic outcome, not from which issues closed.
+- Test from the perspective of the user, operator, or client. Prefer
+  observable behavior over internal state.
+- Run everything fresh against the current state, and capture reproducible
+  proof such as commands and output, screenshots, or transcripts.
+- When passing tests are part of the proof, check that they are not skipped,
+  stale, or vacuous.
+- Do not fix what you find unless you were assigned to.
 
-## Proof Choice
+## Results
 
-Use the proof method named by the tracker item. If it leaves the method open,
-choose the smallest proof that genuinely exercises the claim. Use first-class
-evidence for independent validation, parent-level claims, process policy,
-public contracts, migrations, stale-test risk, and non-pass classifications.
+Classify each claim:
 
-For a completion or readiness claim, identify the exact command or observation
-that proves it, run it fresh after the final relevant change, inspect the full
-result and exit status, and attach that evidence to the classification.
+- `pass`: shown with observable proof.
+- `fail`: shown not to hold; give the first concrete failure.
+- `blocked`: could not be checked; say what is missing.
+- `not-applicable`: the claim does not apply in this context; say why.
 
-## Failure Handling
-
-For every non-pass result, name the first concrete failure and classify it
-with the shared [failure classification](../references/tracker-commands/evidence-tracking.md)
-vocabulary. Give the Manager enough evidence to create or identify follow-up
-work instead of silently broadening scope.
-Report the finding to the orchestrating Manager; validation does not decide by
-itself that a repair becomes part of the mission's critical path. The Manager
-uses [Finding Disposition](../references/finding-disposition.md) to decide what
-happens next.
+For each `fail`, state the likely cause using the
+[shared vocabulary](../references/tracker-commands/evidence-tracking.md#shared-vocabulary):
+`defect in this change`, `expected migration breakage`, `environment/tooling`,
+or `pre-existing`. Include reproduction steps and expected versus actual results.
+Findings go to the accountable agent, who decides what happens next using
+[Finding Disposition](../references/finding-disposition.md).
 
 ## Handoff
 
-Report scenario result, line-by-line classifications, evidence IDs or artifacts,
-commands or steps run, ignored-test review, docs/help consistency result,
-failures, follow-up items, and deferred validation.
+Also report each claim with its result and proof, and any claims you could not
+check.

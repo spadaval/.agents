@@ -2,7 +2,7 @@
 
 Use this reference to create, classify, relate, update, transition, or close
 missions, epics, issues, and validation work. Agent Factory procedures define
-the record's meaning and required content.
+what the records mean and contain.
 
 ## Atelier
 
@@ -12,10 +12,11 @@ the record's meaning and required content.
 - Omit the transition name to inspect currently valid transitions and blockers:
   `atelier issue transition <id>`.
 - Use parent fields for hierarchy and typed links for other relationships.
-- Atelier epics begin in `draft`. Refine the outcome and preservation claims,
-  add immediate children and dependencies, select the proof route, then inspect
-  and execute the configured `ready` transition. Draft epics remain planning
-  context and must not be dispatched as ready work.
+- Atelier epics begin in `draft`. Refine the outcome and any existing
+  behavior that must be preserved, add immediate children and dependencies,
+  select the proof route, then inspect and execute the configured `ready`
+  transition. Draft epics are planning context; do not dispatch them as ready
+  work.
 - Use the configured `supersede` transition with a reason when evidence makes
   speculative epic work obsolete; preserve completed work and evidence.
 - For a prepared multi-record graph change, use `atelier bundle preview` before
@@ -39,7 +40,7 @@ the record's meaning and required content.
   `gh api` for ordinary issue operations supported by `gh issue`.
 - Treat Projects and custom fields as repository-selected enhancements, not as
   prerequisites for using GitHub Issues.
-- Put review findings and the Manager's disposition in comments on the
-  accountable issue. For an actionable deferred finding, create a normal bug
-  or enhancement, link it from the comment, and add a blocking relationship
-  only when the Manager explicitly says it blocks current work.
+- Put review findings and their dispositions in comments on the relevant
+  issue or PR. For a deferred finding, create a normal bug or enhancement,
+  link it from the comment, and add a blocking relationship only when the
+  accountable agent explicitly makes it a blocker.

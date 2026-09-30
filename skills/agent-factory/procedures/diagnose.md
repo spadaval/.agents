@@ -1,36 +1,41 @@
 # Diagnose
 
-Use this subskill to establish the cause of a bug, failed check, performance
-regression, integration failure, or unexpected behavior before proposing a fix.
-Diagnosis is read-only except for explicitly authorized instrumentation,
-reproduction fixtures, or disposable experiments.
+Use this subskill when something fails and the cause is not yet understood:
+a bug, failing check, performance regression, integration failure, or
+unexpected behavior. The goal is a verified root cause. A patch that makes the
+symptom disappear is not a diagnosis.
 
 ## Method
 
-1. State the observed behavior, expected behavior, scope, and impact.
-2. Reproduce it consistently or report what evidence is still missing.
-3. Read the complete error, trace, logs, and relevant recent changes.
-4. Trace the failing value or state backward across component boundaries.
-5. Form competing hypotheses and test the cheapest discriminating one first.
-6. Identify the root cause and the smallest regression proof that would fail
-   before a repair and pass after it.
+1. **Pin down the symptom.** State the observed behavior, the expected
+   behavior, and the impact. Read the complete error, trace, and logs, and
+   check recent changes.
+2. **Reproduce it.** Get a consistent failing reproduction, such as a test,
+   script, or command. If you cannot, report what evidence is missing rather
+   than guessing.
+3. **Trace backward.** Follow the bad value or state back across component
+   boundaries. Where a multi-component system hides where things go wrong,
+   instrument the boundaries and record inputs and outputs instead of
+   inferring from the final symptom.
+4. **Test hypotheses.** Keep competing explanations in mind and test the
+   cheapest one that tells them apart first. Change one variable at a time.
+   If several hypotheses fail, step back and question the framing, the
+   reproduction, or your model of the system before trying more.
 
-Instrument boundaries when a multi-component system hides where state changes.
-Record inputs and outputs at each boundary instead of guessing from the final
-symptom. Change one experimental variable at a time. After three unsuccessful
-root-cause hypotheses, stop and question the framing, architecture, or
-reproduction before proposing another patch.
+## Fixing
 
-## Authority
+If the cause is verified, the fix is local, and repair is within your scope,
+you may fix it. Turn the reproduction into a regression test, watch it fail,
+fix the bug, and watch it pass. The fix still needs independent review like
+any other code.
 
-Do not implement the repair. Preserve the failing reproduction and route the
-established cause, repair boundary, and regression proof into a separate
-`implement` assignment. If the original request asked for both diagnosis and
-repair, the orchestrator may continue immediately after this handoff without
-asking for routine permission, but the Worker roles remain separate.
+If the cause points to a design flaw, needs a breaking change, or lies outside
+your scope, stop before changing production code. Hand back the cause, a
+recommended repair boundary, and the regression proof a fix should satisfy.
+
+Remove temporary instrumentation before finishing.
 
 ## Handoff
 
-Report the reproduction, observations, hypotheses tested, root cause, confidence,
-recommended repair boundary, proposed regression proof, artifacts or commands,
-and unresolved uncertainty. Distinguish established facts from inference.
+Also report the reproduction, hypotheses tested and their results, the root
+cause with your confidence, and what is established fact versus inference.

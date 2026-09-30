@@ -1,35 +1,31 @@
 # Migrate
 
-Use this subskill for demolition, reconnect work, planned temporary breakage,
-or migration closeout. Ordinary implementation does not use this subskill.
+Use this subskill when work intentionally removes or replaces an interface,
+path, or data shape. That covers demolition, reconnecting consumers after a
+break, and closing out a migration. Ordinary feature work does not need it.
 
-## Classification
+## Principles
 
-Before editing, classify the assigned work:
+- **Name the breakage.** If something will be temporarily broken, say what,
+  why, who reconnects it, and how you will know it is fixed. Unnamed breakage
+  is just a regression.
+- **Leave no residue.** Search code, tests, fixtures, docs, help text, config,
+  and tracker items for references to the old path. A migration is finished
+  when the old path is gone, not when the new one works.
+- **Do not keep shims** unless compatibility is the explicit deliverable. If
+  a temporary bridge is necessary, give it an owner and a removal condition.
+- **Prefer the repository's own checks** to prove each step.
 
-- **demolition**: removes an obsolete surface or path;
-- **reconnect**: restores downstream behavior after intentional breakage;
-- **terminal validation**: proves a migration is complete;
-- **temporary breakage**: allowed only when named, scoped, owned, and
-  recoverable.
+## Completion
 
-Terminal validation runs as an independent `validate` assignment; the Worker
-that performed the migration never solely proves it complete.
-
-Use repository-owned command and validation surfaces for exact checks. Use
-local-state repair only when diagnostics report degraded derived state or the
-migration explicitly owns repair.
-
-## Rules
-
-- Search for residue in docs, tests, code, help text, skills, and tracker work.
-- Name expected breakage and its reconnect or terminal-validation owner.
-- Attach first-class evidence for migration claims and classify failures with
-  the shared [failure classification](../references/tracker-commands/evidence-tracking.md)
-  vocabulary.
+Before declaring a migration complete, run the residue search and the
+repository checks fresh. Get independent `validate` confirmation when the
+migration changes a public, persisted, or cross-team contract. For
+internal-only migrations, author-run proof plus the normal code review is
+enough.
 
 ## Handoff
 
-Report the classification, removed or reconnected surfaces, residue searches,
-evidence IDs, remaining breakage, owner for each follow-up, and the
-terminal-validation assignment, its owner, or its result.
+Also report what was removed or reconnected, the residue searches run and
+their results, any remaining breakage with its owner, and the completion
+proof.

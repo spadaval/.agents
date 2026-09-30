@@ -1,227 +1,139 @@
 # Orchestrate
 
-Use this subskill to run a mission, epic, or multi-item workstream. The
-orchestrator delegates, integrates, validates, replans, and closes work against
-the active strategy.
+Use this subskill to run a mission, epic, or any workstream with several
+pieces. The orchestrator is accountable for the outcome. It decides what
+happens next, delegates or does the work, integrates results, keeps the plan
+current, and closes against demonstrated outcomes.
 
-## Operating Model
+## Before Starting
 
-Assign one role and one Agent Factory subskill to each subagent. The
-orchestrator may maintain its implementation graph; it does not need a separate
-`plan` assignment for routine expansion or repair.
+Know the outcome you are driving toward and what governs it: the strategic
+plan for a mission, or the issue or user request for smaller work. Check the
+workspace state and a representative baseline before any mutating work (see
+[Workspace Lifecycle](../references/workspace-lifecycle.md)). If a substantial
+mission has no agreed outcome or strategy, run `plan` first.
 
-Roles belong to the two accountability classes defined in the
-[Constitution](../constitution.md): Managers are accountable across tasks;
-Workers are accountable for one bounded assignment and its truthful result.
+Keep going through ready work without asking permission between steps. Stop
+and ask only when you reach a real authority boundary, an ambiguity that would
+change the result, a concrete current hazard, or a blocker you cannot resolve
+within the strategy.
 
-| Class   | Role                         | Responsibility                                                                                     |
-| ------- | ---------------------------- | -------------------------------------------------------------------------------------------------- |
-| Manager | Mission strategist           | Preserves the intended outcome, target system shape, priorities, boundaries, and adaptation rules |
-| Manager | Mission or epic orchestrator | Keeps multi-item work coherent by delegating, integrating, replanning, and closing                 |
-| Manager | Tracker graph manager        | Keeps the implementation plan executable                                                          |
-| Manager | Repository steward           | Preserves durable guidance, architecture health, and the experience of future agents              |
-| Worker  | Diagnostic investigator      | Reproduces unexplained behavior, tests hypotheses, and establishes root cause before repair        |
-| Worker  | Implementation worker        | Changes one owned slice and leaves proof and handoff                                               |
-| Worker  | Breaking migration worker    | Removes interfaces or migrates with temporary breakage; names and owns breakage                    |
-| Worker  | Docs author or refresher     | Produces one bounded documentation outcome and records drift discovered                            |
-| Worker  | Code reviewer                | Challenges a diff for construction defects and unsupported claims                                 |
-| Worker  | Behavior validator           | Proves and classifies behavior from the user, operator, or agent point of view                     |
-| Worker  | Audit or readiness scout     | Returns bounded evidence about structure, process quality, or operability                          |
+## Delegate or Do It Yourself
 
-Establish the mission, strategy path and revision, current graph, worktree
-state, and next coherent increment before dispatching mutating work. Integrate
-results at useful checkpoints and preserve unrelated changes.
+Delegation costs a context handoff and loses detail. Do the work yourself when
+you already hold the context and the task is small. Delegate when:
 
-Load [Workspace Lifecycle](../references/workspace-lifecycle.md) before the first
-mutating increment and at integration or closeout. Continue through ready work
-without asking for routine permission between assignments. Pause only for a
-genuine authority boundary, unresolved ambiguity that changes the result,
-a concrete current hazard, or a blocker that cannot be repaired within the
-active strategy.
+- slices can run in parallel;
+- a task would flood your context with material you will not need again;
+- the work needs a different model or reasoning level; or
+- the work must be independent of you, as review and validation of code you
+  wrote must be.
 
-For non-trivial implementation, load [Good Code](../references/good-code.md).
-Preserve the current claims and constraints, require sound ownership and
-boundaries, then prefer fewer moving parts. Defer machinery whose only reason
-is possible future work.
+Code you write yourself follows the same review rule as any other author's.
 
-## Replanning Loop
+## Assignments
 
-Replan after an integrated increment, material discovery, failed assumption,
-new blocker, or strategic revision:
+A delegated assignment is self-contained. The assignee sees only what you give
+it and what it can pull from the repository. Include:
 
-1. Compare the evidence with the active strategy revision.
-2. Identify demonstrated outcomes and changed assumptions.
-3. Classify the change.
-4. Change only the smallest affected layer.
-5. Reconcile ready, blocked, obsolete, and newly necessary work.
-6. Dispatch the next coherent increment.
+- **Goal and why:** the outcome, the reason it matters, and how it fits the
+  larger work. Assignees make better judgment calls when they know the intent.
+- **Subskill:** exactly one, such as `implement`, `diagnose`, or `review`.
+- **Context:** tracker IDs, relevant docs, ADRs, and constraints, and what has
+  been learned so far that the assignee cannot discover alone. Point to large
+  artifacts by path or ID instead of pasting them.
+- **Scope:** what it may change, and what it must leave alone.
+- **Workspace:** where to work (branch or worktree). Tell it to preserve
+  changes it did not make, especially when agents run in parallel.
+- **Proof expected:** the observable result that would show the goal is met.
+- **Handoff:** anything beyond the standard handoff you need back.
 
-| Class | Action |
+Set the model and reasoning effort when the runtime allows it (see
+[Submodel Selection](../references/submodel-selection.md)). Start subagents
+with fresh context unless essential context cannot be summarized.
+
+For spikes or competing implementations, add the candidate fields from
+[Implementation Candidates](../references/implementation-candidates.md).
+
+## Review and Validation
+
+You arrange review. Every non-trivial code change, including code you wrote
+yourself, gets an independent reviewer before it counts as done (see
+[Independent Review](../SKILL.md#independent-review)). Batch reviews per
+slice, per PR, or per increment, whichever keeps the diff reviewable. You have
+read the author's handoff, so you are not an independent reviewer of its code.
+
+When dispatching a reviewer or validator:
+
+- Give it the diff or scenario, the governing requirements and constraints
+  quoted exactly, and the proof that was run.
+- Do not pass along the author's rationale or self-assessment.
+- Do not pre-judge its work: do not tell it to ignore a class of findings, cap
+  severity, or treat any content as beyond challenge. If two requirements
+  conflict, hand over both and let the reviewer report the conflict.
+
+When findings come back, read them in full and decide each one with
+[Finding Disposition](../references/finding-disposition.md). You decide scope;
+you do not need to redo the review. For findings on code you wrote yourself,
+you are not a neutral judge: fix recommended `FIX NOW` findings or send your
+rebuttal back to a reviewer. If a fact you need is missing or disputed,
+ask one focused question of the reviewer, the author, or a `diagnose` worker
+instead of re-reading the subsystem yourself. Record decisions where the work
+is tracked.
+
+Use an independent `validate` assignment for mission acceptance, for epics
+that change a user-facing or cross-boundary outcome, and for scenarios where
+deciding what to check needs an independent eye. Otherwise, author-run proof
+is sufficient evidence of behavior.
+
+## Integrating Results
+
+Treat a returned implementation as a candidate until you have checked it.
+Passing tests show behavior, not construction quality. Before integrating,
+confirm the proof is fresh and exercises the claim and that the change fits
+the strategy. Unreviewed code may be integrated into a working or mission
+branch while its review is pending, but it does not reach the default or
+protected branch until review is done. When a candidate works but is
+built wrong, decide whether to refactor, reimplement, or discard it using
+[Implementation Candidates](../references/implementation-candidates.md).
+
+## Keeping the Plan Current
+
+The plan, whether an issue graph or a plan file, is a hypothesis. Revise it after each integrated increment,
+material discovery, failed assumption, or new blocker. Change the smallest
+layer that absorbs the new evidence:
+
+| Change | Action |
 | --- | --- |
-| Assignment repair | Clarify, retry, or reassign the same issue. |
-| Implementation replan | Revise issues, dependencies, sequencing, or proof while preserving strategy. |
-| Strategic replan | Pause affected work and route evidence through `decide` and `plan`. |
-| Containment | Stop work that creates a concrete current hazard, then replan at the correct layer. |
+| Assignment problem | Clarify, retry, or reassign the same work. |
+| Plan problem | Revise issues, dependencies, sequencing, or proof within the strategy. |
+| Strategy problem | Pause the affected work, continue independent work, and route the question through `decide` and `plan`. |
+| Current hazard | Stop the harmful work first, then replan at the right layer. |
 
-Decide product and architecture questions that fall within the strategy's
-adaptation authority. A change to outcome, target system, governing tradeoff,
-boundary, assurance gate, adaptation authority, or an accepted ADR is
-strategic. Continue independent work while a strategic question is resolved.
+A change is strategic when it alters the outcome, the target system shape, a
+governing tradeoff, a boundary, or an accepted ADR. Those need the authority
+described in the [Constitution](../constitution.md#strategy-changes-deliberately).
 
-Preserve completed history and failed evidence. Supersede obsolete speculative
-work instead of rewriting it to make the new route appear inevitable.
+Plan executable work only as far as current evidence supports. Keep later work
+as draft epics with a preliminary outcome and known unknowns, and expand the
+next one when its predecessor's evidence arrives or ready work runs low. If
+ready work runs out, figure out whether you are missing detail, evidence, or a
+decision. Do not invent busywork.
 
-## Just-In-Time Expansion
-
-Plan ordinary issues only to the nearest evidence boundary. Keep enough ready
-work for current execution and the next coherent handoff without expanding
-distant work prematurely.
-
-Expand a draft epic when predecessor evidence arrives, a material unknown is
-resolved, or the ready-work buffer is running low. For each expansion:
-
-1. Select an undemonstrated strategic outcome.
-2. Choose the smallest increment that delivers value or reduces important
-   uncertainty.
-3. Refine the epic outcome and any behavior-preservation claims.
-4. Confirm its decisions and dependencies are ready.
-5. Create only the immediate implementation and integration work needed for
-   that increment.
-6. Choose focused proof and any independent review or validation justified by
-   the claim and risk.
-7. Move the epic through the repository's ordinary draft-to-ready transition.
-
-If ready work runs out, diagnose whether the cause is missing detail, missing
-evidence, a failed assumption, or a strategic question. Do not manufacture work
-only to keep agents busy.
-
-## Graph And Branch Reconciliation
-
-Use direct tracker and Git changes; no separate replanning record is required.
-
-- Rescope an issue when its route changes but its outcome and review boundary
-  remain coherent. Split it when a partial result is independently valuable or
-  needs different ownership, proof, or sequencing.
-- Defer work when it remains valuable but is unnecessary for the current
-  outcome or unsafe to specify now. Keep the outcome, reason, owner or trigger,
-  and dependency consequence durable; remove it from the executable horizon.
-- Supersede speculative work when evidence makes its outcome obsolete. Preserve
-  completed work, failed evidence, and rationale instead of rewriting history.
-- Keep a discovered bug in the current branch only when repairing it is needed
-  to deliver or prove the assigned outcome and fits the governing boundary. If
-  it is adjacent, independently shippable, or would broaden review risk, create
-  follow-up work and fix it on its own repository-appropriate owner branch.
-- Return to strategy when the proposed change alters the outcome, target
-  system, governing tradeoff, boundary, assurance, adaptation authority, or an
-  accepted ADR.
-
-## Implementation Portfolios
-
-Treat produced code as an implementation candidate until the Manager selects
-its disposition. Passing proof establishes observed behavior, not that the
-candidate has the right construction or should be integrated.
-
-The orchestrator may use direct implementation, an exploratory spike,
-in-place refactoring, reimplementation informed by an earlier candidate,
-parallel spikes, or a hybrid of these. Load [Implementation
-Portfolios](../references/implementation-portfolios.md) when code is being used
-to reduce uncertainty, when materially different constructions could be
-informative, or when deciding whether a candidate should survive.
-
-Use a disposable spike when it can cheaply reduce meaningful uncertainty in a
-complex or unclear implementation. Go direct when the path is understood or a
-spike is unlikely to change the approach. A spike may prioritize learning over
-production design; mark it evidence only by default, contain its side effects,
-and follow it with a fresh implementation when its shape is unsuitable.
-
-When several plausible approaches cannot be compared reliably without code,
-run isolated parallel spikes against the same constraints and proof. Compare
-what they demonstrate, then choose the production approach; do not integrate a
-winning prototype by default.
-
-After a candidate returns, assess its behavior, design, and learning
-separately. Then classify its disposition as integrate, refactor, reimplement,
-retain for comparison or follow-up, discard, or blocked. A green candidate does
-not default to integration. Preserve decision-relevant evidence and learning
-before superseding or discarding code, and follow workspace and human authority
-for any destructive action.
-
-## Delegation
-
-Every assignment preserves unrelated changes in the worktree and names:
-
-```text
-Repository: <absolute path>
-Selected tracker: <provider and repository, project, or path>
-Mission and parent: <tracker IDs or none>
-Strategy: <path>@<revision> | compact mission body:<reference> | none
-Workspace/branch: <context>
-Assigned issue(s): <exact IDs>
-Role/subskill: <exactly one>
-Model and reasoning: <choice and rationale>
-Implementation portfolio: <not-applicable, or
-  Strategy: <strategy>
-  Candidate relationship: <relationship>
-  Learning question: <question>
-  Prior-candidate visibility: <full | evidence only | none>
-  Expected disposition: <disposition>
-  Disposition owner: <orchestrating Manager>>
-Owned scope: <files, modules, commands, or workflows>
-Out of scope: <boundaries>
-Governing constraints: <relevant strategy or ADR constraints>
-Design constraints: <owner, boundaries, state authority, prohibited residue,
-  repository conventions, or none>
-Replan trigger: <evidence or changed assumption, when applicable>
-Expected proof: <observable result>
-Evidence destination: <tracker or evidence target>
-Independence: <none, review, validation, epic, or mission>
-Handoff: <result, changes, evidence, commands, dirty state, commit, blockers,
-          and exact follow-up>
-```
-
-Before delegation, load
-[Submodel Selection](../references/submodel-selection.md). Name required docs,
-ADRs, glossary terms, breakage, and validation criteria when relevant.
-
-Keep dispatch prompts self-contained but small. Move bulk artifacts such as
-specs, large diffs, and long evidence into files or tracker items and
-reference them by path or ID; pasted bulk stays resident in the
-orchestrator's context and is re-read on every later turn. A dispatch prompt
-carries the assignment, the pointers, and the interfaces the assignee cannot
-know.
-
-Use `not-applicable` for assignments outside an implementation portfolio. Do
-not let a spike silently become production code or let a replacement inherit an
-earlier candidate's structure when structural independence is the point.
-
-Route high-risk diffs to `review` and behavior claims to `validate`. Give
-reviewers and validators their attention lens: the governing constraints
-copied exactly from strategy, ADR, or issue text. Do not pre-judge their
-work: do not instruct a reviewer or validator to ignore a class of findings,
-cap a finding's severity, treat mandated content as exempt from challenge,
-or settle a conflict between governing requirements on their behalf.
-Conflicting requirements are handed over together, not adjudicated in the
-dispatch. Treat Worker discoveries as evidence, not automatic mission
-scope.
-
-When review or validation returns a finding, read the complete result, compare
-its evidence with the outcome and active strategy, then load
-[Finding Disposition](../references/finding-disposition.md) and choose
-`FIX NOW`, `DEFER`, or `NO ACTION`. The orchestrating Manager owns the scope
-decision, not code-level fact-finding. Use the evidence supplied by code-context
-Workers. If a needed fact is missing or disputed, ask the reviewer or
-implementer for proof or assign one bounded `review` or `diagnose` question.
-Do not reread the whole subsystem or create a standing adjudication role.
-
-Record the decision on the accountable issue. File each actionable deferred
-finding as a normal bug or enhancement, link it, and keep it off the current
-critical path unless the rubric says it blocks. A finding that conflicts with
-the plan is still evidence; replan at the layer that owns the conflict instead
-of dispatching a contradictory fix.
+When a worker finds a nearby bug, fix it in the current change only if it
+blocks the current outcome. Otherwise record it as follow-up work. Preserve
+completed work and failed evidence when superseding plans; do not rewrite
+history to make the new route look inevitable.
 
 ## Closeout
 
-Close against demonstrated strategic outcomes and required proof, not issue
-count. Report the active strategy revision, delivered and deferred outcomes,
-graph changes, evidence, commits, residual breakage, paused questions, next
-increment, readiness checks, and worktree state.
+Close against demonstrated outcomes, not issue count:
+
+1. Run the proof for each acceptance claim fresh, with independent validation
+   where the scaling rules call for it.
+2. Confirm all non-trivial code has been independently reviewed.
+3. Confirm no debug residue, temporary breakage, or orphaned paths remain.
+4. Update the docs and tracker items or plan file the work affected.
+
+In the handoff, also report delivered and deferred outcomes, plan changes,
+paused questions, and workspace state.

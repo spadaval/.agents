@@ -1,37 +1,34 @@
 # Audit
 
-Use this subskill to identify evidence-backed architecture, process, or
-operability findings without designing or implementing the fix.
+Use this subskill to find evidence-backed problems in architecture, process,
+or operability without designing or implementing fixes.
 
-## Stance
+## Approach
 
-- Read the mapped architecture, quality, validation, product, ADR, and domain
-  sources needed for the audit scope.
-- Report problems, not preferences.
-- Recommend implementation only when the solution is obvious and low-ambiguity.
-- Look for partial work and partial migrations: new and old paths coexisting
-  without a clear boundary, docs describing a target state that commands do not
-  enforce, runtime behavior that migrated only some call sites, fixtures/tests
-  preserving stale assumptions, or tracker items marked complete while dependent
-  cleanup remains unowned.
-- When findings should become work, route them through planning conventions and
-  durable tracker items.
+- Read the architecture, product, and quality docs and the ADRs relevant to
+  the scope, then compare them with what the code and workflows actually do.
+- Report problems, not preferences. A finding needs a concrete consequence.
+- Look especially for half-finished work: old and new paths coexisting with no
+  clear boundary, docs describing a target the code does not enforce,
+  migrations that reached only some call sites, tests that preserve stale
+  assumptions, and tracker items closed while dependent cleanup has no owner.
+- Suggest a fix only when it is obvious. Otherwise say what kind of work
+  should follow.
 
-## Finding Shape
+## Findings
 
-For each finding, report:
+For each finding give:
 
-- **Problem**: the mismatch or risk.
-- **Evidence**: concrete files, commands, workflows, tests, docs, or behavior.
-- **Quality smell**: coupling, low cohesion, information leakage, legacy drag,
-  partial migration, partial implementation, misplaced responsibility, weak test
-  interface, or speculative abstraction.
-- **Likely cause**: why the design creates friction.
-- **Value if fixed**: what gets simpler, safer, more local, or more reliable.
-- **Risk**: what assumption could make the fix premature.
-- **Confidence**: high, medium, or low.
-- **Next step**: no action, spike, artifact update, implementation, migration,
-  review, or validation.
+- **Problem:** the mismatch or risk.
+- **Evidence:** the files, commands, tests, or behavior that show it.
+- **Impact:** what gets simpler, safer, or more reliable if it is fixed.
+- **Confidence:** high, medium, or low.
+- **Next step:** no action, spike, decision, implementation, migration, or
+  docs update.
 
-Durable architecture choices belong in ADRs or target-state docs, not only in
-tracker notes.
+Add the likely cause, or the risk that a fix would be premature, when either
+is not obvious.
+
+If findings should become work, record them as tracker items, or in a plan
+file if there is no tracker. Architecture decisions
+belong in docs or ADRs, not only in tracker notes.

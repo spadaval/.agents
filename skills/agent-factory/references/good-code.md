@@ -1,39 +1,42 @@
 # Good Code
 
-Use this reference when planning, producing, reviewing, or deciding the
-disposition of implementation code. Repository architecture and standards
-remain authoritative; this reference supplies the shared questions.
+Use this reference when planning, writing, or reviewing non-trivial code.
+The repository's own architecture and standards take precedence; this page
+supplies the shared questions.
 
 Good code does more than pass its tests. It:
 
-- satisfies the current behavior and constraints;
-- puts responsibility and state in the right owner;
-- preserves clear boundaries and dependency direction;
+- meets the current requirements and constraints;
+- puts each responsibility and each piece of state in one clear owner;
+- respects boundaries and dependency direction;
 - uses the fewest moving parts that keep the design coherent;
-- makes important behavior and failure modes easy to verify;
-- localizes likely change instead of duplicating knowledge; and
+- makes important behavior and failure modes easy to verify, and reports
+  failures with the failed operation, the relevant identifier, and an
+  actionable reason;
+- keeps likely changes local instead of duplicating knowledge; and
 - leaves no obsolete paths, temporary shortcuts, or misleading residue.
 
-Judge behavior, design, and operability separately. Working behavior makes a
-candidate useful; sound design makes it fit to integrate. Operable code leaves
-the next agent able to understand, test, change, and diagnose it safely.
+Behavior, design, and operability are separate judgments. Working behavior
+makes code useful. Sound design makes it fit to integrate. Operability means
+the next agent can understand, test, change, and diagnose it safely.
 
-For non-trivial production code, establish the intended owner, boundaries,
-state authority, important invariants, and proof before or while implementing.
-Use a spike when construction can cheaply answer an important unknown, but do
-not let the spike's shape become the design by default. Preserve what it taught,
-then refactor or reimplement deliberately.
+For non-trivial work, know the intended owner, boundaries, source of truth for
+state, key invariants, and proof before or while you build. A spike is a
+cheap way to answer an unknown, but do not let its shape become the design by
+default. Keep what it taught you and build the real thing deliberately.
 
-Before integration, ask:
+Before integrating, ask:
 
-- Is responsibility in one clear owner, with one authority for each state?
-- Do dependencies and knowledge cross only intended boundaries?
-- Does every new moving part support a current claim or constraint?
-- Is there a materially simpler design that does not move the complexity?
-- Can important behavior be falsified at the boundary that owns it?
-- Did the change remove its temporary code and obsolete paths?
+- Does each responsibility have one owner, and each piece of state one
+  authority?
+- Do dependencies cross only intended boundaries?
+- Does every new moving part serve a current requirement?
+- Is there a materially simpler design that does not just move the
+  complexity?
+- Can the important behavior be tested at the boundary that owns it?
+- Is temporary code and every obsolete path gone?
 
-These are judgment prompts, not a checklist for trivial changes. Style
-preferences are not quality defects. A defect must identify a concrete
-boundary, responsibility, unnecessary mechanism, verification problem, or
-residue and explain its consequence.
+These are prompts for judgment, not a checklist for trivial changes. A
+quality defect names a concrete boundary, responsibility, unnecessary
+mechanism, verification gap, or piece of residue and explains its
+consequence. Style preferences are not defects.

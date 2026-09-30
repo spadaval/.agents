@@ -1,112 +1,89 @@
 # Repository Shape
 
-Use this reference when installing Agent Factory or assessing whether a fresh
-agent can orient, act, and validate work from durable repository sources.
-Names may vary, but each responsibility needs one discoverable owner.
-
-## Entry Map and Baseline
-
-A repository that expects durable, multi-person or multi-agent work makes its
-governing knowledge visible in version control. A short root instruction file
-(such as `AGENTS.md`) points to — rather than duplicates — one discoverable
-owner per responsibility:
-
-| Responsibility | Typical home | Keep it good by |
-| --- | --- | --- |
-| Tracker identity, location, and workflow entry points | `## Agent Factory` in `AGENTS.md` (see below) | Selecting and linking, not copying command cookbooks |
-| Product intent: purpose, users, outcomes, non-goals | `PRODUCT_INTENT.md` | Changing it only when product direction changes |
-| Domain language and resolved vocabulary | `CONTEXT.md` | Defining terms precisely; removing or marking obsolete vocabulary |
-| Documentation front door | `docs/index.md` | Naming which document owns each concern, not merely listing files |
-| Product behavior, workflows, public contracts | `docs/product/` | Explaining what the product does, not module layout or internals |
-| Boundaries, dependency direction, data ownership | `docs/architecture/` | Explaining how the system is shaped, not user-visible behavior |
-| Durable decisions and rationale | `docs/adr/` | Stable identifiers and status; supersede, never silently rewrite accepted history |
-| Standards and validation routing | Quality and validation docs | Mapping each claim to its check, proof destination, independence trigger, and result classification |
-| Current work: scope, outcomes, dependencies, lifecycle, evidence links | The selected tracker | Encoding Agent Factory concepts the tracker lacks in provider-owned configuration |
-| Durable versus rebuildable state | The entry map or validation docs | Giving derived state one documented repair owner |
-
-Small repositories may begin with fewer files, but split a document when it
-starts serving conflicting owners or audiences. Product, architecture, and
-context knowledge answer different questions — what users can expect, how the
-implementation is constrained, and what the shared words mean. Cross-links are
-expected; duplicating a contract across all three is not. When the boundary is
-unclear, choose the document a future contributor would consult to decide
-whether a proposed change is correct, then link from the others.
-
-## Agent Factory Binding
-
-Onboarding should add or update a concise `## Agent Factory` section in the
-applicable `AGENTS.md`; do not require a standalone Agent Factory binding file.
-The section records only repository facts that a capable agent cannot safely
-infer:
-
-- the selected tracker and its repository, project, or local location;
-- repository-specific encodings for missions, epics, validation work,
-  dependencies, or evidence when the tracker does not model them directly;
-- links to the validation and workflow policy that govern tracked work; and
-- unusual setup, permission, or recovery constraints.
-
-Keep tracker configuration with its natural owner: GitHub templates and labels
-under GitHub-owned configuration, Atelier workflow in Atelier-owned
-configuration, and branch or review policy in the repository's contributing or
-workflow docs. `AGENTS.md` selects and links those sources instead of copying
-them. In a monorepo, use the nearest scoped `AGENTS.md`; add a nested binding
-only when that subtree genuinely uses different tracker or workflow conventions.
-
-## ADR Discipline
-
-Create an ADR when a decision is costly to reverse, non-obvious, likely to be
-revisited, spans boundaries, changes a public or persistence contract, or
-intentionally rejects a plausible alternative. A useful ADR contains:
-
-1. A stable number or identifier and descriptive title.
-2. Its status, such as proposed, accepted, superseded, or deprecated.
-3. The context and forces that made a decision necessary.
-4. The decision itself, stated plainly.
-5. Consequences and meaningful tradeoffs.
-6. A link to a superseding ADR when the decision changes.
-
-ADRs explain why the current product or architecture is shaped as it is; the
-product and architecture indexes explain what is currently true. Do not use an
-ADR as an unindexed dumping ground for implementation notes, and do not rewrite
-accepted history to conceal a changed decision.
-
-## Documentation as a Maintained System
-
-Treat documentation as a set of owned contracts, not a collection of notes.
-Every durable document should have a discoverable route from the entry map or a
-documentation index. Prefer focused pages with explicit ownership over one
-large catch-all document. Remove, archive, or mark superseded guidance when it
-is no longer authoritative; stale guidance is worse than an acknowledged gap
-because it confidently misroutes work.
-
-When a change alters product behavior, architecture boundaries, domain
-language, durable state, validation policy, or a significant decision, include
-the corresponding documentation or ADR update in the accountable work. A
-separate follow-up is appropriate only when the repository records its owner
-and dependency explicitly.
-
-## Durable State and Local State
-
-Make the source of truth unambiguous. State that must survive a fresh clone,
-review, or handoff belongs in tracked records. Caches, indexes, locks, command
-diagnostics, generated output, and machine-local configuration are derived or
-local: identify them as such, ignore them when appropriate, and give each a
-documented repair owner. Never make private machine state the only route to
-current scope, decisions, or validation evidence.
+Use this reference when installing Agent Factory or assessing whether a
+repository is easy for agents to work in. The goal is that a fresh agent can
+find what it needs from durable, version-controlled sources. File names and
+layout are the repository's choice.
 
 ## Readiness Test
 
-A fresh agent should be able to answer, from the entry map and linked sources:
+A fresh agent should be able to answer these from the repository's entry
+point (usually `AGENTS.md` or the README) and the sources it links to:
 
-1. What is this product trying to achieve?
+1. What is this product trying to achieve, and for whom?
 2. What do its core terms mean?
-3. Where is current work and its lifecycle state?
-4. Which behavior is public, and which constraints are architectural?
+3. Where is current work tracked, and what state is it in?
+4. What behavior is public, and what constraints are architectural?
 5. Why were important non-obvious choices made?
-6. Which standards apply, and what proves this change?
-7. Which state is durable, and how is local derived state repaired?
-8. Which tracker is selected, and how does it represent Agent Factory work?
+6. How is the code built and checked, and what standards apply?
+7. Which state is durable, and which is generated or local and safe to
+   rebuild?
+8. Which tracker is used, and how does it represent missions, epics, and
+   evidence?
 
-A missing responsibility is a repository-readiness gap even when the code is
-otherwise buildable. Record the gap in the repository's tracker instead of
-embedding a private replacement inside Agent Factory.
+A small repository may answer most of these in one README. A larger one will
+split them up. Either is fine if the answers exist and can be found. A
+missing answer is a readiness gap even if the code builds.
+
+## Entry Point
+
+Keep the root instruction file short. It is a map that points to one clear
+home for each concern, plus any constraints an agent cannot safely infer. It
+is not a command cookbook, and it should not duplicate the docs it links to.
+
+The Agent Factory part of it, typically a short `## Agent Factory` section,
+records only what a capable agent could not work out alone:
+
+- the tracker and its location;
+- how missions, epics, validation, and evidence are represented if the tracker
+  does not model them directly;
+- links to review, validation, and workflow policy;
+- unusual setup, permission, or recovery constraints.
+
+Keep tracker configuration with its owner. For example, GitHub templates and
+labels live under `.github/`, and branch policy lives in the contributing
+docs. In a monorepo, add a nested instruction file only where a subtree
+genuinely works differently.
+
+## Common Homes
+
+When a repository is large enough to split these concerns, typical homes are:
+
+| Concern | Typical home |
+| --- | --- |
+| Product intent, users, non-goals | README or a product intent doc |
+| Domain vocabulary | A glossary or context doc |
+| Doc index: which doc owns what | `docs/index.md` or README |
+| Product behavior and public contracts | `docs/product/` or equivalent |
+| Architecture: boundaries, ownership, dependency direction | `docs/architecture/` or equivalent |
+| Decisions and rationale | `docs/adr/` |
+| Standards and how claims are checked | Contributing, quality, or testing docs |
+
+Split a document when it starts serving conflicting audiences. Product docs
+say what users can expect, architecture docs say how the system is
+constrained, and vocabulary docs say what words mean. Cross-link them rather
+than repeating one contract in all three.
+
+## Decisions
+
+Write an ADR when a decision is costly to reverse, non-obvious, likely to be
+re-argued, crosses boundaries, changes a public or persisted contract, or
+deliberately rejects a plausible alternative. A useful ADR has a stable
+identifier, a status, the context and forces behind it, the decision, and its
+consequences. When a decision changes, write a new ADR that supersedes the old
+one rather than rewriting history.
+
+## Docs as a Maintained System
+
+Every durable doc should be reachable from the entry point or an index. When a
+change alters behavior, architecture, vocabulary, durable state, or a
+significant decision, update the affected docs in the same piece of work. Stale
+guidance is worse than an acknowledged gap because it confidently misleads.
+
+## Durable and Local State
+
+Make the source of truth unambiguous. Anything that must survive a fresh clone
+or a handoff lives in version control or the tracker. Caches, indexes,
+generated output, and machine-local config should be identified as such,
+ignored where appropriate, and rebuildable by a documented command. Private
+machine state must never be the only record of scope, decisions, or proof.

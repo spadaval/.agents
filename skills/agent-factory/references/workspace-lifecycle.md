@@ -1,30 +1,32 @@
 # Workspace Lifecycle
 
-Use repository and harness policy to isolate mutating work without imposing one
-Git workflow on every environment.
+Use this reference when starting, integrating, or closing mutating work.
+Follow the repository's and the harness's own workspace conventions. This is
+not a mandated Git workflow.
 
 ## Start
 
-1. Inspect the current branch, dirty state, repository instructions, and native
-   workspace facilities.
-2. Preserve unrelated changes. Reuse an already isolated workspace when it owns
-   the assignment.
-3. Prefer the harness's native workspace or worktree support. Use manual Git
-   worktrees only when policy permits and no native owner exists.
-4. Run the smallest representative baseline check before editing. Classify a
-   failing baseline as pre-existing, environment/tooling, or assignment-blocking;
-   do not attribute it to the new work later.
+1. Check the current branch, uncommitted changes, and repository
+   instructions.
+2. Preserve changes you did not make. Never discard or overwrite them.
+3. Isolate the work if others may be working in the same checkout. Prefer the
+   harness's native worktree or workspace support. Use manual Git worktrees
+   only when repository policy allows.
+4. Run a small, representative baseline check. If it already fails, note
+   whether the failure is pre-existing, an environment problem, or something
+   that blocks the work, so it is not blamed on your change later.
 
 ## During Work
 
-Keep one accountable owner for the branch or workspace. Record commits,
-integration dependencies, expected temporary breakage, and derived local state.
-Do not make private workspace state the only home of decisions or proof.
+Each branch or workspace has one accountable owner. Keep decisions and proof
+in commits, PRs, or the tracker, not only in the workspace.
 
 ## Close
 
-Run fresh assignment proof and the repository-required integration checks.
-Report branch, commits, dirty state, untracked files, residual breakage, and the
-valid next action: integrate, open review, retain for follow-up, or discard.
-Never merge, delete, or discard a workspace merely because implementation is
-finished; follow repository policy and the human's authority for that action.
+Run the final proof and any integration checks the repository requires. Report
+the branch, commits, uncommitted or untracked files, any remaining breakage,
+and the next step: integrate, open for review, keep for follow-up, or discard.
+
+Finishing the implementation is not permission to merge, delete, or discard a
+workspace. Follow repository policy and the human's direction for those
+actions.

@@ -1,102 +1,100 @@
 # Finding Disposition
 
-Use this reference when review or validation reports a finding.
+Use this reference to decide what happens to a review or validation finding.
 
-## Roles
+## Who Decides
 
-- The reviewer reports every supported finding and may recommend a disposition.
-- The Manager chooses `FIX NOW`, `DEFER`, or `NO ACTION`.
-- The implementer may confirm or challenge the technical evidence. It fixes
-  only `FIX NOW` findings.
-- A human decides when the choice depends on risk tolerance or authority that
-  durable sources do not establish.
+- **Reviewers and validators** report every finding they can support and may
+  recommend a disposition.
+- **The accountable agent**, the orchestrator or whoever owns the outcome,
+  decides the disposition. It decides scope; it does not redo the review.
+- **The author** may confirm or dispute the facts with evidence. It fixes the
+  findings marked `FIX NOW`. It does not decide the disposition of findings
+  on its own code. When the author is also the accountable agent (working
+  alone, or an orchestrator's own code), it fixes every finding the reviewer recommended as `FIX NOW` unless a
+  reviewer accepts its rebuttal. A recommended `FIX NOW` it leaves unresolved
+  is reported first in the handoff, and the work is not done.
+- **A human** decides when the answer depends on risk tolerance or authority
+  that no durable source settles.
 
-Severity describes impact. It does not decide priority.
+Severity describes impact, not priority. A "high severity" label does not
+make a finding blocking, and a deadline does not make it non-blocking. A
+`FIX NOW` recommendation must name the blocking condition and show that it
+exists on a current code path in the target environment. A label such as
+"security" or "maintainability" is not enough by itself.
 
-The Manager owns the scope decision, not code-level fact-finding. A `FIX NOW`
-recommendation must name the blocking condition and evidence that it exists on
-a current path. If a needed fact is missing or disputed, ask the reviewer,
-implementer, or an investigator one bounded question. Decide after the answer;
-do not inspect the whole subsystem or create a standing adjudication role.
+If deciding requires a fact you do not have, or the reviewer and author
+disagree about a fact, ask one focused question of the reviewer, the author,
+or a `diagnose` worker. Decide once you have the answer. Do not reinvestigate
+the subsystem yourself.
 
 ## FIX NOW
 
-Use `FIX NOW` only when evidence proves at least one of these:
+The finding blocks the current work. Use this when evidence shows at least
+one of the following:
 
-1. **Current-contract fault:** the change fails a current acceptance claim or
-   user scenario, violates a governing constraint or non-scope boundary, adds
-   an unauthorized substantial subsystem, or relies on misleading proof.
-2. **Change-caused regression:** the change breaks behavior that worked before
-   and the active strategy does not authorize that breakage.
-3. **Concrete current hazard:** in the actual target environment, the change
-   allows unauthorized access, execution, or writes; exposes real secrets or
-   customer data; or can corrupt or irreversibly destroy real state.
-4. **Design-integrity fault:** the change introduces conflicting ownership,
-   duplicate state authority, a broken dependency boundary, uncontained
-   temporary code, or another defect that makes current behavior materially
-   harder to test, change, or diagnose.
+1. **Contract failure:** the change misses a current requirement, violates a
+   constraint or non-scope boundary, or relies on proof that does not show
+   what it claims.
+2. **Regression:** the change breaks something that worked, and the strategy
+   does not authorize the breakage.
+3. **Current hazard:** in the actual target environment, the change allows
+   unauthorized access or writes, exposes secrets or user data, or can
+   corrupt or destroy real state. "Only admins can reach it" and "the release
+   is late" are not rebuttals to a real current hazard.
+4. **Design integrity:** the change introduces conflicting ownership, a
+   duplicate source of truth, a broken dependency boundary, uncontained
+   temporary code, or unnecessary complexity (see below).
 
-A label such as security, maintainability, or high severity is not enough by
-itself. Name the concrete defect, the current boundary or responsibility it
-harms, and its consequence. Style preferences do not qualify.
-
-If a blocking finding cannot be repaired within the active strategy, simplify
-or remove the affected surface, reimplement it, or return to strategy or a
-human decision. Do not silently defer it.
+Fix blocking findings with the smallest change that removes the problem, not
+with a framework for future problems. If a blocking finding cannot be fixed
+within the current strategy, remove or simplify the affected surface, or
+escalate. Never quietly downgrade it.
 
 ## DEFER
 
-Use `DEFER` for a real, actionable problem that does not meet `FIX NOW`.
+The finding is real and actionable but does not block the current work.
+Typical cases are pre-existing problems the change did not worsen, and risks
+that apply only to surfaces not yet built. Create a follow-up issue and link
+it, or add a follow-up entry to the PR description or plan file if there is no
+tracker. It is not a blocker unless you explicitly make it one.
 
-Create a normal bug or enhancement issue and link the finding. The new issue is
-not a dependency or blocker for current work unless the Manager explicitly
-makes it one.
-
-Pre-existing problems that the change does not worsen belong here. If a problem
-is supported but its blocking status is unclear, default to `DEFER`.
-The Manager may request the smallest bounded check that could prove a blocking
-condition. If it does not, defer.
+When a finding is real but you cannot tell whether it blocks, defer it,
+unless one small check could settle the question. In that case, run the
+check.
 
 ## NO ACTION
 
-Use `NO ACTION` when the finding is false, duplicate, only stylistic, has no
-concrete planned surface, is explicitly outside the product, protects a surface
-that should be removed, or has no independent actionable outcome.
+The finding is wrong, a duplicate, purely stylistic, or has no consequence.
+It may also protect a surface that should not exist or concern something
+explicitly outside the product. Record a one-line reason.
 
 ## Complexity
 
-After preserving the current outcome and constraints, choose the solution with
-the least total system complexity.
+After meeting current requirements, prefer the design with the fewest moving
+parts: components, abstractions, interfaces, state, configuration, fallbacks,
+or compatibility paths. Fewer lines alone does not make a design simpler.
 
-Complexity is a defect only when a known, materially simpler construction meets
-the same current claims and constraints without moving equivalent complexity
-elsewhere. Materially simpler means removing a moving part: a component,
-abstraction, interface, state model, persistence model, configuration option,
-fallback, compatibility path, or operational handoff. Fewer lines alone do not
-prove it.
+Complexity is a defect when a known, simpler construction meets the same
+current requirements without moving equivalent complexity elsewhere.
+Unneeded complexity introduced by the current change is `FIX NOW`.
+Pre-existing complexity the change does not worsen is `DEFER`.
 
-Every new moving part must support a current claim or constraint. If its only
-reason is possible future work, defer it.
+When a reviewer and author disagree about whether a mechanism is necessary,
+the author must name the current requirement it serves and what would break
+without it. The reviewer must name the simpler alternative. Get the smallest
+proof that tells them apart. Machinery justified only by possible future work
+does not survive this test.
 
-A proven complexity defect introduced by the current change is a
-current-contract fault: `FIX NOW`. Pre-existing complexity that the change does
-not worsen is `DEFER`.
+## Recording
 
-When agents disagree, the agent claiming a mechanism is necessary must name the
-current claim and the concrete failure caused by removing it. The agent seeking
-simplification must name a simpler construction that meets the same claim. The
-Manager obtains the smallest proof that separates the two. If the answer
-depends on unrecorded scope or risk tolerance, ask the human.
-
-## Tracker Record
-
-Put the review and the Manager's disposition on the accountable issue. Keep it
-short:
+Record the decisions where the work is tracked (tracker, PR, or plan file).
+Keep it short:
 
 ```text
-R1 FIX NOW — <reason>
-R2 DEFER -> #<issue> — <reason>
-R3 NO ACTION — <reason>
+R1 FIX NOW: <reason>
+R2 DEFER -> <follow-up link>: <reason>
+R3 NO ACTION: <reason>
 ```
 
-Do not create a separate finding registry or shadow backlog.
+Do not keep a separate findings registry.
