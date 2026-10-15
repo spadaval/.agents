@@ -18,8 +18,7 @@ point (usually `AGENTS.md` or the README) and the sources it links to:
 6. How is the code built and checked, and what standards apply?
 7. Which state is durable, and which is generated or local and safe to
    rebuild?
-8. Which tracker is used, and how does it represent missions, epics, and
-   evidence?
+8. Does it use Atelier, and what are its merge policy and base branch?
 
 A small repository may answer most of these in one README. A larger one will
 split them up. Either is fine if the answers exist and can be found. A
@@ -34,15 +33,13 @@ is not a command cookbook, and it should not duplicate the docs it links to.
 The Agent Factory part of it, typically a short `## Agent Factory` section,
 records only what a capable agent could not work out alone:
 
-- the tracker and its location;
-- how missions, epics, validation, and evidence are represented if the tracker
-  does not model them directly;
+- that the repository uses Atelier, and the session commands agents run;
 - links to review, validation, workflow, and branch policy;
 - unusual setup, permission, or recovery constraints.
 
-Keep tracker configuration with its owner. For example, GitHub templates and
-labels live under `.github/`, and branch policy lives in the contributing
-docs. In a monorepo, add a nested instruction file only where a subtree
+Keep tracker configuration with its owner. For example, Atelier's workflow
+and merge policy live in `.atelier/workflow.yaml`, and contribution policy
+lives in the contributing docs. In a monorepo, add a nested instruction file only where a subtree
 genuinely works differently.
 
 ## Common Homes

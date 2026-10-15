@@ -89,8 +89,10 @@ does not survive this test.
 
 ## Recording
 
-Record the decisions where the work is tracked (tracker, PR, or plan file).
-Keep it short:
+In Atelier, each finding is a review event and each decision is a
+disposition event against it (see [Atelier](atelier.md#branches-review-and-integration)).
+Give each a short reason. Without Atelier, record the decisions in the PR or
+plan file:
 
 ```text
 R1 FIX NOW: <reason>
@@ -98,4 +100,4 @@ R2 DEFER -> <follow-up link>: <reason>
 R3 NO ACTION: <reason>
 ```
 
-Do not keep a separate findings registry.
+Do not keep findings anywhere else.

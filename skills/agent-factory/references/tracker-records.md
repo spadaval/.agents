@@ -1,9 +1,10 @@
 # Tracker Records
 
 Use this reference when creating or updating missions, epics, issues,
-validation items, and tracker comments. It defines what each record contains,
-not tracker commands; see [Managing Issues](tracker-commands/managing-issues.md)
-for those. Repository conventions come first where they differ.
+validation items, evidence, and handoff notes. It defines what each record
+contains; see [Atelier](atelier.md) for the commands. The headings below are
+Atelier's typed body sections, so use them verbatim. Repository conventions
+come first where they differ.
 
 ## Principles
 
@@ -11,36 +12,38 @@ for those. Repository conventions come first where they differ.
   status and sequencing, and docs own design. Link to the owner instead of
   copying. Copies drift, and then agents cannot tell which one is true.
 - **Records are short.** A reader should see what the item is for, and what
-  done means, in seconds. Leave out any section that would say nothing.
-- **Status lives in state, not prose.** Use the tracker's open, closed, and
-  label or field state, plus dated comments. Do not keep status tables in
-  issue bodies or docs.
-- **Link, don't version.** Point to the strategy file, docs, and other issues
-  by path or link, not by revision number.
+  done means, in seconds. Leave out any optional section that would say
+  nothing.
+- **Status lives in state, not prose.** Use the record's status and native
+  links, plus dated notes. Do not keep status tables in record bodies or
+  docs.
+- **Link, don't version.** Point to the strategy file, docs, and other records
+  by path or ID, not by revision number.
 
-With no tracker, keep the same records as sections of a plan file, with a
+Without Atelier, keep the same records as sections of a plan file, with a
 status line on each.
 
 ## Mission
 
-The mission body is a front door. It does not restate the strategy.
+The mission record is a front door. It does not restate the strategy. Link
+the strategy file through the record's `strategy` path field.
 
 ```md
-- **Strategy:** <path to strategy file>
-- **Deliberation:** <link to planning artifact, if any>
-
+## Outcome
 <One paragraph: the outcome, in plain words.>
 
-## Epics
-<Native sub-issues, or a list of links. No status tables.>
+## Success criteria
+<Only when there is no strategy file; otherwise the strategy owns them.>
 ```
 
-If there is no separate strategy file, the mission body is the strategy.
-Use the [strategy template](strategic-plans.md#template) directly.
+If there is no separate strategy file, the mission body is the strategy:
+state the success criteria here and add other
+[strategy template](strategic-plans.md#template) sections only as needed.
+Execution work joins the mission through `advances` links, so do not list
+epics in the body.
 
-Post progress as comments. At meaningful points, post a dated status comment
-listing the success criteria shown so far, current epics, blockers, and open
-questions.
+Post progress as dated notes. At meaningful points, note the success criteria
+shown so far, current epics, blockers, and open questions.
 
 ## Epic
 
@@ -69,8 +72,8 @@ validation item.>
 ```
 
 A draft epic may contain only Outcome and Unknowns. Before marking it ready,
-fill in Proof, and add its immediate child issues and dependencies using the
-tracker's native links.
+fill in Proof, and add its immediate child issues and dependencies as native
+links.
 
 ## Issue
 
@@ -91,47 +94,60 @@ if the work were wrong or missing.>
 ## Context
 <Links to relevant files, interfaces, docs, ADRs, and findings. The target
 environment, if it affects risk.>
-
-## Depends on
-<Linked issues. Omit when none.>
 ```
 
-Use the tracker's native dependency links when it has them, and omit the
-section. Put follow-up findings in new issues, not in the body of a closed
-one.
+Express dependencies as `blocked_by` links, not body text. Put follow-up
+findings in new issues, not in the body of a closed one.
 
 ## Validation Item
 
 Create one when an independent `validate` assignment is needed, such as for
-mission acceptance or an epic that changes a user-facing outcome.
+mission acceptance or an epic that changes a user-facing outcome. It uses the
+`validation` issue type and the ordinary issue body:
 
 ```md
-## Claims
-<The success criteria or acceptance claims under test, by reference.>
+## Goal
+Check <referenced mission criteria or acceptance claims> independently.
 
-## Method
-<How each will be checked, and in what environment.>
+## Done when
+Each claim has an explicit result and linked evidence receipt; the handoff
+states failures, blocked checks, and proof limits.
 
-## Results
-<Filled in by the validator: each claim, its result, and a link to its
-evidence comment. The evidence comments hold the detail.>
+## Scope
+<Checks and artifacts the validator may produce. Omit when unnecessary.>
+
+## Context
+<Links to the claims, the method and environment, and relevant design.>
 ```
 
-## Comments
+Results live in evidence receipts, one per claim, attached to the validation
+item. The validator notes the receipt IDs and its handoff on the item. Do not
+rewrite acceptance intent to store results.
 
-**Evidence** (see [Evidence Tracking](tracker-commands/evidence-tracking.md)):
+## Evidence
 
-```md
-**Evidence** for <claim or issue>
-Check: <command, scenario, or measurement>
-Result: <pass | fail | blocked | not-applicable>: <one line>
-Artifacts: <links to CI runs, logs, screenshots, commits>
-```
+Record evidence in the tracker when later work or a later agent will rely on
+it: epic or mission acceptance, independent validation, migrations, and
+non-pass results. For ordinary slices, proof in the handoff is enough unless
+the repository's merge policy requires a receipt.
 
-**Handoff:** the standard [handoff](../SKILL.md#handoff), posted when an
-assignment ends.
+A receipt states the claim, the check, the result, the commit, and links to
+transcripts or artifacts. Use this vocabulary verbatim so evidence stays
+searchable:
 
-**Finding dispositions:** the short form in
+- Claim results: `pass`, `fail`, `blocked`, `not-applicable`.
+- Cause of a failure: `defect in this change`, `expected breakage`,
+  `environment/tooling`, `pre-existing`. `expected breakage` applies only on
+  an isolated rewrite branch declared in the plan, never on the default
+  branch.
+- Finding dispositions: `FIX NOW`, `DEFER`, `NO ACTION`.
+
+## Notes and Reviews
+
+**Handoff:** the standard [handoff](../SKILL.md#handoff), appended as a dated
+note when an assignment ends.
+
+**Reviews and finding dispositions:** review events, not notes. See
 [Finding Disposition](finding-disposition.md#recording).
 
 ## Deferred Follow-Up

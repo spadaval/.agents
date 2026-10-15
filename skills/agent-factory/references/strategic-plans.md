@@ -26,9 +26,9 @@ because it describes tasks, order, or status, it is not strategy.
 | Rationale for a hard-to-reverse decision | An ADR, linked from the strategy |
 | Work packages ("briefs", workstreams) | Epics in the tracker |
 | Sequencing, ordering rules, dependencies | Tracker dependencies and epic bodies |
-| Status, progress, what is done | The tracker: item state and mission status comments |
+| Status, progress, what is done | The tracker: item state and dated mission notes |
 | Analysis of the starting point | An `audit` result or the first epic. Summarize it in one or two sentences under Why if it motivates the mission. |
-| Evidence and results | Evidence comments on the tracker item |
+| Evidence and results | Evidence receipts attached to the tracker item |
 | History of changes | Git history and commit messages, plus one "Last changed" line |
 
 ## Template
@@ -36,7 +36,7 @@ because it describes tasks, order, or status, it is not strategy.
 ```md
 ---
 status: draft | active | completed | superseded
-mission: <tracker link>
+mission: <mission ID>
 last_changed: "<date>: <one-line summary>"
 ---
 
@@ -75,7 +75,7 @@ Leave out any section that says nothing.
 ```md
 ---
 status: active
-mission: https://github.com/acme/shop/issues/412
+mission: shop-k3x9
 last_changed: "2026-09-12: S1 latency target relaxed to 2s (user direction)"
 ---
 
@@ -94,7 +94,7 @@ the web client's polling code is removed.
 - S3: Pages recover after a dropped connection without a reload (scenario
   test that kills the connection).
 - S4: Web client polling code is deleted. The API polling endpoint stays for
-  mobile clients, and its removal is owned by mission #430.
+  mobile clients, and its removal is owned by mission shop-7q2m.
 
 # Shape
 - Server-sent events from the existing API service; no new service or broker
@@ -107,7 +107,7 @@ the web client's polling code is removed.
 # Scope
 In: web client order pages, API streaming endpoint, web client polling
 removal.
-Out: mobile apps (they keep polling until mission #430), other pages.
+Out: mobile apps (they keep polling until mission shop-7q2m), other pages.
 Environment: production behind the existing load balancer.
 
 # Authority
@@ -128,7 +128,7 @@ directs the change, or the Authority section allows it.
 
 To change it, edit the file in place and update the `last_changed` line. In
 the commit message, say what changed, why, and on whose authority. Post a
-short comment on the mission issue. Git holds the full history, so do not
+short dated note on the mission. Git holds the full history, so do not
 keep revision logs or snapshot copies in the document. Tracker items link to
 the strategy file, not to a revision number, so the links never go stale.
 After a change, reconcile the affected tracker work before dispatching more.

@@ -96,6 +96,7 @@ something observable.
 | Workspace collision | The tree contains unrelated edits | Preserve them and report the final state. |
 | Leftover workspace | A spike's learning is recorded and a slice has merged | Archive-tag and delete the spike branch, delete the merged branch, remove both worktrees, and report the inventory. |
 | Main-branch breakage | A migration step would leave the default branch failing | Choose atomic or expand-and-contract, or move the rewrite to an isolated branch. |
+| Ungated merge | In an Atelier repository, plain `git merge` of a reviewed branch is quicker | Commit the done claim on the work branch and integrate with `atelier merge`, so the base policy's gates run. |
 
 ### Over-application: ceremony where it does not help
 
@@ -103,7 +104,7 @@ something observable.
 | --- | --- | --- |
 | Trivial fix | A one-line typo or formatting fix in a repo with a tracker | Fix, verify, commit. No tracker items, strategy, or reviewer. |
 | Small contained change | A single-session change of about 50 lines | No strategy doc or epics. Self-verify, get one independent review, and write a clear PR description. |
-| No tracker | The repository has no tracker, or the agent lacks access | Proceed with a plan in the PR or a file. Do not block on setting one up. |
+| No Atelier | The repository does not use Atelier, or the agent cannot run it | Proceed with a plan in the PR or a file. Offer to install Atelier for mission-sized work; do not block on it. |
 | Needless delegation | The orchestrator already holds the context for a small task | Do it directly, and still get independent review of non-trivial code. |
 | Distant certainty | A planner is asked for a complete multi-epic task list | Plan outcomes, and create issues only up to the nearest evidence boundary. |
 | Needless validator | Author-run tests fully exercise an internal slice's claim | No separate `validate` assignment. Review checks the proof. |

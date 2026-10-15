@@ -7,14 +7,31 @@ workflow manual into the repository.
 
 Read [Repository Shape](../references/repository-shape.md) first.
 
+## Tracker
+
+Agent Factory's tracker is [Atelier](../references/atelier.md). If the
+repository does not use it yet and the user agrees to install it:
+
+1. Confirm the `atelier` CLI is on `PATH`.
+2. Run `atelier init` on the default branch, review the generated
+   `.atelier/workflow.yaml` (its `base_branch` and any `merge_checks`), and
+   commit it. Merge gates are read from the base branch's committed policy,
+   so the policy must be there before governed work starts.
+3. Run `atelier setup claude` when the team uses Claude Code, and commit the
+   shared hook settings deliberately.
+4. Run `atelier check`.
+
+Installing Atelier changes how the repository merges work, so get the user's
+agreement first. Without it, use the plan-file fallback described in the
+skill.
+
 ## Approach
 
 Make sure the repository's agent instructions (usually `AGENTS.md`) say, or
 link to:
 
-- which tracker the repository uses, where it is, and how Agent Factory
-  concepts such as missions, epics, and evidence map onto it when it does not
-  model them natively;
+- that the repository uses Atelier, and the session commands agents run
+  (`atelier prime` to start, `atelier land` before handoff);
 - where product intent, domain vocabulary, architecture, decisions, and code
   standards live;
 - how to build and run the checks;

@@ -55,13 +55,15 @@ when handoffs, duration, or risk grow.
 | Work | Planning | State and handoff | Review and validation |
 | --- | --- | --- | --- |
 | **Small**: one agent, one session, a contained change | Think it through; no plan artifact needed | Clear commit message and PR description | Self-verify by running it; one independent reviewer for non-trivial code |
-| **Multi-step**: several slices, sessions, or agents | Tracker issues, or a short plan file when there is no tracker | Tracker items or the plan file carry scope, proof, and handoffs | Independent review per slice or per PR |
-| **Mission**: multi-epic, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), epics, issues planned just in time | Tracker is the source of truth; decisions in docs or ADRs | Independent review of all non-trivial code; independent `validate` for mission acceptance and for epics that change a user-facing or cross-boundary outcome |
+| **Multi-step**: several slices, sessions, or agents | Atelier issues, or a short plan file when the repository does not use Atelier | Atelier records or the plan file carry scope, proof, and handoffs | Independent review per slice or per PR |
+| **Mission**: multi-epic, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), epics, issues planned just in time | Atelier is the source of truth; decisions in docs or ADRs | Independent review of all non-trivial code; independent `validate` for mission acceptance and for epics that change a user-facing or cross-boundary outcome |
 
-If the repository has no tracker, or you cannot use it, keep the plan and any
-follow-up items in a file in the repository or in the PR description. Do not
-stop work to set a tracker up unless the user asks. Wherever this skill says
-"create an issue", that fallback applies.
+Agent Factory's tracker is [Atelier](references/atelier.md). Small work needs
+no tracker. If the repository does not use Atelier, or you cannot use it,
+keep the plan and any follow-up items in a file in the repository or in the
+PR description, and for mission-sized work offer to install Atelier (see
+`install`). Do not stop work to set it up unless the user asks. Wherever this
+skill says "create an issue", that fallback applies.
 
 ## Independent Review
 
@@ -168,9 +170,9 @@ Load these only when the work needs them.
 | [Strategic plans](references/strategic-plans.md) | Writing or changing a mission strategy |
 | [Submodel selection](references/submodel-selection.md) | Choosing models and reasoning effort for subagents |
 | [Branches and worktrees](references/branches-and-worktrees.md) | Deciding where to work, creating or cleaning up branches and worktrees, integrating |
-| [Tracker records](references/tracker-records.md) | Writing missions, epics, issues, validation items, or tracker comments |
+| [Tracker records](references/tracker-records.md) | Writing missions, epics, issues, validation items, evidence, or handoff notes |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory or assessing repository readiness |
-| Tracker commands: [navigating](references/tracker-commands/navigating-work.md), [managing issues](references/tracker-commands/managing-issues.md), [evidence](references/tracker-commands/evidence-tracking.md), [integrating](references/tracker-commands/integrating-changes.md), [admin](references/tracker-commands/administration-and-recovery.md) | Operating the repository's tracker (Atelier or GitHub Issues) |
+| [Atelier](references/atelier.md) | Operating the tracker: orienting, records, evidence, review, and integration |
 
 Maintainers changing this skill should read
 [maintainers/skill-evaluation.md](maintainers/skill-evaluation.md) first.

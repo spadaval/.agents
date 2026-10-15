@@ -29,7 +29,7 @@ Classify each claim:
 - `not-applicable`: the claim does not apply in this context; say why.
 
 For each `fail`, state the likely cause using the
-[shared vocabulary](../references/tracker-commands/evidence-tracking.md#shared-vocabulary):
+[shared vocabulary](../references/tracker-records.md#evidence):
 `defect in this change`, `expected breakage`, `environment/tooling`,
 or `pre-existing`. Include reproduction steps and expected versus actual results.
 Findings go to the accountable agent, who decides what happens next using
