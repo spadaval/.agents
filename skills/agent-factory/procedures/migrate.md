@@ -36,7 +36,11 @@ during construction would cost more than it teaches. Build on the mission's
 integration branch, or on one dedicated branch if there is no mission. Things
 may be broken there until the rewrite lands, while the default branch stays
 green the whole time. Record the choice and the reason in the plan, and merge only when the
-rewrite is complete and reviewed.
+rewrite is complete and reviewed. Atelier's gated merge does not support a
+separate rewrite or integration branch yet (see
+[Branches and Worktrees](../references/branches-and-worktrees.md#atelier-limits));
+with Atelier, prefer an atomic change or expand-and-contract, and ask the
+human before planning a rewrite branch.
 
 Do not break the default branch deliberately. Failing checks there hide real
 regressions and block everyone else.

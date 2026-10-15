@@ -25,7 +25,8 @@ delete. Create as few as possible, and clean up after the work.
   issues share a branch when they will be reviewed and merged together.
 - **At most one integration branch per mission,** and only when mission work
   must stay off the default branch until it is ready. Slice PRs target it. An
-  isolated rewrite (see `migrate`) uses this branch.
+  isolated rewrite (see `migrate`) uses this branch. Atelier's gated merge
+  does not support this yet; see the limits below.
 - **No branch per retry or review fix.** Commit review fixes to the branch
   under review, and retry on the same branch. To throw away a pushed attempt,
   archive-tag its tip first (see below) and follow the repository's
@@ -35,8 +36,25 @@ delete. Create as few as possible, and clean up after the work.
   deep. Merge the base before stacking further.
 - **Spikes** get one disposable branch each, deleted once their learning is
   recorded (see [Implementation Candidates](implementation-candidates.md)).
-- **Naming:** follow the repository's convention. Otherwise use
+- **Naming:** follow the repository's convention. With Atelier, `atelier
+  start` names the branch `<issue_type>/<id>`. Otherwise use
   `agent/<issue>-<short-slug>`.
+
+### Atelier Limits
+
+Atelier integrates an owner's branch only into the base branch named in
+`.atelier/workflow.yaml`, and `atelier start` records the branch you run it
+from as the new branch's base, permanently. So with Atelier:
+
+- run `atelier start` from the base branch;
+- do not stack one owner's branch on another's; sequence the work, or put
+  both slices under one epic so they share a branch;
+- do not plan a mission integration branch or an isolated rewrite branch
+  under gated merge. If the work needs one, say so in the plan and ask the
+  human how to integrate it.
+
+An owner started from the wrong branch fails `atelier land` and
+`atelier merge`, and recovering requires hand-editing the record.
 
 ## Worktrees
 
@@ -91,8 +109,9 @@ with an open PR. Close or retarget the PR first.
 
 Run the final proof and any integration checks the repository requires. Then
 inventory what the work created, starting from handoffs and tracker records
-and cross-checking with `git worktree list`, `git branch --list 'agent/*'`,
-and the remote branches. The `agent/*` listing includes other missions' work.
+and cross-checking with `git worktree list`, `git branch --list` for the
+repository's work-branch patterns (with Atelier, `<issue_type>/*`), and the
+remote branches. Those listings include other missions' work.
 Anything you cannot trace to this work is not yours to delete. Remove or
 archive what is finished, and run `git worktree prune` to clear stale
 entries.

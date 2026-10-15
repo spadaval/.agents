@@ -26,7 +26,9 @@ what each record contains.
 
 - Use `atelier issue create`, `show`, `update`, `transition`, `note`, `link`,
   and `unlink`. Author bodies with typed `--body` Markdown using the headings
-  in [Tracker Records](tracker-records.md).
+  in [Tracker Records](tracker-records.md). To revise an epic's or issue's
+  body later, edit its sections in `.atelier/issues/<id>.md` and run
+  `atelier check`; `issue update --body` applies only to missions.
 - Use epic parent fields for direct child hierarchy, `advances` links for
   mission scope, and `blocked_by` for dependencies. Missions are not parents.
 - Omit the transition name to see valid transitions and blockers:
@@ -56,9 +58,10 @@ what each record contains.
 
 ## Branches, Review, and Integration
 
-- `atelier start <id>` resolves the branch owner (an epic, or a standalone
-  issue), checks out or creates its work branch (`<issue_type>/<id>` by
-  default), records it, and starts the item. Commit those record changes with
+- Run `atelier start <id>` from the base branch. It resolves the branch
+  owner (an epic, or a standalone issue), checks out or creates its work
+  branch (`<issue_type>/<id>` by default), records the branch and its base,
+  and starts the item. The recorded base is never replaced. Commit those record changes with
   the work. Missions coordinate work and own no branch.
 - Atelier never creates commits. Commit records with the implementation, and
   commit the done claim on the work branch so it is reviewed with the code.
@@ -73,15 +76,17 @@ what each record contains.
 - Material changes after approval (code, policy, acceptance, relationships)
   make it stale. Adding evidence or review records and in-scope status changes
   do not.
-- `atelier merge <id> --check` evaluates the gates without integrating;
-  `atelier merge <id>` fast-forwards the policy's base branch to the reviewed
-  work and deletes the local work branch. Gates come from the base branch's
+- Integrate only with `atelier merge`, never a plain `git merge` into the
+  base branch, which skips every gate. `atelier merge <id> --check` evaluates
+  the gates without integrating; `atelier merge <id>` fast-forwards the
+  policy's base branch to the reviewed work and deletes the local work
+  branch. Gates come from the base branch's
   committed policy. Merge writes no records and does not push; pushing
   follows repository policy.
 - Merge integrates only into the base branch named in
-  `.atelier/workflow.yaml`. Atelier does not yet support a separate mission
-  integration branch, so an isolated rewrite (see `migrate`) cannot use
-  gated merge until it does. Say so in the plan rather than improvising.
+  `.atelier/workflow.yaml`, so mission integration branches, isolated rewrite
+  branches, and stacked owner branches are not supported yet. See
+  [Atelier Limits](branches-and-worktrees.md#atelier-limits).
 - Before handoff, commit canonical records and run `atelier land`. Active work
   may stay open with an honest handoff; done claims must satisfy their gates.
 

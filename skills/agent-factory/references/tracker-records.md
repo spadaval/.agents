@@ -36,11 +36,13 @@ the strategy file through the record's `strategy` path field.
 <Only when there is no strategy file; otherwise the strategy owns them.>
 ```
 
-If there is no separate strategy file, the mission body is the strategy:
-state the success criteria here and add other
-[strategy template](strategic-plans.md#template) sections only as needed.
-Execution work joins the mission through `advances` links, so do not list
-epics in the body.
+Atelier accepts only Outcome, Success criteria, and Epics in a mission body,
+plus the shared Notes and Close Reason. If there is no separate strategy file,
+Outcome and Success criteria carry the strategy. When the mission needs more
+of the [strategy template](strategic-plans.md#template), such as Shape,
+Scope, or Authority, write a strategy file and link it; do not add those
+sections to the mission. Execution work joins the mission through `advances`
+links, so the Epics section is optional.
 
 Post progress as dated notes. At meaningful points, note the success criteria
 shown so far, current epics, blockers, and open questions.
