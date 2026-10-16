@@ -6,8 +6,9 @@ who may change what. Every agent working on the mission reads it, so it has
 to stay short, stable, and at a high altitude.
 
 Write one as a file when a mission is long-running, spans several increments
-or systems, or involves contested tradeoffs. For smaller work, put the same
-sections in the mission issue body instead of a separate file.
+or systems, or involves contested tradeoffs. For smaller work, the mission's
+Outcome and Success criteria carry the strategy instead of a separate file
+(see [Tracker Records](tracker-records.md#mission)).
 
 ## Where It Lives
 
