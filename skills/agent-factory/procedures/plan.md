@@ -1,7 +1,7 @@
 # Plan
 
 Use this subskill to shape new work: write or revise a mission strategy, lay
-out epics, and create the first executable issues. Once execution is under
+out increments, and create the first executable issues. Once execution is under
 way, `orchestrate` maintains the plan itself. Come back to `plan` only for
 strategic revisions.
 
@@ -11,17 +11,18 @@ strategic revisions.
   shape, scope, and authority. For a substantial mission, write it as a short
   file (see [Strategic Plans](../references/strategic-plans.md)). For smaller
   work, the mission issue or PR description can serve.
-- **Epics** are outcome-bearing increments that make the whole mission
-  visible. A good epic is also a natural unit for one branch, one review
-  batch, and, where needed, one validation pass.
+- **Increments** are outcome-bearing slices that make the whole mission
+  visible. A good increment is also a natural unit for one branch, one review
+  batch, and, where needed, one validation pass. In Atelier each is a parent
+  issue whose children are its executable issues.
 - **Issues** are executable slices, created only as far ahead as evidence
   supports.
 - **Validation issues**, when the tracker is used, hold an independent
-  `validate` assignment for an epic or mission outcome.
+  `validate` assignment for an increment or mission outcome.
 
 Each record has one job; see [Tracker Records](../references/tracker-records.md)
 for what goes in each. Detailed design goes in architecture docs or design
-docs linked from epics, not in the strategy. Do not keep a separate
+docs linked from increments, not in the strategy. Do not keep a separate
 implementation-plan document, work briefs, or status tables alongside the
 tracker.
 
@@ -32,10 +33,13 @@ tracker.
 2. State the outcome, target shape, what is out of scope, and how success
    will be shown.
 3. Settle consequential choices that the first work depends on, using
-   `decide` where there are several credible paths. Do not park such a choice
-   in a future issue. If evidence is missing, plan the work that gathers it.
-4. Sketch the remaining mission as draft epics, each with a preliminary
-   outcome and its known unknowns. Do not invent tasks for distant epics.
+   `decide` where there are several credible paths. Do not park such a
+   choice in a future issue; one only the human can make goes in a
+   [decision record](../references/tracker-records.md#decision). If
+   evidence is missing, plan the work that gathers it.
+4. Sketch the remaining mission as backlog increments, each with a
+   preliminary goal and its known unknowns. Do not invent tasks for distant
+   increments.
 5. Make the first increment executable. Prefer an increment that proves a
    representative user outcome end to end over one that only builds
    infrastructure, unless a current constraint requires the infrastructure
@@ -82,5 +86,5 @@ tradeoff must change:
 
 ## Handoff
 
-Also report the strategy location, decisions recorded, epics and ready issues
+Also report the strategy location, decisions recorded, increments and ready issues
 created, and open questions.

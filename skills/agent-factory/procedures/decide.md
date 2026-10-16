@@ -35,6 +35,9 @@ return a recommendation, not a decision.
 Record the decision where its rationale will be needed:
 
 - mission-scoped decisions go in the strategic plan or issue;
+- a choice waiting on the human goes in an Atelier `decision` record (see
+  [Tracker Records](../references/tracker-records.md#decision)), with its
+  Decision section filled in when it is made;
 - decisions that outlast the mission go in the owning product or architecture
   doc, plus an ADR when the rationale would otherwise be lost or re-argued.
 

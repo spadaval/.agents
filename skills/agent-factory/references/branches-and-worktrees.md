@@ -21,7 +21,7 @@ delete. Create as few as possible, and clean up after the work.
 ## Branches
 
 - **One branch per pull request, and PRs sized for review.** A PR usually
-  covers an epic or another reviewable increment, not a single issue. Several
+  covers one reviewable increment, not a single issue. Several
   issues share a branch when they will be reviewed and merged together.
 - **At most one integration branch per mission,** and only when mission work
   must stay off the default branch until it is ready. Slice PRs target it. An
@@ -48,7 +48,7 @@ from as the new branch's base, permanently. So with Atelier:
 
 - run `atelier start` from the base branch;
 - do not stack one owner's branch on another's; sequence the work, or put
-  both slices under one epic so they share a branch;
+  both slices under one parent issue so they share a branch;
 - do not plan a mission integration branch or an isolated rewrite branch
   under gated merge. If the work needs one, say so in the plan and ask the
   human how to integrate it.

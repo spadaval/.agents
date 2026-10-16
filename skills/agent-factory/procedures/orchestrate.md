@@ -1,6 +1,6 @@
 # Orchestrate
 
-Use this subskill to run a mission, epic, or any workstream with several
+Use this subskill to run a mission, an increment, or any workstream with several
 pieces. The orchestrator is accountable for the outcome. It decides what
 happens next, delegates or does the work, integrates results, keeps the plan
 current, and closes against demonstrated outcomes.
@@ -83,7 +83,7 @@ ask one focused question of the reviewer, the author, or a `diagnose` worker
 instead of re-reading the subsystem yourself. Record decisions where the work
 is tracked.
 
-Use an independent `validate` assignment for mission acceptance, for epics
+Use an independent `validate` assignment for mission acceptance, for increments
 that change a user-facing or cross-boundary outcome, and for scenarios where
 deciding what to check needs an independent eye. Otherwise, author-run proof
 is sufficient evidence of behavior.
@@ -117,7 +117,7 @@ governing tradeoff, a boundary, or an accepted ADR. Those need the authority
 described in the [Constitution](../constitution.md#strategy-changes-deliberately).
 
 Plan executable work only as far as current evidence supports. Keep later work
-as draft epics with a preliminary outcome and known unknowns, and expand the
+as backlog increments with a preliminary goal and known unknowns, and plan the
 next one when its predecessor's evidence arrives or ready work runs low. If
 ready work runs out, figure out whether you are missing detail, evidence, or a
 decision. Do not invent busywork.

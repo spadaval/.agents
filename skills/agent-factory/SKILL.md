@@ -1,6 +1,6 @@
 ---
 name: agent-factory
-description: "Use for software work that spans multiple steps, sessions, or agents: planning or running a mission or epic, delegating work to subagents, making a consequential product or architecture decision, diagnosing an unexplained failure, or independently reviewing or validating agent-written code. Also use to connect a repository's tracker and docs for agent work."
+description: "Use for software work that spans multiple steps, sessions, or agents: planning or running a mission or a multi-issue increment, delegating work to subagents, making a consequential product or architecture decision, diagnosing an unexplained failure, or independently reviewing or validating agent-written code. Also use to connect a repository's tracker and docs for agent work."
 ---
 
 # Agent Factory
@@ -56,7 +56,7 @@ when handoffs, duration, or risk grow.
 | --- | --- | --- | --- |
 | **Small**: one agent, one session, a contained change | Think it through; no plan artifact needed | Clear commit message and PR description | Self-verify by running it; one independent reviewer for non-trivial code |
 | **Multi-step**: several slices, sessions, or agents | Atelier issues, or a short plan file when the repository does not use Atelier | Atelier records or the plan file carry scope, proof, and handoffs | Independent review per slice or per PR |
-| **Mission**: multi-epic, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), epics, issues planned just in time | Atelier is the source of truth; decisions in docs or ADRs | Independent review of all non-trivial code; independent `validate` for mission acceptance and for epics that change a user-facing or cross-boundary outcome |
+| **Mission**: several increments, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), increments, issues planned just in time | Atelier is the source of truth; decisions in docs or ADRs | Independent review of all non-trivial code; independent `validate` for mission acceptance and for increments that change a user-facing or cross-boundary outcome |
 
 Agent Factory's tracker is [Atelier](references/atelier.md). Small work needs
 no tracker. If the repository does not use Atelier, or you cannot use it,
@@ -141,8 +141,8 @@ apply.
 
 | Subskill | Use for | Procedure |
 | --- | --- | --- |
-| `orchestrate` | Running a mission, epic, or multi-item workstream: delegating, integrating, replanning, closing | [orchestrate.md](procedures/orchestrate.md) |
-| `plan` | Creating or revising strategy, and shaping epics and issues for new work | [plan.md](procedures/plan.md) |
+| `orchestrate` | Running a mission, increment, or multi-item workstream: delegating, integrating, replanning, closing | [orchestrate.md](procedures/orchestrate.md) |
+| `plan` | Creating or revising strategy, and shaping increments and issues for new work | [plan.md](procedures/plan.md) |
 | `decide` | A consequential product or architecture choice with several credible paths | [decide.md](procedures/decide.md) |
 | `implement` | Building one bounded slice with proof | [implement.md](procedures/implement.md) |
 | `diagnose` | Finding the cause of a bug, failing check, regression, or unexplained behavior | [diagnose.md](procedures/diagnose.md) |
@@ -170,7 +170,7 @@ Load these only when the work needs them.
 | [Strategic plans](references/strategic-plans.md) | Writing or changing a mission strategy |
 | [Submodel selection](references/submodel-selection.md) | Choosing models and reasoning effort for subagents |
 | [Branches and worktrees](references/branches-and-worktrees.md) | Deciding where to work, creating or cleaning up branches and worktrees, integrating |
-| [Tracker records](references/tracker-records.md) | Writing missions, epics, issues, validation items, evidence, or handoff notes |
+| [Tracker records](references/tracker-records.md) | Writing missions, increments, issues, validation items, decisions, evidence, or handoff notes |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory or assessing repository readiness |
 | [Atelier](references/atelier.md) | Operating the tracker: orienting, records, evidence, review, and integration |
 

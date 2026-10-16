@@ -1,7 +1,7 @@
 # Validate
 
 Use this subskill to check independently whether a system actually delivers
-the claimed outcome, whether that is an acceptance scenario, an epic outcome,
+the claimed outcome, whether that is an acceptance scenario, an increment outcome,
 a mission's success criteria, or a migration's completion. Validation starts
 from intended behavior, not from the diff.
 

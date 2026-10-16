@@ -1,10 +1,10 @@
 # Tracker Records
 
-Use this reference when creating or updating missions, epics, issues,
-validation items, evidence, and handoff notes. It defines what each record
-contains; see [Atelier](atelier.md) for the commands. The headings below are
-Atelier's typed body sections, so use them verbatim. Repository conventions
-come first where they differ.
+Use this reference when creating or updating missions, increments, issues,
+validation items, decisions, evidence, and handoff notes. It defines what each
+record contains; see [Atelier](atelier.md) for the commands. The headings
+below are Atelier's typed body sections, so use them verbatim. Repository
+conventions come first where they differ.
 
 ## Principles
 
@@ -26,7 +26,8 @@ status line on each.
 ## Mission
 
 The mission record is a front door. It does not restate the strategy. Link
-the strategy file through the record's `strategy` path field.
+the strategy file through the mission's strategy path (see
+[Strategic Plans](strategic-plans.md#where-it-lives)).
 
 ```md
 ## Outcome
@@ -34,48 +35,22 @@ the strategy file through the record's `strategy` path field.
 
 ## Success criteria
 <Only when there is no strategy file; otherwise the strategy owns them.>
+
+## Background
+<Research, references, and motivation the mission's work shares. Omit when
+none.>
 ```
 
-Atelier accepts only Outcome, Success criteria, and Epics in a mission body,
-plus the shared Notes and Close Reason. If there is no separate strategy file,
-Outcome and Success criteria carry the strategy. When the mission needs more
-of the [strategy template](strategic-plans.md#template), such as Shape,
-Scope, or Authority, write a strategy file and link it; do not add those
-sections to the mission. Execution work joins the mission through `advances`
-links, so the Epics section is optional.
+Atelier accepts only these sections in a mission body, plus the shared Notes
+and Close Reason. If there is no separate strategy file, Outcome and Success
+criteria carry the strategy. When the mission needs more of the
+[strategy template](strategic-plans.md#template), such as Shape, Scope, or
+Authority, write a strategy file and link it; do not add those sections to
+the mission. Work joins the mission through `advances` links; missions are
+never parents.
 
 Post progress as dated notes. At meaningful points, note the success criteria
-shown so far, current epics, blockers, and open questions.
-
-## Epic
-
-An epic is an outcome-bearing increment, and usually one branch, one review
-batch, and one validation point.
-
-```md
-## Outcome
-<What is true when this epic is done, observably.>
-
-## Delivers
-<Mission success criteria this advances, by number, e.g. S1, S3.>
-
-## Scope
-<Only if narrower than the mission's; otherwise omit.>
-
-## Unknowns
-<What must be learned before or during this epic. Omit when none.>
-
-## Proof
-<How the outcome will be shown: author proof plus review, or a linked
-validation item.>
-
-## Design
-<Link to the design doc or ADR, if one exists.>
-```
-
-A draft epic may contain only Outcome and Unknowns. Before marking it ready,
-fill in Proof, and add its immediate child issues and dependencies as native
-links.
+shown so far, current increments, blockers, and open questions.
 
 ## Issue
 
@@ -96,15 +71,48 @@ if the work were wrong or missing.>
 ## Context
 <Links to relevant files, interfaces, docs, ADRs, and findings. The target
 environment, if it affects risk.>
+
+## Unknowns
+<Unverified assumptions and open questions. Omit when none.>
+
+## Design
+<Link to the design doc or ADR, if one exists.>
+
+## Background
+<Research or prior work the reader needs. Omit when none.>
 ```
 
-Express dependencies as `blocked_by` links, not body text. Put follow-up
-findings in new issues, not in the body of a closed one.
+Only Goal and Done when are required; leave out any optional section that
+would say nothing. Express dependencies as `blocked_by` links, not body text.
+Put follow-up findings in new issues, not in the body of a closed one. Mark
+work only a human can do, such as an account approval or a step at a
+particular machine, with the `needs-human` label so agents do not pick it up.
+
+## Increment
+
+An increment is an outcome-bearing slice of a mission: usually one branch, one
+review batch, and one validation point. In Atelier it is a parent issue, any
+work item with direct children, one level deep. Children work on the parent's
+branch, and the parent closes after them. Use labels, not parents, for themes.
+
+A parent uses the Issue template with these meanings:
+
+- **Goal:** what is true when the increment is done, observably.
+- **Done when:** how the outcome will be shown (author proof plus review, or
+  a linked validation item) and which mission success criteria it delivers,
+  by number, e.g. S1, S3.
+- **Unknowns:** what must be learned before or during the increment.
+- **Background:** context every child shares, so children need not repeat it.
+
+Plan later increments in the `backlog` status with a preliminary Goal, a
+provisional Done when (required even in backlog), and their Unknowns. Before
+planning one into `todo`, make its Done when concrete and add its immediate
+children and dependencies as native links.
 
 ## Validation Item
 
 Create one when an independent `validate` assignment is needed, such as for
-mission acceptance or an epic that changes a user-facing outcome. It uses the
+mission acceptance or an increment that changes a user-facing outcome. It uses the
 `validation` issue type and the ordinary issue body:
 
 ```md
@@ -126,10 +134,30 @@ Results live in evidence receipts, one per claim, attached to the validation
 item. The validator notes the receipt IDs and its handoff on the item. Do not
 rewrite acceptance intent to store results.
 
+## Decision
+
+A choice that is waiting on the human is a `decision` record:
+
+```md
+## Question
+<The choice to make, and why it matters now.>
+
+## Options
+<The credible options and their tradeoffs. Omit if not yet known.>
+
+## Decision
+<What was decided, why, and on whose authority. Filled in when deciding.>
+```
+
+Context and Background are optional. Open decisions are the human's by
+default and never appear as agent-ready work. A decision that outlasts the
+mission also goes in the owning doc or an ADR (see
+[`decide`](../procedures/decide.md#authority-and-recording)).
+
 ## Evidence
 
 Record evidence in the tracker when later work or a later agent will rely on
-it: epic or mission acceptance, independent validation, migrations, and
+it: increment or mission acceptance, independent validation, migrations, and
 non-pass results. For ordinary slices, proof in the handoff is enough unless
 the repository's merge policy requires a receipt.
 
