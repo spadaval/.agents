@@ -112,13 +112,9 @@ resolutions, and none of that work is needed until a branch is next to land.
   1. merge the base into it once;
   2. regenerate generated files, such as lockfiles, in that same step;
   3. rerun its proof;
-  4. get the merge reviewed if it needed resolving;
+  4. get the merge reviewed if its result differs from Git's own merge,
+     because it needed resolving or regenerating anything;
   5. then integrate it (with Atelier, `atelier merge`).
-- Land branches that change the same files back to back, so only one of them
-  absorbs the other's changes. To see which waiting branches would merge
-  cleanly and which share files, use the tracker's merge-readiness view where
-  it exists (Atelier `status`), or `git merge-tree --write-tree <base>
-  <branch>`.
 - Check generated files mechanically. Put consistency checks in required
   proof or in the base policy's merge checks, so a merge that leaves a
   generated file broken fails a check before a reviewer has to notice it. In
