@@ -31,7 +31,7 @@ Make sure the repository's agent instructions (usually `AGENTS.md`) say, or
 link to:
 
 - that the repository uses Atelier, and the session commands agents run
-  (`atelier prime` to start, `atelier land` before handoff);
+  (`atelier status` to start, `atelier land` before handoff);
 - where product intent, domain vocabulary, architecture, decisions, and code
   standards live;
 - how to build and run the checks;

@@ -14,8 +14,8 @@ what each record contains.
 
 ## Orienting
 
-- Start a fresh session with `atelier prime`. Use `atelier status` for checkout
-  context and labeled summaries of other local work branches.
+- Start a fresh session with `atelier status`: checkout and owner context,
+  ready and active work, and labeled summaries of other local work branches.
 - Use `atelier work ready`, `blocked`, `active`, `all`, or `missions` for
   operational views, and `atelier work mission <id>`, `atelier work parent <id>`,
   or `atelier issue show <id>` for focused context.
@@ -110,7 +110,7 @@ what each record contains.
 ## Administration
 
 - `atelier init` installs Atelier in a repository. `atelier setup claude`
-  installs SessionStart and Stop hooks that run `prime` and `land`.
+  installs SessionStart and Stop hooks that run `status` and `land`.
 - `atelier check` validates every record and stops at the first structural
   error. Repair canonical records through reviewed edits and rerun it.
 - `atelier prune` lists cleanup candidates; `atelier prune --apply` removes
