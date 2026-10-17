@@ -94,14 +94,16 @@ what each record contains.
   do not.
 - Integrate only with `atelier merge`, never a plain `git merge` into the
   base branch, which skips every gate. `atelier merge <id> --check` evaluates
-  the gates without integrating; `atelier merge <id>` fast-forwards the
-  policy's base branch to the reviewed work and deletes the local work
-  branch. Under `branch_policy.merge_strategy: merge_commit`, a branch behind
-  the base that merges cleanly lands without a catch-up merge: `atelier
-  merge` builds the merge commit, runs the policy's `merge_checks` on the
-  merged tree, and moves the base to it only when every gate passes. Gates
-  come from the base branch's committed policy. Merge writes no records and
-  does not push; pushing follows repository policy.
+  the gates without integrating; `atelier merge <id>` integrates the
+  reviewed work and deletes the local work branch. Under the default
+  `branch_policy.merge_strategy: fast_forward_only` it fast-forwards the
+  base, so the branch must already contain it. Under `merge_commit` it
+  always creates a merge commit of the branch into the current base, runs the
+  policy's `merge_checks` on that merged tree, and moves the base to it only
+  when every gate passes, so a branch behind the base lands without a
+  catch-up merge when the merge is clean. Gates come from the base branch's
+  committed policy. Merge writes no records and does not push; pushing
+  follows repository policy.
 - Merge integrates only into the base branch named in
   `.atelier/workflow.yaml`, so mission integration branches, isolated rewrite
   branches, and stacked owner branches are not supported yet. See

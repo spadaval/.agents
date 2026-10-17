@@ -116,11 +116,13 @@ resolutions, and none of that work is needed until a branch is next to land.
      because it needed resolving or regenerating anything;
   5. then integrate it (with Atelier, `atelier merge`).
 
-  When the integration step itself builds and checks the merged tree (Atelier
-  under `merge_strategy: merge_commit`), a branch that merges cleanly skips
-  steps 1 to 4. Run them only when the merge conflicts, a generated file
-  needs regenerating, or the integration step refuses because the base
-  changed records about the item.
+  When the integration step itself creates and checks the merged tree
+  (Atelier under `merge_strategy: merge_commit`), a branch that merges
+  cleanly can skip merging the base in, provided the merge checks run the
+  proof that step 3 would rerun. Follow the steps above when the merge
+  conflicts, a merge check fails on the merged tree (such as a stale
+  lockfile), or merge refuses because the base changed records about the
+  item.
 - Check generated files mechanically. Put consistency checks in required
   proof or in the base policy's merge checks, so a merge that leaves a
   generated file broken fails a check before a reviewer has to notice it. In
