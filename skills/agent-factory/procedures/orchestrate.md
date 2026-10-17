@@ -99,6 +99,32 @@ protected branch until review is done. When a candidate works but is
 built wrong, decide whether to refactor, reimplement, or discard it using
 [Implementation Candidates](../references/implementation-candidates.md).
 
+### Landing Parallel Branches
+
+When several branches wait to land, the base moves under the others each time
+one lands. Bringing the base into every waiting branch after each landing
+multiplies catch-up merges, reruns of proof, and reviews of conflict
+resolutions, and none of that work is needed until a branch is next to land.
+
+- Review a branch when its work is done. Leave waiting branches alone when
+  the base moves.
+- When a branch is next to land:
+  1. merge the base into it once;
+  2. regenerate generated files, such as lockfiles, in that same step;
+  3. rerun its proof;
+  4. get the merge reviewed if it needed resolving;
+  5. then integrate it (with Atelier, `atelier merge`).
+- Land branches that change the same files back to back, so only one of them
+  absorbs the other's changes. To see which waiting branches would merge
+  cleanly and which share files, use the tracker's merge-readiness view where
+  it exists (Atelier `status`), or `git merge-tree --write-tree <base>
+  <branch>`.
+- Check generated files mechanically. Put consistency checks in required
+  proof or in the base policy's merge checks, so a merge that leaves a
+  generated file broken fails a check before a reviewer has to notice it. In
+  Rust, run `cargo metadata --locked` in every workspace that has its own
+  `Cargo.lock`.
+
 ## Keeping the Plan Current
 
 The plan, whether an issue graph or a plan file, is a hypothesis. Revise it after each integrated increment,
