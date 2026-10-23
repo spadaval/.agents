@@ -184,4 +184,6 @@ note when an assignment ends.
 
 A normal issue using the Issue template. The Goal says what was found, and the
 Context links to the finding that produced it. It is not a blocker unless
-someone explicitly makes it one.
+someone explicitly makes it one. Create it with
+`atelier issue create --discovered-from <finding, item or receipt id>` so the
+debrief can place it.

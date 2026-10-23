@@ -26,10 +26,11 @@ you already hold the context and the task is small. Delegate when:
 - slices can run in parallel;
 - a task would flood your context with material you will not need again;
 - the work needs a different model or reasoning level; or
-- the work must be independent of you, as review and validation of code you
+- the work must be independent of you, as review and validation of work you
   wrote must be.
 
-Code you write yourself follows the same review rule as any other author's.
+Work you write yourself, code or prose, follows the same review rule as any
+other author's.
 
 ## Assignments
 
@@ -59,16 +60,17 @@ For spikes or competing implementations, add the candidate fields from
 
 ## Review and Validation
 
-You arrange review. Every non-trivial code change, including code you wrote
+You arrange review. Every non-trivial change, including work you wrote
 yourself, gets an independent reviewer before it counts as done (see
 [Independent Review](../SKILL.md#independent-review)). Batch reviews per
 slice, per PR, or per increment, whichever keeps the diff reviewable. You have
-read the author's handoff, so you are not an independent reviewer of its code.
+read the author's handoff, so you are not an independent reviewer of its work.
 
 When dispatching a reviewer or validator:
 
 - Give it the diff or scenario, the governing requirements and constraints
-  quoted exactly, and the proof that was run.
+  quoted exactly, and the proof that was run. In Atelier,
+  `atelier review request <id>` prints this brief from the records.
 - Do not pass along the author's rationale or self-assessment.
 - Do not pre-judge its work: do not tell it to ignore a class of findings, cap
   severity, or treat any content as beyond challenge. If two requirements
@@ -76,7 +78,7 @@ When dispatching a reviewer or validator:
 
 When findings come back, read them in full and decide each one with
 [Finding Disposition](../references/finding-disposition.md). You decide scope;
-you do not need to redo the review. For findings on code you wrote yourself,
+you do not need to redo the review. For findings on work you wrote yourself,
 you are not a neutral judge: fix recommended `FIX NOW` findings or send your
 rebuttal back to a reviewer. If a fact you need is missing or disputed,
 ask one focused question of the reviewer, the author, or a `diagnose` worker
@@ -93,7 +95,7 @@ is sufficient evidence of behavior.
 Treat a returned implementation as a candidate until you have checked it.
 Passing tests show behavior, not construction quality. Before integrating,
 confirm the proof is fresh and exercises the claim and that the change fits
-the strategy. Unreviewed code may be integrated into a working or mission
+the strategy. Unreviewed work may be integrated into a working or mission
 branch while its review is pending, but it does not reach the default or
 protected branch until review is done. When a candidate works but is
 built wrong, decide whether to refactor, reimplement, or discard it using
@@ -157,13 +159,21 @@ blocks the current outcome. Otherwise record it as follow-up work. Preserve
 completed work and failed evidence when superseding plans; do not rewrite
 history to make the new route look inevitable.
 
+When you take up low-priority follow-ups, such as deferred review findings,
+batch them instead of running each through its own branch and review. Make
+them children of one parent increment: they share the parent's branch, each
+keeps its own Done when and proof and closes there, and one independent
+review of the branch, approved on the parent, covers them all. In Atelier,
+the children `atelier start` onto the parent's branch, and `atelier review
+request <parent>` briefs every child's Done when.
+
 ## Closeout
 
 Close against demonstrated outcomes, not issue count:
 
 1. Run the proof for each acceptance claim fresh, with independent validation
    where the scaling rules call for it.
-2. Confirm all non-trivial code has been independently reviewed.
+2. Confirm all non-trivial changes have been independently reviewed.
 3. Confirm no debug residue, temporary breakage, or orphaned paths remain,
    and that branches and worktrees created for the work are removed or
    archived.

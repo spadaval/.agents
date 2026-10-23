@@ -10,8 +10,8 @@ Use this reference to decide what happens to a review or validation finding.
   decides the disposition. It decides scope; it does not redo the review.
 - **The author** may confirm or dispute the facts with evidence. It fixes the
   findings marked `FIX NOW`. It does not decide the disposition of findings
-  on its own code. When the author is also the accountable agent (working
-  alone, or an orchestrator's own code), it fixes every finding the reviewer recommended as `FIX NOW` unless a
+  on its own work. When the author is also the accountable agent (working
+  alone, or an orchestrator's own work), it fixes every finding the reviewer recommended as `FIX NOW` unless a
   reviewer accepts its rebuttal. A recommended `FIX NOW` it leaves unresolved
   is reported first in the handoff, and the work is not done.
 - **A human** decides when the answer depends on risk tolerance or authority

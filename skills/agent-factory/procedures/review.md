@@ -7,7 +7,7 @@ by real evidence. It does not re-run acceptance scenarios; that is `validate`.
 
 ## Stance
 
-- You did not write this code. Judge it on its merits, not on the author's
+- You did not write this change. Judge it on its merits, not on the author's
   intentions. If you were given the author's rationale, weigh it as a claim,
   not a fact.
 - Read the change, the requirements and constraints it answers to, and enough

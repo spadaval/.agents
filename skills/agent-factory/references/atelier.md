@@ -67,7 +67,7 @@ what each record contains.
 
 ## Branches, Review, and Integration
 
-- Run `atelier start <id>` from the base branch. It resolves the branch
+- Run `atelier start <id> --base <base>` from any checkout, or plain `atelier start <id>` from the base branch. It resolves the branch
   owner (the parent, or a standalone issue), checks out or creates its work
   branch (`<issue_type>/<owner-id>` by default), records the branch and its
   base, and starts the item. The recorded base is never replaced. Children
@@ -78,25 +78,33 @@ what each record contains.
   the strategy files linked from missions (filing, grooming, decisions,
   strategy edits) may go on the base branch directly; everything else goes
   through a work branch and `atelier merge`.
-- Atelier creates no commits except the merge commit described below.
-  Commit records with the implementation, and commit the done claim on the
+- Atelier creates no commits except the merge commit described below and,
+  when asked with `--commit-records` (or `--stage-records` to group several
+  commands), the records the command wrote. Commit records with the
+  implementation, and commit the done claim on the
   work branch so it is reviewed with the code.
 - Record review against the branch owner with `atelier review record`,
   `approve`, `finding`, and `trivial`, each with an explicit `--identity` and
   summary. Approval must come from an identity other than the code's Git
   authors. `trivial` is the visible form of the trivial-change exemption.
+  A trivial change can also be committed on the base and exempted there,
+  with no owner issue or work branch: `atelier review trivial --base
+  <commit>` covers exactly that commit.
 - Record each [finding disposition](finding-disposition.md) with
   `atelier review disposition`. `fix_now` needs a later resolution commit and
   fresh independent approval; `defer` needs an existing follow-up issue;
   `defer` and `no_action` need acceptance from a non-author identity.
+- File work found along the way with `atelier issue create
+  --discovered-from <item, finding or receipt id>`.
 - Material changes after approval (code, policy, acceptance, relationships)
   make it stale. Adding evidence or review records and in-scope status changes
   do not.
 - Integrate only with `atelier merge`, never a plain `git merge` into the
   base branch, which skips every gate. `atelier merge <id> --check` evaluates
   the gates without integrating; `atelier merge <id>` integrates the
-  reviewed work and deletes the local work branch. Under the default
-  `branch_policy.merge_strategy: fast_forward_only` it fast-forwards the
+  reviewed work and deletes the local work branch. Under
+  `branch_policy.merge_strategy: fast_forward_only` (the default unless
+  `merge_checks` include a `shell.check`) it fast-forwards the
   base, so the branch must already contain it. Under `merge_commit` it
   always creates a merge commit of the branch into the current base, runs the
   policy's `merge_checks` on that merged tree, and moves the base to it only

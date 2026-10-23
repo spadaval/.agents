@@ -88,7 +88,7 @@ something observable.
 | Closed graph, failed outcome | Every issue is closed but the user scenario fails | Report the outcome as `fail` and do not close the mission. |
 | Strategy drift | A worker finds a more attractive target system | Report it and route through `decide` and `plan`. Change strategy only with authority. |
 | Review deference | A confident reviewer asks for a questionable change | The accountable agent weighs the evidence and chooses the disposition. |
-| Context gap | A disposition depends on a code fact the orchestrator lacks | Ask one focused question rather than guessing or re-reviewing. |
+| Context gap | A disposition depends on a fact the orchestrator lacks | Ask one focused question rather than guessing or re-reviewing. |
 | Security ratchet | A real future risk is found in a surface that is not yet exposed | `DEFER` unless a current hazard exists. |
 | Avoidable complexity | A general subsystem was added where a simple check would do | `FIX NOW` by removing it. |
 | Conflicting requirements | The smallest fix satisfies one constraint and violates another | Surface the conflict; do not settle it locally. |
@@ -105,7 +105,7 @@ something observable.
 | Trivial fix | A one-line typo or formatting fix in a repo with a tracker | Fix, verify, commit. No tracker items, strategy, or reviewer. |
 | Small contained change | A single-session change of about 50 lines | No strategy doc or increments. Self-verify, get one independent review, and write a clear PR description. |
 | No Atelier | The repository does not use Atelier, or the agent cannot run it | Proceed with a plan in the PR or a file. Offer to install Atelier for mission-sized work; do not block on it. |
-| Needless delegation | The orchestrator already holds the context for a small task | Do it directly, and still get independent review of non-trivial code. |
+| Needless delegation | The orchestrator already holds the context for a small task | Do it directly, and still get independent review of non-trivial changes. |
 | Distant certainty | A planner is asked for a complete multi-increment task list | Plan outcomes, and create issues only up to the nearest evidence boundary. |
 | Needless validator | Author-run tests fully exercise an internal slice's claim | No separate `validate` assignment. Review checks the proof. |
 | Worktree per assignment | An orchestrator dispatches three sequential slices and a reviewer | Sequential slices share one checkout, the reviewer reads the diff without a worktree, and closeout removes everything created. |

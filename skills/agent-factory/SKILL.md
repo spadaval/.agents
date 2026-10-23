@@ -20,7 +20,7 @@ reason from the Constitution.
   fixed, or is done, run the check that proves that specific claim after your
   last relevant change, and read its full output. A green suite that never
   exercises the claim, an earlier run, or another agent's report is not proof.
-- **Get non-trivial code reviewed by someone other than its author.** Authors
+- **Get non-trivial changes reviewed by someone other than their author.** Authors
   verify their own work by running it, but they do not review it. See
   [Independent Review](#independent-review).
 - **Diagnose before repairing.** When the cause of a failure is unknown,
@@ -54,9 +54,9 @@ when handoffs, duration, or risk grow.
 
 | Work | Planning | State and handoff | Review and validation |
 | --- | --- | --- | --- |
-| **Small**: one agent, one session, a contained change | Think it through; no plan artifact needed | Clear commit message and PR description | Self-verify by running it; one independent reviewer for non-trivial code |
+| **Small**: one agent, one session, a contained change | Think it through; no plan artifact needed | Clear commit message and PR description | Self-verify by running it; one independent reviewer for non-trivial changes |
 | **Multi-step**: several slices, sessions, or agents | Atelier issues, or a short plan file when the repository does not use Atelier | Atelier records or the plan file carry scope, proof, and handoffs | Independent review per slice or per PR |
-| **Mission**: several increments, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), increments, issues planned just in time | Atelier is the source of truth; decisions in docs or ADRs | Independent review of all non-trivial code; independent `validate` for mission acceptance and for increments that change a user-facing or cross-boundary outcome |
+| **Mission**: several increments, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), increments, issues planned just in time | Atelier is the source of truth; decisions in docs or ADRs | Independent review of all non-trivial changes; independent `validate` for mission acceptance and for increments that change a user-facing or cross-boundary outcome |
 
 Agent Factory's tracker is [Atelier](references/atelier.md). Small work needs
 no tracker. If the repository does not use Atelier, or you cannot use it,
@@ -67,28 +67,30 @@ skill says "create an issue", that fallback applies.
 
 ## Independent Review
 
-Every non-trivial code change is reviewed by someone other than its author
-before it is considered done. That reviewer can be another agent or a human
+Every non-trivial change, code or prose, is reviewed by someone other than its
+author before it is considered done. That reviewer can be another agent or a human
 who did not write it. Review may be batched per slice, per PR, or per
-integrated increment. Unreviewed code may sit on a working branch, but it does
+integrated increment. Unreviewed work may sit on a working branch, but it does
 not merge into the repository's default or protected branch, a PR is not
 marked ready, and a mission does not close until review has happened.
 
-- **What counts as code:** anything that changes behavior when executed or
-  deployed. That includes application code, tests, configuration, schemas and
+- **What needs review:** code, meaning anything that changes behavior when
+  executed or deployed (application code, tests, configuration, schemas and
   data migrations, build and CI definitions, infrastructure, and agent prompts
-  or skills. Prose-only documentation is not code.
+  or skills), and prose such as docs, ADRs and plans. One standard applies to
+  both: a planning or design error spreads into everything built on it.
+  Tracker records follow the tracker's own rules.
 - **Trivial changes are exempt:** changes whose correctness is fully evident
   from the diff. Examples are typo fixes, formatting, tool-driven renames,
   comments, prose wording, and patch-level dependency bumps with passing
   checks. Wording changes to prompts or skills are not trivial, because they
   change behavior. If you have to think about whether a change is trivial,
   it is not.
-- **Who reviews:** someone who did not write the code and does not carry the
+- **Who reviews:** someone who did not write the change and does not carry the
   author's reasoning. A fresh subagent qualifies. A different model is a
   bonus, not a requirement. An orchestrator that has read the author's
-  handoff or rationale does not count as independent. Code the orchestrator
-  writes itself needs review like anyone else's.
+  handoff or rationale does not count as independent. Work the orchestrator
+  writes itself, code or prose, needs review like anyone else's.
 - **Who arranges it:** under an orchestrator, the orchestrator dispatches
   reviewers and the author reports its review status. An author working alone
   spawns its own reviewer.
@@ -98,11 +100,11 @@ marked ready, and a mission does not close until review has happened.
 - **Changes after review:** any non-trivial change made after review, whether
   a fix to a finding, a new commit, or a conflict resolution, gets reviewed
   too. The reviewer does not have to be the same one.
-- **Disagreement:** an author who disputes a finding answers with a code fact
+- **Disagreement:** an author who disputes a finding answers with a fact
   or a test, never with confidence, schedule, or severity. The accountable
   agent decides using [Finding Disposition](references/finding-disposition.md).
   An author who is also the accountable agent, whether working alone or as an
-  orchestrator that wrote the code, is not a neutral judge of its own
+  orchestrator that wrote the work, is not a neutral judge of its own
   rebuttal. It either fixes every finding the reviewer recommended as
   `FIX NOW`, or sends its rebuttal back to a reviewer. Any recommended
   `FIX NOW` left unresolved goes at the top of the handoff, and the work is

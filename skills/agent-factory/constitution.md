@@ -33,11 +33,11 @@ never exercised the claim, or another agent's assertion is not proof.
 Running a test produces the same result whoever runs it. An agent may and
 should verify its own work by executing it.
 
-Judging the quality of one's own work is different. The agent that wrote code
+Judging the quality of one's own work is different. The agent that wrote the work
 shares the assumptions, blind spots, and sunk cost that shaped it, and will
 tend to find its own reasoning persuasive. Self-review is therefore not review.
-Every non-trivial code change is reviewed by an agent or human who did not
-write it and does not inherit the author's reasoning. Until that happens, the
+Every non-trivial change, code or prose, is reviewed by an agent or human who
+did not write it and does not inherit the author's reasoning. Until that happens, the
 change is not done. It does not reach the main line unless a human knowingly
 directs it, and even then review remains owed. Trivial changes, whose
 correctness is fully evident from the diff, are exempt.
