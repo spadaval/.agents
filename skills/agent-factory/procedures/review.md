@@ -7,8 +7,8 @@ by real evidence. It does not re-run acceptance scenarios; that is `validate`.
 
 ## Stance
 
-- You did not write this code. Judge it on its merits, not on the author's
-  intentions. If you were given the author's rationale, weigh it as a claim,
+- You did not write this change. Judge it on its merits, not on the
+  author's intentions. If you were given the author's rationale, weigh it as a claim,
   not a fact.
 - Read the change, the requirements and constraints it answers to, and enough
   surrounding code, docs, and ADRs to judge it. For non-trivial code, use
@@ -33,6 +33,12 @@ a contract miss.
    sources of truth, error handling, security, data integrity, concurrency,
    leftover residue, and stale docs.
 
+For documents and tracker records, the same two questions become: is what
+the document claims true of the code, the decisions, and the other docs, and
+could the agent or person who acts on it misread it? Look for contradictions, stale
+competing versions, and vague statements an implementer would have to guess
+at.
+
 Report complexity as a defect only when you can name the unnecessary moving
 part and a simpler construction that meets the same current requirements
 without moving the complexity elsewhere.
@@ -49,7 +55,7 @@ Contract: pass | fail | unable to assess, with one line of explanation
 Fitness:  pass | fail | unable to assess, with one line of explanation
 
 Findings
-- R1 [high|medium|low] path:line: problem, impact, and suggested fix.
+- R1 path:line: problem, impact, and suggested fix.
   Recommendation: FIX NOW | DEFER | NO ACTION, with a reason.
 
 Open questions

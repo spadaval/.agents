@@ -118,7 +118,7 @@ The agent can spawn subagents.
 Give this only if the agent spawns a reviewer, as that reviewer's report:
 
 ```text
-R1 [high] flags/cache.py:41: the cache key omits the tenant, so users with the
+R1 flags/cache.py:41: the cache key omits the tenant, so users with the
 same ID in different tenants share flags. Repro: tests/flags/test_tenant.py
 (new, fails). Recommendation: FIX NOW.
 ```

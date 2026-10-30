@@ -30,8 +30,7 @@ way to guarantee this, but the order is your call.
 
 **Declarative, configuration, UI, or docs changes:** use the most direct
 check available, such as a build, typecheck, schema validation, dry run,
-rendering, or screenshot. These still count as code for review purposes when
-they change behavior.
+rendering, or screenshot. They need review like any other change.
 
 When a failing observation before the change is impractical, name the reason
 and use the cheapest proof that could still show the change is wrong. That is
@@ -51,7 +50,7 @@ Throughout:
 
 ## Review
 
-Non-trivial code goes to an independent reviewer (see
+Non-trivial changes go to an independent reviewer (see
 [Independent Review](../SKILL.md#independent-review)). Under an orchestrator,
 the orchestrator arranges review, so report your review status as
 outstanding. Working alone, spawn a reviewer yourself and give it the diff,
@@ -59,10 +58,10 @@ the requirements, and your proof, but not your rationale. If you cannot, leave
 the change unmerged and say review is outstanding.
 
 When findings arrive, check each one against the code. Fix the `FIX NOW`
-findings one at a time, re-running the relevant proof. Working alone, treat
-every finding the reviewer recommended as `FIX NOW` that way unless a reviewer
-accepts your rebuttal. If you believe a finding is wrong, answer with a code
-fact or a test. Schedule, severity, and confidence are not rebuttals. Do not
+findings one at a time, re-running the relevant proof. You do not decide
+findings on your own work (see
+[Finding Disposition](../references/finding-disposition.md#who-decides)). If
+you believe a finding is wrong, answer with a fact or a test. Do not
 silently drop a finding or expand scope to address it. Non-trivial fixes need
 review too.
 

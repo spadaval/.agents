@@ -33,10 +33,11 @@ tracker.
 2. State the outcome, target shape, what is out of scope, and how success
    will be shown.
 3. Settle consequential choices that the first work depends on, using
-   `decide` where there are several credible paths. Do not park such a
-   choice in a future issue; one only the human can make goes in a
-   [decision record](../references/tracker-records.md#decision). If
-   evidence is missing, plan the work that gathers it.
+   `decide` where there are several credible paths, and record each in a
+   [decision record](../references/tracker-records.md#decision). Do not park
+   such a choice in a future issue; one only the human can make stays an
+   open decision record. If evidence is missing, plan the work that gathers
+   it.
 4. Sketch the remaining mission as backlog increments, each with a
    preliminary goal and its known unknowns. Do not invent tasks for distant
    increments.
@@ -64,7 +65,9 @@ possible future work.
 
 Before handing off, reread the ready issues. Check that together they cover
 the increment's outcome, that their interfaces agree with one another, and
-that each has a proof that could fail.
+that each has a proof that could fail. Then get the new planning
+independently reviewed; work does not start on an issue until it has been
+(see [Independent Review](../SKILL.md#independent-review)).
 
 ## Strategic Revision
 

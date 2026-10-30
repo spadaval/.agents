@@ -26,10 +26,10 @@ you already hold the context and the task is small. Delegate when:
 - slices can run in parallel;
 - a task would flood your context with material you will not need again;
 - the work needs a different model or reasoning level; or
-- the work must be independent of you, as review and validation of code you
-  wrote must be.
+- the work must be independent of you, as review and validation of work you
+  did must be.
 
-Code you write yourself follows the same review rule as any other author's.
+Changes you make yourself follow the same review rule as any other author's.
 
 ## Assignments
 
@@ -59,28 +59,31 @@ For spikes or competing implementations, add the candidate fields from
 
 ## Review and Validation
 
-You arrange review. Every non-trivial code change, including code you wrote
-yourself, gets an independent reviewer before it counts as done (see
+You arrange review. Every non-trivial change, including your own plans and
+code, gets an independent reviewer before it counts as done (see
 [Independent Review](../SKILL.md#independent-review)). Batch reviews per
 slice, per PR, or per increment, whichever keeps the diff reviewable. You have
-read the author's handoff, so you are not an independent reviewer of its code.
+read the author's handoff, so you are not an independent reviewer of its
+work.
 
 When dispatching a reviewer or validator:
 
 - Give it the diff or scenario, the governing requirements and constraints
   quoted exactly, and the proof that was run.
 - Do not pass along the author's rationale or self-assessment.
-- Do not pre-judge its work: do not tell it to ignore a class of findings, cap
-  severity, or treat any content as beyond challenge. If two requirements
-  conflict, hand over both and let the reviewer report the conflict.
+- Do not pre-judge its work: do not tell it to ignore a class of findings,
+  limit its recommendations, or treat any content as beyond challenge. If two
+  requirements conflict, hand over both and let the reviewer report the
+  conflict.
 
 When findings come back, read them in full and decide each one with
 [Finding Disposition](../references/finding-disposition.md). You decide scope;
-you do not need to redo the review. For findings on code you wrote yourself,
-you are not a neutral judge: fix recommended `FIX NOW` findings or send your
-rebuttal back to a reviewer. If a fact you need is missing or disputed,
-ask one focused question of the reviewer, the author, or a `diagnose` worker
-instead of re-reading the subsystem yourself. Record decisions where the work
+you do not need to redo the review. You do not decide findings on your own
+work (see
+[Finding Disposition](../references/finding-disposition.md#who-decides)). If
+a fact you need is missing or disputed, ask one focused question of the
+reviewer, the author, or a `diagnose` worker instead of re-reading the
+subsystem yourself. Record decisions where the work
 is tracked.
 
 Use an independent `validate` assignment for mission acceptance, for increments
@@ -125,9 +128,7 @@ resolutions, and none of that work is needed until a branch is next to land.
   item.
 - Check generated files mechanically. Put consistency checks in required
   proof or in the base policy's merge checks, so a merge that leaves a
-  generated file broken fails a check before a reviewer has to notice it. In
-  Rust, run `cargo metadata --locked` in every workspace that has its own
-  `Cargo.lock`.
+  generated file broken fails a check before a reviewer has to notice it.
 
 ## Keeping the Plan Current
 
@@ -163,7 +164,7 @@ Close against demonstrated outcomes, not issue count:
 
 1. Run the proof for each acceptance claim fresh, with independent validation
    where the scaling rules call for it.
-2. Confirm all non-trivial code has been independently reviewed.
+2. Confirm all non-trivial changes have been independently reviewed.
 3. Confirm no debug residue, temporary breakage, or orphaned paths remain,
    and that branches and worktrees created for the work are removed or
    archived.

@@ -136,7 +136,8 @@ rewrite acceptance intent to store results.
 
 ## Decision
 
-A choice that is waiting on the human is a `decision` record:
+A consequential choice is a `decision` record, whether it is waiting on the
+human or was made within an agent's authority:
 
 ```md
 ## Question
@@ -146,12 +147,16 @@ A choice that is waiting on the human is a `decision` record:
 <The credible options and their tradeoffs. Omit if not yet known.>
 
 ## Decision
-<What was decided, why, and on whose authority. Filled in when deciding.>
+<What was decided, why, on whose authority, and its consequences. Filled in
+when deciding.>
 ```
 
 Context and Background are optional. Open decisions are the human's by
-default and never appear as agent-ready work. A decision that outlasts the
-mission also goes in the owning doc or an ADR (see
+default and never appear as agent-ready work. In an Atelier repository the
+decision record is the ADR: docs link to it instead of restating its
+rationale. A changed decision gets a new record linked to the old one with
+`atelier issue link <new> <old> --role supersedes`; a decided record cannot
+take the `supersede` transition (see
 [`decide`](../procedures/decide.md#authority-and-recording)).
 
 ## Evidence

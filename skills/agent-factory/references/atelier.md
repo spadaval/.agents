@@ -44,8 +44,11 @@ what each record contains.
   `--status backlog`, or move it with the `defer` transition. The `plan`
   transition brings it back to `todo`. A backlog parent parks its unstarted
   children. Missions begin in `draft` and become `todo` with `ready`.
-- File a choice for the human as a `decision` record and close it with the
-  `decide` transition once its Decision section is filled in.
+- Record each consequential choice as a `decision` record and close it with
+  the `decide` transition once its Decision section is filled in. An open
+  decision waits for the human; an agent recording a choice within its own
+  authority fills in the Decision section and runs `decide` in the same
+  change.
 - Use the `supersede` transition with a reason when evidence makes planned
   work obsolete. Preserve completed work and its evidence.
 - For a prepared multi-record graph, run `atelier bundle preview <file>` before
@@ -77,7 +80,17 @@ what each record contains.
 - Planning changes need no work branch. Commits that touch only records and
   the strategy files linked from missions (filing, grooming, decisions,
   strategy edits) may go on the base branch directly; everything else goes
-  through a work branch and `atelier merge`.
+  through a work branch and `atelier merge`. Landing directly is not an
+  exemption from review: a non-trivial planning change is reviewed before
+  the work it defines starts (see
+  [Independent Review](../SKILL.md#independent-review)). `atelier review
+  request` needs a started owner, so brief the reviewer with the planning
+  commits instead, and record the result with `atelier review approve` or
+  `finding` against the increment or issue, the mission for a strategy edit,
+  or the decision record itself. On the base branch Atelier cannot tell who authored the plan, so it
+  does not stop the planner accepting `defer` or `no_action` on findings
+  about its own plan; follow
+  [Finding Disposition](finding-disposition.md#who-decides) anyway.
 - Atelier creates no commits except the merge commit described below.
   Commit records with the implementation, and commit the done claim on the
   work branch so it is reviewed with the code.

@@ -33,14 +33,18 @@ never exercised the claim, or another agent's assertion is not proof.
 Running a test produces the same result whoever runs it. An agent may and
 should verify its own work by executing it.
 
-Judging the quality of one's own work is different. The agent that wrote code
+Judging the quality of one's own work is different. The agent that wrote it
 shares the assumptions, blind spots, and sunk cost that shaped it, and will
 tend to find its own reasoning persuasive. Self-review is therefore not review.
-Every non-trivial code change is reviewed by an agent or human who did not
-write it and does not inherit the author's reasoning. Until that happens, the
-change is not done. It does not reach the main line unless a human knowingly
-directs it, and even then review remains owed. Trivial changes, whose
-correctness is fully evident from the diff, are exempt.
+This holds for documents as much as for code: agents act on what they read,
+and prose has no compiler or tests to catch its errors. Every non-trivial
+change is reviewed by an agent or human who did not write it and does not
+inherit the author's reasoning. Until that happens, the change is not done.
+It does not reach the main line unless a human knowingly directs it, and even
+then review remains owed. Planning records are the exception: they may land
+first so every branch sees the plan, and are reviewed before the work they
+define starts. Trivial changes, whose correctness is fully evident from the
+diff, are exempt.
 
 The same bias applies when an author judges a dispute about its own work.
 An author disputing a review finding answers with evidence, and someone other
@@ -162,7 +166,7 @@ arrives.
 
 Workers report what is true: findings, failures, discoveries. The agent
 accountable for the outcome decides what those facts mean for current scope.
-A reviewer's severity label does not set priority, and a worker's discovery
+A reviewer's recommendation does not set priority, and a worker's discovery
 does not expand the mission by being found.
 
 ---

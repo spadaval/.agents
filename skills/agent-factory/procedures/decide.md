@@ -32,14 +32,13 @@ If the decision changes strategy, it needs the authority described in the
 [Constitution](../constitution.md#strategy-changes-deliberately). Without it,
 return a recommendation, not a decision.
 
-Record the decision where its rationale will be needed:
-
-- mission-scoped decisions go in the strategic plan or issue;
-- a choice waiting on the human goes in an Atelier `decision` record (see
-  [Tracker Records](../references/tracker-records.md#decision)), with its
-  Decision section filled in when it is made;
-- decisions that outlast the mission go in the owning product or architecture
-  doc, plus an ADR when the rationale would otherwise be lost or re-argued.
+Give each decision one record that holds the choice and its rationale. With
+Atelier, that is a `decision` record (see
+[Tracker Records](../references/tracker-records.md#decision)), which serves as
+the ADR. Without it, use an ADR, or the strategy or issue for a choice that
+only matters within one mission. The strategy and the product or architecture
+docs then state the current design and link to the decision instead of
+restating its rationale.
 
 ## Handoff
 

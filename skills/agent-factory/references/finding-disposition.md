@@ -8,20 +8,20 @@ Use this reference to decide what happens to a review or validation finding.
   recommend a disposition.
 - **The accountable agent**, the orchestrator or whoever owns the outcome,
   decides the disposition. It decides scope; it does not redo the review.
-- **The author** may confirm or dispute the facts with evidence. It fixes the
-  findings marked `FIX NOW`. It does not decide the disposition of findings
-  on its own code. When the author is also the accountable agent (working
-  alone, or an orchestrator's own code), it fixes every finding the reviewer recommended as `FIX NOW` unless a
-  reviewer accepts its rebuttal. A recommended `FIX NOW` it leaves unresolved
-  is reported first in the handoff, and the work is not done.
+- **The author** may confirm or dispute the facts with a fact or a test, and
+  fixes the findings marked `FIX NOW`. It does not decide findings on its
+  own work, whatever its role, because it shares the blind spots that
+  produced the work. So when the author is also the accountable agent,
+  it fixes every finding a reviewer recommended as `FIX NOW`, or sends its
+  rebuttal to a reviewer to weigh. A recommended `FIX NOW` left unresolved is
+  reported first in the handoff, and the work is not done.
 - **A human** decides when the answer depends on risk tolerance or authority
   that no durable source settles.
 
-Severity describes impact, not priority. A "high severity" label does not
-make a finding blocking, and a deadline does not make it non-blocking. A
-`FIX NOW` recommendation must name the blocking condition and show that it
-exists on a current code path in the target environment. A label such as
-"security" or "maintainability" is not enough by itself.
+A deadline does not make a finding non-blocking. A `FIX NOW` recommendation
+must name the blocking condition and show that it exists on a current path in
+the target environment. A label such as "high severity", "security", or
+"maintainability" is not enough by itself.
 
 If deciding requires a fact you do not have, or the reviewer and author
 disagree about a fact, ask one focused question of the reviewer, the author,

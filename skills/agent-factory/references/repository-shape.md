@@ -53,7 +53,7 @@ When a repository is large enough to split these concerns, typical homes are:
 | Doc index: which doc owns what | `docs/index.md` or README |
 | Product behavior and public contracts | `docs/product/` or equivalent |
 | Architecture: boundaries, ownership, dependency direction | `docs/architecture/` or equivalent |
-| Decisions and rationale | `docs/adr/` |
+| Decisions and rationale | Atelier `decision` records, or `docs/adr/` without Atelier |
 | Standards and how claims are checked | Contributing, quality, or testing docs |
 
 Split a document when it starts serving conflicting audiences. Product docs
@@ -63,9 +63,10 @@ than repeating one contract in all three.
 
 ## Decisions
 
-Write an ADR when a decision is costly to reverse, non-obvious, likely to be
-re-argued, crosses boundaries, changes a public or persisted contract, or
-deliberately rejects a plausible alternative. A useful ADR has a stable
+Write an ADR (with Atelier, a `decision` record) when a decision is costly
+to reverse, non-obvious, likely to be re-argued, crosses boundaries, changes a
+public or persisted contract, or deliberately rejects a plausible
+alternative. A useful ADR has a stable
 identifier, a status, the context and forces behind it, the decision, and its
 consequences. When a decision changes, write a new ADR that supersedes the old
 one rather than rewriting history.

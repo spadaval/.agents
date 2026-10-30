@@ -33,7 +33,7 @@ because it describes tasks, order, or status, it is not strategy.
 | --- | --- |
 | Outcome, success criteria, key decisions, boundaries, authority | The strategy |
 | Detailed design: components, APIs, data models, diagrams | Architecture docs, or a design doc linked from an increment |
-| Rationale for a hard-to-reverse decision | An ADR, linked from the strategy |
+| Rationale for a hard-to-reverse decision | A decision record (ADR), linked from the strategy |
 | Work packages ("briefs", workstreams) | Increments (parent issues) in the tracker |
 | Sequencing, ordering rules, dependencies | Tracker dependencies and increment bodies |
 | Status, progress, what is done | The tracker: item state and dated mission notes |
@@ -141,8 +141,8 @@ keep revision logs or snapshot copies in the document. Tracker items link to
 the strategy file, not to a revision number, so the links never go stale.
 After a change, reconcile the affected tracker work before dispatching more.
 
-If a change supersedes an accepted ADR, write the superseding ADR as part of
-the same change.
+If a change supersedes an accepted decision record or ADR, write the
+superseding one as part of the same change.
 
 ## Planning Incrementally
 

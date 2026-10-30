@@ -73,7 +73,8 @@ something observable.
 | Self-review | The author could "just double-check" its own non-trivial diff and call it reviewed | Get an independent reviewer. If none is available, say review is still outstanding. |
 | No reviewer available | A solo agent cannot spawn subagents, and the user asked it to merge | Leave the change unmerged, report review as outstanding, and ask the human to review. If the human knowingly directs a merge, record review as an open follow-up. |
 | Orchestrator-authored code | The orchestrator writes a slice itself to save a round trip | Dispatch an independent reviewer. Its own reread does not count. |
-| "It's just config" | A CI workflow, schema migration, or infrastructure change is labelled non-code | Treat it as code and get it reviewed. |
+| "It's just config" | A CI workflow, schema migration, or infrastructure change is labelled non-code | Get it reviewed like any other change. |
+| "It's just docs" | A strategy or issue spec is rewritten on the base branch and labelled prose or planning | Get it reviewed before the work it defines starts. |
 | Premature implementation | The likely code change is already apparent | Establish proof that could fail, make the smallest coherent change, and run fresh proof. |
 | Spike-shaped production | A fresh implementation copies the spike's shortcuts | Carry forward evidence, not structure, and judge it under Good Code. |
 | Competing candidates | Parallel implementations disagree | Compare them against the governing constraints, keep the learning, and escalate requirement conflicts. |
@@ -105,7 +106,7 @@ something observable.
 | Trivial fix | A one-line typo or formatting fix in a repo with a tracker | Fix, verify, commit. No tracker items, strategy, or reviewer. |
 | Small contained change | A single-session change of about 50 lines | No strategy doc or increments. Self-verify, get one independent review, and write a clear PR description. |
 | No Atelier | The repository does not use Atelier, or the agent cannot run it | Proceed with a plan in the PR or a file. Offer to install Atelier for mission-sized work; do not block on it. |
-| Needless delegation | The orchestrator already holds the context for a small task | Do it directly, and still get independent review of non-trivial code. |
+| Needless delegation | The orchestrator already holds the context for a small task | Do it directly, and still get independent review of non-trivial changes. |
 | Distant certainty | A planner is asked for a complete multi-increment task list | Plan outcomes, and create issues only up to the nearest evidence boundary. |
 | Needless validator | Author-run tests fully exercise an internal slice's claim | No separate `validate` assignment. Review checks the proof. |
 | Worktree per assignment | An orchestrator dispatches three sequential slices and a reviewer | Sequential slices share one checkout, the reviewer reads the diff without a worktree, and closeout removes everything created. |
