@@ -96,9 +96,9 @@ Outcome: one or two sentences giving the observable result against Done
 when, or for `supersede` why the work will not happen. Test names,
 measurements, and review status go in evidence and review records.
 
-Where repository policy requires it, Close Reason also carries the
-implementer report: what a reviewer of the finished mission needs that the
-diff and the proof do not show.
+Close Reason also carries the implementer report: what a reviewer of the
+finished mission needs that the diff and the proof do not show. Repository
+policy may require particular parts.
 
 ```md
 ## Close Reason
@@ -136,7 +136,7 @@ A parent uses the Issue template with these meanings:
 - **Goal:** what is true when the increment is done, observably.
 - **Done when:** how the outcome will be shown (author proof plus review, or
   a linked validation item) and which mission success criteria it delivers,
-  by slug, e.g. `pipe-safe`, S3.
+  by slug, e.g. `pipe-safe`.
 - **Unknowns:** what must be learned before or during the increment.
 - **Background:** context every child shares, so children need not repeat it.
 
@@ -198,21 +198,21 @@ take the `supersede` transition (see
 ### Decision Notes
 
 A choice an implementer makes inside one work item, within its authority, is
-a decision note on that item, not a record. Write one when a later reader
-would otherwise ask "why is it like this?": a design choice between credible
-options, a deliberate departure from the plan, or a tradeoff. Keep it short;
-a two-line note that gets written beats a full one that is skipped.
+a decision note on that item. Write one when a later reader would otherwise
+ask "why is it like this?": a design choice between credible options, a
+deliberate departure from the plan, or a tradeoff. Keep it short; a two-line
+note that gets written beats a full one that is skipped.
 
 ```text
 atelier issue note <id> --kind decision "<the choice>" --reason "<why>" \
-  [--rejected "<alternative>"]... [--one-way]
+  [--rejected "<alternative>"]...
 ```
 
-Mark it `--one-way` when reversing it later would be expensive, such as a
-record format, a public interface, or a data migration. One-way decisions
-lead `atelier work decisions <mission>`, where reviewers look first. A choice
-that reaches beyond the item, or that only the human can make, is a decision
-record instead.
+A choice that would need an ADR (see
+[Repository Shape](repository-shape.md)), such as one that is costly to
+reverse or changes a public or persisted contract, is a decision record, not
+a note. So is one that reaches beyond the item or that only the human can
+make. `atelier work decisions <mission>` lists both.
 
 ## Evidence
 
@@ -235,7 +235,8 @@ searchable:
 ## Notes and Reviews
 
 **Handoff:** the standard [handoff](../SKILL.md#handoff), appended as a dated
-note when an assignment ends.
+note when an assignment ends. When the assignment closes the item, the note
+can point at the Close Reason instead of repeating it.
 
 **Reviews and finding dispositions:** review events, not notes. See
 [Finding Disposition](finding-disposition.md#recording).

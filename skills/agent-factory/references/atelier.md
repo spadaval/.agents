@@ -72,9 +72,11 @@ what each record contains.
   Capture a command after `--` to pin current HEAD and derive the result from
   the exit status. Manual receipts require an explicit `--result`.
 - A receipt that judges mission success criteria names each with its own
-  result: `--criterion pipe-safe=pass --criterion quiet-tokens=fail` for
-  manual proof, or a bare `--criterion <slug>` that takes a captured
-  command's result. Target the mission, or an item only that mission holds
+  result: `--result fail --criterion pipe-safe=pass --criterion
+  quiet-tokens=fail` for manual proof, or a bare `--criterion <slug>` that
+  takes a captured command's result. A manual receipt's `--result` is the
+  receipt's overall result, and a `fail` blocks closing its target until a
+  later pass, so it is `pass` only when every criterion it names passes. Target the mission, or an item only that mission holds
   (an item in several missions is refused); the receipt keeps that mission
   even if the item moves. `check` refuses a slug the mission does not
   define. `atelier work mission <id>` marks each criterion proven, failing or
@@ -101,8 +103,9 @@ what each record contains.
   decisions own no branch.
 - Planning changes need no work branch. Commits that touch only records and
   the strategy files linked from missions (filing, grooming, decisions,
-  strategy edits) may go on the base branch directly; everything else goes
-  through a work branch and `atelier merge`. Landing directly is not an
+  strategy edits) may go on the base branch directly, as may a trivial
+  change exempted with `atelier review trivial --base` (below); everything
+  else goes through a work branch and `atelier merge`. Landing directly is not an
   exemption from review: a non-trivial planning change is reviewed before
   the work it defines starts (see
   [Independent Review](../SKILL.md#independent-review)). `atelier review

@@ -142,7 +142,8 @@ Every assignment ends with a handoff. It contains:
 
 Subskills name any additional fields they need. Leave out fields that do not
 apply. When the assignment closes a tracker item, the durable part of the
-handoff also goes in the item's record: decisions as decision notes, and the
+handoff also goes in the item's record: decisions as decision notes or
+records, and the
 outcome, deviations, surprises, and open items as the implementer report in
 its Close Reason (see [Tracker Records](references/tracker-records.md)).
 

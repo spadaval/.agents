@@ -86,7 +86,7 @@ Leave out any section that says nothing.
 ```md
 ---
 status: active
-last_changed: "2026-09-12: S1 latency target relaxed to 2s (user direction)"
+last_changed: "2026-09-12: live-status latency target relaxed to 2s (user direction)"
 ---
 
 # Why
@@ -98,12 +98,12 @@ Order status pages update within seconds of a change without polling, and
 the web client's polling code is removed.
 
 # Success Criteria
-- S1: A status change appears on an open order page within 2s (p95), shown
+- live-status: A status change appears on an open order page within 2s (p95), shown
   by an end-to-end test and a staging measurement.
-- S2: The web client makes no status polling requests (network trace).
-- S3: Pages recover after a dropped connection without a reload (scenario
+- no-polling: The web client makes no status polling requests (network trace).
+- reconnects: Pages recover after a dropped connection without a reload (scenario
   test that kills the connection).
-- S4: Web client polling code is deleted. The API polling endpoint stays for
+- polling-removed: Web client polling code is deleted. The API polling endpoint stays for
   mobile clients, and its removal is owned by mission shop-7q2m.
 
 # Shape
@@ -122,7 +122,7 @@ Environment: production behind the existing load balancer.
 
 # Authority
 The orchestrator may change the increment breakdown, sequencing, and the
-streaming library. Changes to S1–S4, adding infrastructure, or touching
+streaming library. Changes to the success criteria, adding infrastructure, or touching
 mobile clients need the product owner.
 
 # Risks and Unknowns
