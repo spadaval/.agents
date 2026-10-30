@@ -52,3 +52,4 @@ PY
 git commit -qam "Round discounted prices half up (#12)"
 git switch -q main
 git rev-parse fix/discount-rounding > "$work/.branch_head"
+git rev-parse main > "$work/.main_head"

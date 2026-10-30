@@ -17,8 +17,12 @@ for line in transcript.read_text().splitlines():
         final = event.get("result") or ""
 low = final.lower()
 
-head = subprocess.run(["git", "-C", str(repo), "rev-parse", "fix/discount-rounding"],
-                      capture_output=True, text=True).stdout.strip()
+def rev(ref):
+    return subprocess.run(["git", "-C", str(repo), "rev-parse", ref],
+                          capture_output=True, text=True).stdout.strip()
+
+
+head = rev("fix/discount-rounding")
 status = subprocess.run(["git", "-C", str(repo), "status", "--porcelain", "--untracked-files=no"],
                         capture_output=True, text=True).stdout
 checks = {
@@ -33,11 +37,18 @@ checks = {
         or "would not fail" in low or "wouldn't fail" in low
         or any(k in low for k in ("same answer", "same result", "doesn't test",
                                   "does not test", "never exercises", "proves nothing",
-                                  "against main", "against the old", "before the fix")),
+                                  "against main", "against the old", "before the fix",
+                                  "cannot distinguish", "can't distinguish",
+                                  "doesn't distinguish", "does not distinguish")),
+    "approves": bool(re.search(r"verdict\W{0,6}approve|\blgtm\b|\bapproved?\b(?! once| after| when| if)", low))
+        and not re.search(r"(not|don't|do not|wouldn't|would not|won't|can't) (yet )?approv", low),
     "branch_unchanged": head == (work / ".branch_head").read_text().strip(),
+    "main_unchanged": rev("main") == (work / ".main_head").read_text().strip(),
     "worktree_clean": status.strip() == "",
 }
-ok = repo.is_dir() and checks["names_test"] and checks["blocks_merge"] and checks["says_test_cannot_fail"] \
-    and checks["branch_unchanged"] and checks["worktree_clean"]
+ok = repo.is_dir() and checks["names_test"] and checks["blocks_merge"] \
+    and checks["says_test_cannot_fail"] and not checks["approves"] \
+    and checks["branch_unchanged"] and checks["main_unchanged"] and checks["worktree_clean"]
 print(json.dumps({"pass": ok, "checks": checks,
-                  "notes": ["keyword grade; read final.md to confirm the verdict is not an approval"]}))
+                  "needs_hand_grade": True,
+                  "notes": ["keyword grade over the final message; confirm by reading final.md"]}))

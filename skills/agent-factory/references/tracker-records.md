@@ -123,8 +123,10 @@ risks, skipped checks with reasons, and blockers. `None.` if none.>
 ```
 
 Write it in the record body, or in a file passed with `--reason-file`, then
-run the close transition. Close before requesting the final review: a close
-committed after an approval needs a fresh approval to cover the done claim. Be
+run the close transition. Close before requesting the final review, so the
+reviewer sees the done claim and the report, and the approval covers the
+claim (`merge --check` reports a done claim outside every approval as
+`claims.reviewed`). Be
 candid and short: a reviewer reads these across a whole mission.
 
 ## Increment

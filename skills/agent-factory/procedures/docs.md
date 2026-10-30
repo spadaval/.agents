@@ -15,7 +15,7 @@ as fixing drift, recording decisions, or updating guidance after a change.
   configuration, run or inspect the real thing rather than trusting the old
   text.
 - When a decision changes, write a superseding decision record or ADR (see
-  [Strategic Plans](../references/strategic-plans.md#changing-it)); do not
+  [Tracker Records](../references/tracker-records.md#decision)); do not
   rewrite accepted history.
 - When you find a gap you cannot resolve, such as an unclear owner or an
   undecided behavior, record it as follow-up work instead of guessing.
