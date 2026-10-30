@@ -57,8 +57,10 @@ What is true when the mission is done, stated so someone could observe it.
 Note any partial outcome that would still be worth shipping.
 
 # Success Criteria
-Numbered, observable claims (S1, S2, ...). Increments and validation refer to these
-numbers. For each, say how it will be shown, such as a test, scenario, or
+Observable claims, one `- <slug>: <claim>` bullet each, with a short
+kebab-case slug that names the claim (`- pipe-safe: ...`); older strategies
+use `S1`, `S2`, which still work. Increments, validation and evidence refer to
+these slugs. For each, say how it will be shown, such as a test, scenario, or
 measurement.
 
 # Shape

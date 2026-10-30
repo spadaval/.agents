@@ -67,6 +67,9 @@ review too.
 
 ## Handoff
 
+Before the close transition, record decisions you made as decision notes and
+write the implementer report in the item's Close Reason (see
+[Tracker Records](../references/tracker-records.md#close-reason-and-the-implementer-report)).
 Also report the branch or commit, and any branch or worktree you created and
 its cleanup state. For
 an implementation candidate, report observed behavior, design concerns, and

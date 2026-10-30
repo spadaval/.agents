@@ -34,7 +34,8 @@ the strategy file through the mission's strategy path (see
 <One paragraph: the outcome, in plain words.>
 
 ## Success criteria
-<Only when there is no strategy file; otherwise the strategy owns them.>
+<Only when there is no strategy file; otherwise the strategy owns them. One
+`- <slug>: <claim>` bullet per criterion.>
 
 ## Background
 <Research, references, and motivation the mission's work shares. Omit when
@@ -88,6 +89,41 @@ Put follow-up findings in new issues, not in the body of a closed one. Mark
 work only a human can do, such as an account approval or a step at a
 particular machine, with the `needs-human` label so agents do not pick it up.
 
+### Close Reason and the Implementer Report
+
+Close Reason is written when the item closes. Its first paragraph is the
+Outcome: one or two sentences giving the observable result against Done
+when, or for `supersede` why the work will not happen. Test names,
+measurements, and review status go in evidence and review records.
+
+Where repository policy requires it, Close Reason also carries the
+implementer report: what a reviewer of the finished mission needs that the
+diff and the proof do not show.
+
+```md
+## Close Reason
+
+<Outcome.>
+
+### Deviations
+<Where the work departed from the issue or plan, and why. `None.` if none.>
+
+### Decisions
+<The choices that shaped the work; point at the item's decision notes rather
+than repeating them. `None.` if none.>
+
+### Surprises
+<What you did not expect: a wrong assumption, a hidden constraint, a cost.
+`None.` if none.>
+
+### Open items
+<What is left, each with its follow-up issue ID. `None.` if none.>
+```
+
+Write it in the record body, or in a file passed with `--reason-file`, then
+run the close transition; the report does not make an approval stale. Be
+candid and short: a reviewer reads these across a whole mission.
+
 ## Increment
 
 An increment is an outcome-bearing slice of a mission: usually one branch, one
@@ -100,7 +136,7 @@ A parent uses the Issue template with these meanings:
 - **Goal:** what is true when the increment is done, observably.
 - **Done when:** how the outcome will be shown (author proof plus review, or
   a linked validation item) and which mission success criteria it delivers,
-  by number, e.g. S1, S3.
+  by slug, e.g. `pipe-safe`, S3.
 - **Unknowns:** what must be learned before or during the increment.
 - **Background:** context every child shares, so children need not repeat it.
 
@@ -158,6 +194,25 @@ rationale. A changed decision gets a new record linked to the old one with
 `atelier issue link <new> <old> --role supersedes`; a decided record cannot
 take the `supersede` transition (see
 [`decide`](../procedures/decide.md#authority-and-recording)).
+
+### Decision Notes
+
+A choice an implementer makes inside one work item, within its authority, is
+a decision note on that item, not a record. Write one when a later reader
+would otherwise ask "why is it like this?": a design choice between credible
+options, a deliberate departure from the plan, or a tradeoff. Keep it short;
+a two-line note that gets written beats a full one that is skipped.
+
+```text
+atelier issue note <id> --kind decision "<the choice>" --reason "<why>" \
+  [--rejected "<alternative>"]... [--one-way]
+```
+
+Mark it `--one-way` when reversing it later would be expensive, such as a
+record format, a public interface, or a data migration. One-way decisions
+lead `atelier work decisions <mission>`, where reviewers look first. A choice
+that reaches beyond the item, or that only the human can make, is a decision
+record instead.
 
 ## Evidence
 

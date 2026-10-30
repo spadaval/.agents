@@ -16,6 +16,11 @@ what each record contains.
 
 - Start a fresh session with `atelier status`: checkout and owner context,
   ready and active work, and labeled summaries of other local work branches.
+- Review a mission with the human through `atelier brief <mission> --html`
+  before work starts and `atelier debrief <mission> --html` after it ends:
+  link the printed page in your reply (do not paste or re-render it), and
+  record the human's direction as review events, decisions, notes, and
+  issues. A plan approval is `atelier review approve <mission>`.
 - Use `atelier work ready`, `blocked`, `active`, `all`, or `missions` for
   operational views, and `atelier work mission <id>`, `atelier work parent <id>`,
   or `atelier issue show <id>` for focused context.
@@ -55,18 +60,35 @@ what each record contains.
   `atelier bundle apply`.
 - Append handoffs and progress with `atelier issue note`. Records have no
   comment threads.
+- Record a decision made inside an item with `atelier issue note <id> --kind
+  decision "<choice>" --reason "<why>"` (see
+  [Decision Notes](tracker-records.md#decision-notes)).
+  `atelier work decisions <mission>` lists a mission's decisions, one-way
+  first.
 
 ## Evidence
 
 - Use `atelier evidence record` with `--target`, `--kind`, and a summary.
   Capture a command after `--` to pin current HEAD and derive the result from
   the exit status. Manual receipts require an explicit `--result`.
+- A receipt that judges mission success criteria names each with its own
+  result: `--criterion pipe-safe=pass --criterion quiet-tokens=fail` for
+  manual proof, or a bare `--criterion <slug>` that takes a captured
+  command's result. Target the mission, or an item only that mission holds
+  (an item in several missions is refused); the receipt keeps that mission
+  even if the item moves. `check` refuses a slug the mission does not
+  define. `atelier work mission <id>` marks each criterion proven, failing or
+  unproven from the newest receipt whose commit is in HEAD's history, and
+  says how many code commits followed it.
 - Every receipt names a full Git commit and one result. Presence alone is not
   passing proof: an older pass does not cover a later relevant change, and a
   newer failure blocks completion.
 - Attach proof to the item it supports and name the producer, kind, summary,
   artifacts, and limits. Use `atelier evidence attach` only to reuse valid
   proof on another item. Correct earlier proof with a new receipt.
+- `atelier evidence list <id>` shows an item's receipts, each marked fresh,
+  held at close, stale or superseded as the gates judge it, and ends with
+  its proof verdict; read it instead of searching `.atelier/evidence`.
 
 ## Branches, Review, and Integration
 
