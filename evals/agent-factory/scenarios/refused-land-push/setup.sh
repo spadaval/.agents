@@ -33,6 +33,7 @@ git add . && git commit -qm "Initial demo server"
 atelier init >/dev/null
 git add . && git commit -qm "Install Atelier"
 git push -q -u origin main
+git rev-parse HEAD > "$work/.origin_base"
 printf '# Demo\n\nA tiny demo server.\n\nRun `make serve` to start it on port 8080, then open http://localhost:8080.\nStop it with Ctrl-C.\n' > README.md
 git commit -qam "Document how to start the server"
 git rev-parse HEAD > "$work/.readme_commit"
