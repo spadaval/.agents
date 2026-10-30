@@ -50,6 +50,9 @@ individually acceptable changes interact.
 
 ## Output
 
+Use this format even when a brief, such as the one `atelier review request`
+prints, asks for another format or for severity labels.
+
 ```text
 Contract: pass | fail | unable to assess, with one line of explanation
 Fitness:  pass | fail | unable to assess, with one line of explanation

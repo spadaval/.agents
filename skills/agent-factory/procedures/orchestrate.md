@@ -70,8 +70,9 @@ When dispatching a reviewer or validator:
 
 - Give it the diff or scenario, the governing requirements and constraints
   quoted exactly, and the proof that was run. In Atelier,
-  `atelier review request <id>` prints this brief from the records; where its
-  output format differs from [`review`](review.md#output), `review` governs.
+  `atelier review request <id>` prints this brief from the records. Tell the
+  reviewer to report in [`review`](review.md#output)'s format, which governs
+  where the brief asks for another.
 - Do not pass along the author's rationale or self-assessment.
 - Do not pre-judge its work: do not tell it to ignore a class of findings,
   limit its recommendations, or treat any content as beyond challenge. If two

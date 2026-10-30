@@ -109,8 +109,8 @@ policy may require particular parts.
 <Where the work departed from the issue or plan, and why. `None.` if none.>
 
 ### Decisions
-<The choices that shaped the work; point at the item's decision notes rather
-than repeating them. `None.` if none.>
+<The choices that shaped the work; point at the item's decision notes or
+records rather than repeating them. `None.` if none.>
 
 ### Surprises
 <What you did not expect: a wrong assumption, a hidden constraint, a cost.
@@ -172,8 +172,12 @@ rewrite acceptance intent to store results.
 
 ## Decision
 
-A consequential choice is a `decision` record, whether it is waiting on the
-human or was made within an agent's authority:
+A choice is a `decision` record when it is costly to reverse, reaches
+beyond the item it was made in, changes a public or persisted contract, or
+needs the human. That holds whether it is waiting on the human or was made
+within an agent's authority. Other choices made inside one work item are
+[decision notes](#decision-notes), even when they are non-obvious or reject
+an alternative.
 
 ```md
 ## Question
@@ -208,11 +212,10 @@ atelier issue note <id> --kind decision "<the choice>" --reason "<why>" \
   [--rejected "<alternative>"]...
 ```
 
-A choice that would need an ADR (see
-[Repository Shape](repository-shape.md)), such as one that is costly to
-reverse or changes a public or persisted contract, is a decision record, not
-a note. So is one that reaches beyond the item or that only the human can
-make. `atelier work decisions <mission>` lists both.
+A choice that meets the record test in [Decision](#decision) is a decision
+record, not a note. Do not use `issue note --one-way`: a choice that is
+costly to reverse is a record. `atelier work decisions <mission>` lists notes
+and records together.
 
 ## Evidence
 
@@ -235,8 +238,10 @@ searchable:
 ## Notes and Reviews
 
 **Handoff:** the standard [handoff](../SKILL.md#handoff), appended as a dated
-note when an assignment ends. When the assignment closes the item, the note
-can point at the Close Reason instead of repeating it.
+note when an assignment ends. When the assignment closes the item, the
+outcome, decisions, and open items live in the Close Reason, and the note
+points at it and holds only what Close Reason does not: changes, proof, and
+review status.
 
 **Reviews and finding dispositions:** review events, not notes. See
 [Finding Disposition](finding-disposition.md#recording).

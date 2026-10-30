@@ -66,7 +66,9 @@ than repeating one contract in all three.
 Write an ADR (with Atelier, a `decision` record) when a decision is costly
 to reverse, non-obvious, likely to be re-argued, crosses boundaries, changes a
 public or persisted contract, or deliberately rejects a plausible
-alternative. A useful ADR has a stable
+alternative. With Atelier, a choice made inside one work item that is only
+non-obvious or rejects an alternative is a decision note instead (see
+[Tracker Records](tracker-records.md#decision)). A useful ADR has a stable
 identifier, a status, the context and forces behind it, the decision, and its
 consequences. When a decision changes, write a new ADR that supersedes the old
 one rather than rewriting history.
