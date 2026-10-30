@@ -32,11 +32,11 @@ If the decision changes strategy, it needs the authority described in the
 [Constitution](../constitution.md#strategy-changes-deliberately). Without it,
 return a recommendation, not a decision.
 
-Give each decision one record that holds the choice and its rationale. With
+Give each decision one home that holds the choice and its rationale. With
 Atelier, a choice that meets the
 [record test](../references/tracker-records.md#decision) is a `decision`
 record, which serves as the ADR; otherwise it is a decision note on its
-item. Without it, use an ADR, or the strategy or issue for a choice that
+item. Without Atelier, use an ADR, or the strategy or issue for a choice that
 only matters within one mission. The strategy and the product or architecture
 docs then state the current design and link to the decision instead of
 restating its rationale.

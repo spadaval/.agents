@@ -33,8 +33,8 @@ tracker.
 2. State the outcome, target shape, what is out of scope, and how success
    will be shown.
 3. Settle consequential choices that the first work depends on, using
-   `decide` where there are several credible paths, and record each in a
-   [decision record](../references/tracker-records.md#decision). Do not park
+   `decide` where there are several credible paths, and record each per the
+   [record test](../references/tracker-records.md#decision). Do not park
    such a choice in a future issue; one only the human can make stays an
    open decision record. If evidence is missing, plan the work that gathers
    it.

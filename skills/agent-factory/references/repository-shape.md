@@ -63,13 +63,11 @@ than repeating one contract in all three.
 
 ## Decisions
 
-Write an ADR (with Atelier, a `decision` record) when a decision is costly
-to reverse, non-obvious, likely to be re-argued, crosses boundaries, changes a
-public or persisted contract, or deliberately rejects a plausible
-alternative. With Atelier, use the record test in
-[Tracker Records](tracker-records.md#decision) instead: a choice that meets
-it is a `decision` record, and other choices inside one work item are
-decision notes. A useful ADR has a stable
+With Atelier, the [record test](tracker-records.md#decision) decides what
+gets a `decision` record, which serves as the ADR. Without Atelier, write an
+ADR when a decision is costly to reverse, non-obvious, likely to be
+re-argued, crosses boundaries, changes a public or persisted contract, or
+deliberately rejects a plausible alternative. A useful ADR has a stable
 identifier, a status, the context and forces behind it, the decision, and its
 consequences. When a decision changes, write a new ADR that supersedes the old
 one rather than rewriting history.

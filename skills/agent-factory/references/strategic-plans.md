@@ -33,7 +33,7 @@ because it describes tasks, order, or status, it is not strategy.
 | --- | --- |
 | Outcome, success criteria, key decisions, boundaries, authority | The strategy |
 | Detailed design: components, APIs, data models, diagrams | Architecture docs, or a design doc linked from an increment |
-| Rationale for a hard-to-reverse decision | A decision record (ADR), linked from the strategy |
+| Rationale for a decision that meets the [record test](tracker-records.md#decision) | A decision record (ADR), linked from the strategy |
 | Work packages ("briefs", workstreams) | Increments (parent issues) in the tracker |
 | Sequencing, ordering rules, dependencies | Tracker dependencies and increment bodies |
 | Status, progress, what is done | The tracker: item state and dated mission notes |

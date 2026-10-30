@@ -30,5 +30,6 @@ Add the likely cause, or the risk that a fix would be premature, when either
 is not obvious.
 
 If findings should become work, record them as tracker items, or in a plan
-file if there is no tracker. Architecture decisions
-belong in docs or ADRs, not only in tracker notes.
+file if there is no tracker. Record architecture decisions per the
+[record test](../references/tracker-records.md#decision), and keep the
+architecture docs current with them.

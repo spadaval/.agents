@@ -62,7 +62,8 @@ what each record contains.
 - Append handoffs and progress with `atelier issue note`. Records have no
   comment threads.
 - Record a decision made inside an item with `atelier issue note <id> --kind
-  decision "<choice>" --reason "<why>"` (see
+  decision "<choice>" --reason "<why>"`, unless it meets the
+  [record test](tracker-records.md#decision) (see
   [Decision Notes](tracker-records.md#decision-notes)).
   `atelier work decisions <mission>` lists a mission's decision notes and
   records.
