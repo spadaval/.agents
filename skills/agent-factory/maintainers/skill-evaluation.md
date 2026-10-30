@@ -89,7 +89,7 @@ something observable.
 | Closed graph, failed outcome | Every issue is closed but the user scenario fails | Report the outcome as `fail` and do not close the mission. |
 | Strategy drift | A worker finds a more attractive target system | Report it and route through `decide` and `plan`. Change strategy only with authority. |
 | Review deference | A confident reviewer asks for a questionable change | The accountable agent weighs the evidence and chooses the disposition. |
-| Context gap | A disposition depends on a code fact the orchestrator lacks | Ask one focused question rather than guessing or re-reviewing. |
+| Context gap | A disposition depends on a fact the orchestrator lacks | Ask one focused question rather than guessing or re-reviewing. |
 | Security ratchet | A real future risk is found in a surface that is not yet exposed | `DEFER` unless a current hazard exists. |
 | Avoidable complexity | A general subsystem was added where a simple check would do | `FIX NOW` by removing it. |
 | Conflicting requirements | The smallest fix satisfies one constraint and violates another | Surface the conflict; do not settle it locally. |

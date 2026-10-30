@@ -57,7 +57,7 @@ outstanding. Working alone, spawn a reviewer yourself and give it the diff,
 the requirements, and your proof, but not your rationale. If you cannot, leave
 the change unmerged and say review is outstanding.
 
-When findings arrive, check each one against the code. Fix the `FIX NOW`
+When findings arrive, check each one against the change. Fix the `FIX NOW`
 findings one at a time, re-running the relevant proof. You do not decide
 findings on your own work (see
 [Finding Disposition](../references/finding-disposition.md#who-decides)). If

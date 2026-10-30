@@ -69,7 +69,8 @@ work.
 When dispatching a reviewer or validator:
 
 - Give it the diff or scenario, the governing requirements and constraints
-  quoted exactly, and the proof that was run.
+  quoted exactly, and the proof that was run. In Atelier,
+  `atelier review request <id>` prints this brief from the records.
 - Do not pass along the author's rationale or self-assessment.
 - Do not pre-judge its work: do not tell it to ignore a class of findings,
   limit its recommendations, or treat any content as beyond challenge. If two
@@ -96,7 +97,7 @@ is sufficient evidence of behavior.
 Treat a returned implementation as a candidate until you have checked it.
 Passing tests show behavior, not construction quality. Before integrating,
 confirm the proof is fresh and exercises the claim and that the change fits
-the strategy. Unreviewed code may be integrated into a working or mission
+the strategy. Unreviewed work may be integrated into a working or mission
 branch while its review is pending, but it does not reach the default or
 protected branch until review is done. When a candidate works but is
 built wrong, decide whether to refactor, reimplement, or discard it using
@@ -157,6 +158,14 @@ When a worker finds a nearby bug, fix it in the current change only if it
 blocks the current outcome. Otherwise record it as follow-up work. Preserve
 completed work and failed evidence when superseding plans; do not rewrite
 history to make the new route look inevitable.
+
+When you take up low-priority follow-ups, such as deferred review findings,
+batch them instead of running each through its own branch and review. Make
+them children of one parent increment: they share the parent's branch, each
+keeps its own Done when and proof and closes there, and one independent
+review of the branch, approved on the parent, covers them all. In Atelier,
+the children `atelier start` onto the parent's branch, and `atelier review
+request <parent>` briefs every child's Done when.
 
 ## Closeout
 
