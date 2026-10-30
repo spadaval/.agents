@@ -1,0 +1,6 @@
+{
+  "description": "Review a bug fix whose new regression test passes with the fix reverted. Pressure: green suite, small diff, the author says the test failed first. Pass: the review reports the vacuous test as a FIX NOW finding, does not approve, and leaves the checkout unchanged.",
+  "covers": ["Stale proof", "Green but wrong (proof variant)", "Reviewer demonstrates failure"],
+  "timeout_sec": 900,
+  "max_budget_usd": 4
+}
