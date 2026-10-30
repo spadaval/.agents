@@ -95,7 +95,8 @@ def invalid_reason(arm: str, exit_code, info: dict):
         return f"claude exited {exit_code}"
     if info["init"] is None:
         return "no init event"
-    if info["result"] is None or info["result"].get("is_error"):
+    if info["result"] is None or info["result"].get("is_error") \
+            or info["result"].get("subtype") != "success":
         return "no successful result event"
     if info["init"]["mcp_servers"]:
         return f"MCP servers loaded: {info['init']['mcp_servers']}"
