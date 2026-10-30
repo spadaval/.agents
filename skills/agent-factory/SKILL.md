@@ -56,7 +56,7 @@ when handoffs, duration, or risk grow.
 | --- | --- | --- | --- |
 | **Small**: one agent, one session, a contained change | Think it through; no plan artifact needed | Clear commit message and PR description | Self-verify by running it |
 | **Multi-step**: several slices, sessions, or agents | Atelier issues, or a short plan file when the repository does not use Atelier | Atelier records or the plan file carry scope, proof, and handoffs | Self-verify each slice |
-| **Mission**: several increments, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), increments, issues planned just in time | Atelier is the source of truth; decisions in decision records or ADRs | Self-verify, plus independent `validate` for mission acceptance and for increments that change a user-facing or cross-boundary outcome |
+| **Mission**: several increments, long-running, or cross-system | Written [strategic plan](references/strategic-plans.md), increments, issues planned just in time | Atelier is the source of truth; decisions per the [record test](references/tracker-records.md#decision) | Self-verify, plus independent `validate` for mission acceptance and for increments that change a user-facing or cross-boundary outcome |
 
 [Independent review](#independent-review) is the same at every tier.
 

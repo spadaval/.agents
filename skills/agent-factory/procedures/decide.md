@@ -33,9 +33,10 @@ If the decision changes strategy, it needs the authority described in the
 return a recommendation, not a decision.
 
 Give each decision one record that holds the choice and its rationale. With
-Atelier, that is a `decision` record (see
-[Tracker Records](../references/tracker-records.md#decision)), which serves as
-the ADR. Without it, use an ADR, or the strategy or issue for a choice that
+Atelier, a choice that meets the
+[record test](../references/tracker-records.md#decision) is a `decision`
+record, which serves as the ADR; otherwise it is a decision note on its
+item. Without it, use an ADR, or the strategy or issue for a choice that
 only matters within one mission. The strategy and the product or architecture
 docs then state the current design and link to the decision instead of
 restating its rationale.

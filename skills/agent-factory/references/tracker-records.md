@@ -117,7 +117,8 @@ records rather than repeating them. `None.` if none.>
 `None.` if none.>
 
 ### Open items
-<What is left, each with its follow-up issue ID. `None.` if none.>
+<What is left: follow-ups with their issue IDs, plus unverified claims,
+risks, and skipped checks. `None.` if none.>
 ```
 
 Write it in the record body, or in a file passed with `--reason-file`, then
@@ -240,8 +241,8 @@ searchable:
 **Handoff:** the standard [handoff](../SKILL.md#handoff), appended as a dated
 note when an assignment ends. When the assignment closes the item, the
 outcome, decisions, and open items live in the Close Reason, and the note
-points at it and holds only what Close Reason does not: changes, proof, and
-review status.
+points at it and holds the remaining handoff fields: changes, proof, review
+status, and any a subskill adds.
 
 **Reviews and finding dispositions:** review events, not notes. See
 [Finding Disposition](finding-disposition.md#recording).
