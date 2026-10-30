@@ -63,11 +63,10 @@ than repeating one contract in all three.
 
 ## Decisions
 
-With Atelier, the [record test](tracker-records.md#decision) decides what
-gets a `decision` record, which serves as the ADR. Without Atelier, write an
-ADR when a decision is costly to reverse, non-obvious, likely to be
-re-argued, crosses boundaries, changes a public or persisted contract, or
-deliberately rejects a plausible alternative. A useful ADR has a stable
+The [record test](tracker-records.md#decision) decides what gets an ADR,
+with or without Atelier: with Atelier the ADR is a `decision` record, and
+without it a file in `docs/adr/`. A choice that does not meet the test is a
+short note on its item, issue, or PR. A useful ADR has a stable
 identifier, a status, the context and forces behind it, the decision, and its
 consequences. When a decision changes, write a new ADR that supersedes the old
 one rather than rewriting history.

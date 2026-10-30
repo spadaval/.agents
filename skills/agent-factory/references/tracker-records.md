@@ -94,7 +94,8 @@ particular machine, with the `needs-human` label so agents do not pick it up.
 Close Reason is written when the item closes. Its first paragraph is the
 Outcome: one or two sentences giving the observable result against Done
 when, or for `supersede` why the work will not happen. Test names,
-measurements, and review status go in evidence and review records.
+measurements, and review status go in evidence receipts, review records, or
+the handoff note, not in Close Reason.
 
 Close Reason also carries the implementer report: what a reviewer of the
 finished mission needs that the diff and the proof do not show. Repository
@@ -122,7 +123,8 @@ risks, skipped checks with reasons, and blockers. `None.` if none.>
 ```
 
 Write it in the record body, or in a file passed with `--reason-file`, then
-run the close transition; the report does not make an approval stale. Be
+run the close transition. Close before requesting the final review: a close
+committed after an approval needs a fresh approval to cover the done claim. Be
 candid and short: a reviewer reads these across a whole mission.
 
 ## Increment

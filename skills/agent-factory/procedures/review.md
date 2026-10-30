@@ -13,7 +13,9 @@ by real evidence. It does not re-run acceptance scenarios; that is `validate`.
 - Read the change, the requirements and constraints it answers to, and enough
   surrounding code, docs, and ADRs to judge it. For non-trivial code, use
   [Good Code](../references/good-code.md).
-- Stay read-only unless you were asked to fix things.
+- Stay read-only unless you were asked to fix things. Recording your
+  findings and approval as review events under your own identity is part of
+  the review, not a change to the work.
 - Report every finding you can support, ordered by impact. Cite files and
   lines, and give a failure scenario where one exists.
 - Ignore formatting and style preferences unless they break an explicit

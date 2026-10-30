@@ -51,7 +51,8 @@ what each record contains.
   children. Missions begin in `draft` and become `todo` with `ready`.
 - Record each choice that meets the record test in
   [Decision](tracker-records.md#decision) as a `decision` record and close it with
-  the `decide` transition once its Decision section is filled in. An open
+  the `decide` transition (`--reason "<the choice>"`) once its Decision
+  section is filled in. An open
   decision waits for the human; an agent recording a choice within its own
   authority fills in the Decision section and runs `decide` in the same
   change.
@@ -78,12 +79,11 @@ what each record contains.
   quiet-tokens=fail` for manual proof, or a bare `--criterion <slug>` that
   takes a captured command's result. A manual receipt's `--result` is the
   receipt's overall result, and a `fail` blocks closing or merging its target
-  until a later pass, so it is `pass` only when every criterion it names passes. Target the mission, or an item only that mission holds
-  (an item in several missions is refused); the receipt keeps that mission
-  even if the item moves. `check` refuses a slug the mission does not
-  define. `atelier work mission <id>` marks each criterion proven, failing or
-  unproven from the newest receipt whose commit is in HEAD's history, and
-  says how many code commits followed it.
+  until a later pass, so it is `pass` only when every criterion it names
+  passes. Target the mission, or an item only that mission holds.
+  `evidence record` refuses a slug the mission does not define.
+  `atelier work mission <id>` marks each criterion proven, failing, or
+  unproven from the newest receipt in HEAD's history.
 - Every receipt names a full Git commit and one result. Presence alone is not
   passing proof: an older pass does not cover a later relevant change, and a
   newer failure blocks completion.

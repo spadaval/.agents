@@ -36,8 +36,8 @@ Give each decision one home that holds the choice and its rationale. With
 Atelier, a choice that meets the
 [record test](../references/tracker-records.md#decision) is a `decision`
 record, which serves as the ADR; otherwise it is a decision note on its
-item. Without Atelier, use an ADR, or the strategy or issue for a choice that
-only matters within one mission. The strategy and the product or architecture
+item. Without Atelier, the same test decides between an ADR and a note in
+the plan file, issue, or PR. The strategy and the product or architecture
 docs then state the current design and link to the decision instead of
 restating its rationale.
 

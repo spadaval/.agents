@@ -86,8 +86,8 @@ work (see
 [Finding Disposition](../references/finding-disposition.md#who-decides)). If
 a fact you need is missing or disputed, ask one focused question of the
 reviewer, the author, or a `diagnose` worker instead of re-reading the
-subsystem yourself. Record decisions where the work
-is tracked.
+subsystem yourself. Record each disposition (see
+[Finding Disposition](../references/finding-disposition.md#recording)).
 
 Use an independent `validate` assignment for mission acceptance, for increments
 that change a user-facing or cross-boundary outcome, and for scenarios where
