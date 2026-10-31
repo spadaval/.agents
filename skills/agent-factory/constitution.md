@@ -41,7 +41,9 @@ and prose has no compiler or tests to catch its errors. Every non-trivial
 change is reviewed by an agent or human who did not write it and does not
 inherit the author's reasoning. Until that happens, the change is not done.
 It does not reach the main line unless a human knowingly directs it, and even
-then review remains owed. Planning records are the exception: they may land
+then review remains owed. In a project whose owner reviews after merge, that
+independent agent review and the automated checks are the only gate: human
+review comes after the merge, not before it. Planning records are the exception: they may land
 first so every branch sees the plan, and are reviewed before the work they
 define starts. Trivial changes, whose correctness is fully evident from the
 diff, are exempt.
