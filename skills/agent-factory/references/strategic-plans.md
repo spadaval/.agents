@@ -106,8 +106,6 @@ the web client's polling code is removed.
 - no-polling: The web client makes no status polling requests (network trace).
 - reconnects: Pages recover after a dropped connection without a reload (scenario
   test that kills the connection).
-- polling-removed: Web client polling code is deleted. The API polling endpoint stays for
-  mobile clients, and its removal is owned by mission shop-7q2m.
 
 # Shape
 - Server-sent events from the existing API service; no new service or broker
@@ -120,7 +118,8 @@ the web client's polling code is removed.
 # Scope
 In: web client order pages, API streaming endpoint, web client polling
 removal.
-Out: mobile apps (they keep polling until mission shop-7q2m), other pages.
+Out: mobile apps (they keep polling until mission shop-7q2m, which also owns
+removing the API polling endpoint), other pages.
 Environment: production behind the existing load balancer.
 
 # Authority

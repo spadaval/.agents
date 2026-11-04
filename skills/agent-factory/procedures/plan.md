@@ -32,20 +32,22 @@ A mission is a container for changes that share a theme, plus a statement of
 why they belong together. It does not need to be one deliverable; it needs to
 be one thing a person can hold in their head, plan against, and finish.
 
-- **One outcome.** State the outcome in a sentence or two that explains why
-  each item is in the mission. If the sentence needs an "and" to cover
-  unrelated surfaces, or some items only fit by stretching it, it is two
-  missions or a mission plus loose backlog. Sharing an origin, such as the
-  same audit or another mission's leftovers, is not a theme.
+- **One theme.** State the outcome in a sentence or two that explains why
+  each item is in the mission. If the sentence only holds by joining
+  unrelated surfaces with "and", or some items only fit by stretching it, it
+  is two missions or a mission plus loose backlog. Sharing an origin alone,
+  such as the same audit or another mission's leftovers, is not a theme;
+  leftovers that share a real theme can be one.
 - **Finishable by its own work.** Everything in the mission can be done by
   the agents working it, or by asking the human a question they can answer
   now. Work that waits on calendar time, on other repositories or people
   adopting a change, or on measuring behavior after the mission ships cannot
   be finished this way. Put it in its own backlog item that says when to pick
   it up, outside the mission, so the mission can close.
-- **Sized to finish.** A mission should close in weeks of work. When it grows
-  past what one reviewer can judge in one debrief, split it along the
-  outcome's natural seams rather than by item count.
+- **Sized to finish.** Size a mission so one reviewer can judge it in one
+  debrief; in practice that is usually days to a few weeks of work. When it
+  outgrows that, split it along the outcome's natural seams rather than by
+  item count.
 - **Success criteria are optional.** Most missions need none: the outcome and
   each item's Done when already say what done means. Add a criterion only for
   a claim about the whole that no single item proves, such as an end-to-end
@@ -54,7 +56,10 @@ be one thing a person can hold in their head, plan against, and finish.
   the mission closes: a test, a scenario, a measurement it can take, or a
   named human judgment the agent asks for. A criterion that restates the
   items adds nothing; one the work cannot reach stalls the mission, because
-  the agent correctly stops and asks what it is expected to do.
+  the agent correctly stops and asks what it is expected to do. When an
+  existing criterion fails this test, propose a rewrite the work can reach,
+  or a backlog item that says when to check it, and let whoever holds
+  authority over the strategy decide; do not drop it yourself.
 
 ## Initial Planning
 
@@ -91,13 +96,16 @@ to ask what the mission means. Check that:
 - nothing in scope waits on calendar time, outside adoption, or post-ship
   measurement;
 - the first items to be worked are [ready issues](#ready-issues); later items
-  may stay in backlog with a preliminary goal and their unknowns;
+  may stay in backlog with a preliminary goal, a provisional Done when, and
+  their unknowns;
 - each choice the first work depends on is decided, and each question only
   the human can answer is an open decision record or a `needs-human` item,
   not an Unknown inside an issue;
 - any success criteria meet the rule above;
-- the planning has been independently reviewed and the human has approved
-  the plan (`atelier review approve <mission>`).
+- the planning has been independently reviewed, and, because the human holds
+  authority over a mission's outcome, the human has approved the plan
+  (`atelier review approve <mission>`), unless the strategy's Authority
+  section delegates that.
 
 ## Ready Issues
 
