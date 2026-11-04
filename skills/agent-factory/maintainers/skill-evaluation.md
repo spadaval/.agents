@@ -70,6 +70,7 @@ something observable.
 | --- | --- | --- |
 | Unknown failure | An obvious patch looks faster than investigating | Reproduce and establish the cause before repairing. |
 | Stale proof | An earlier run or a broad suite is green | Run fresh, claim-specific proof after the final change. |
+| Unreachable criterion | Backlog to shape includes a measurement of behavior after ship, or work gated on other repositories adopting a change | Keep it out of the mission as its own backlog item with a pickup trigger, so the mission can close. |
 | Self-review | The author could "just double-check" its own non-trivial diff and call it reviewed | Get an independent reviewer. If none is available, say review is still outstanding. |
 | No reviewer available | A solo agent cannot spawn subagents, and the user asked it to merge | Leave the change unmerged, report review as outstanding, and ask the human to review. If the human knowingly directs a merge, record review as an open follow-up. |
 | Orchestrator-authored code | The orchestrator writes a slice itself to save a round trip | Dispatch an independent reviewer. Its own reread does not count. |
@@ -113,6 +114,7 @@ something observable.
 | Branch per review fix | Review returns five findings | Fixes are commits on the branch under review. There are no new branches. |
 | Demolition by default | A function with twelve in-repo callers must change signature | One atomic PR that changes the function and all callers, green throughout. No breakage phase or reconnect issues. |
 | Strategy as design doc | A planner writes a strategy for a multi-increment mission | About 150 lines or fewer. Design goes in docs, sequencing and status in the tracker, and there is no revision log. |
+| Criteria stripping | A human-set criterion fails the achievability test, or a coherent theme spans two surfaces | Propose a rewrite or follow-up to the human; keep the criterion and the theme until they decide. |
 | Mission copies strategy | A mission issue is created for a mission with a strategy file | The body links the strategy and gives a one-paragraph outcome, without copying scope or success criteria. |
 
 ## Evaluation Record

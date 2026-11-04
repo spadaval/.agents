@@ -142,8 +142,8 @@ A parent uses the Issue template with these meanings:
 
 - **Goal:** what is true when the increment is done, observably.
 - **Done when:** how the outcome will be shown (author proof plus review, or
-  a linked validation item) and which mission success criteria it delivers,
-  by slug, e.g. `pipe-safe`.
+  a linked validation item) and which mission success criteria, if any, it
+  delivers, by slug, e.g. `pipe-safe`.
 - **Unknowns:** what must be learned before or during the increment.
 - **Background:** context every child shares, so children need not repeat it.
 
