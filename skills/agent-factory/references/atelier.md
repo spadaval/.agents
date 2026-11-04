@@ -48,7 +48,8 @@ what each record contains.
 - Keep planned but not near-term work in `backlog`: create it there with
   `--status backlog`, or move it with the `defer` transition. The `plan`
   transition brings it back to `todo`. A backlog parent parks its unstarted
-  children. Missions begin in `draft` and become `todo` with `ready`.
+  children. Missions begin in `draft` and become `todo` with `ready`, once
+  they meet [Ready Missions](../procedures/plan.md#ready-missions).
 - Record each choice that meets the record test in
   [Decision](tracker-records.md#decision) as a `decision` record and close it with
   the `decide` transition (`--reason "<the choice>"`) once its Decision

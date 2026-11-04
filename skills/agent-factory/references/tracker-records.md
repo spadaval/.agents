@@ -34,8 +34,11 @@ the strategy file through the mission's strategy path (see
 <One paragraph: the outcome, in plain words.>
 
 ## Success criteria
-<Only when there is no strategy file; otherwise the strategy owns them. One
-`- <slug>: <claim>` bullet per criterion.>
+<Optional, and only when there is no strategy file; otherwise the strategy
+owns them. One `- <slug>: <claim>` bullet per criterion, each a claim about
+the whole that the mission's work can make true and check at close (see
+[Shaping a Mission](../procedures/plan.md#shaping-a-mission)). Omit the
+section when there are none.>
 
 ## Background
 <Research, references, and motivation the mission's work shares. Omit when
@@ -43,15 +46,16 @@ none.>
 ```
 
 Atelier accepts only these sections in a mission body, plus the shared Notes
-and Close Reason. If there is no separate strategy file, Outcome and Success
-criteria carry the strategy. When the mission needs more of the
+and Close Reason. If there is no separate strategy file, Outcome and any
+Success criteria carry the strategy. When the mission needs more of the
 [strategy template](strategic-plans.md#template), such as Shape, Scope, or
 Authority, write a strategy file and link it; do not add those sections to
 the mission. Work joins the mission through `advances` links; missions are
 never parents.
 
-Post progress as dated notes. At meaningful points, note the success criteria
-shown so far, current increments, blockers, and open questions.
+Post progress as dated notes. At meaningful points, note what is done
+against the outcome, any success criteria shown so far, current increments,
+blockers, and open questions.
 
 ## Issue
 
