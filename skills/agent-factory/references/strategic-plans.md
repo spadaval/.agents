@@ -7,7 +7,7 @@ to stay short, stable, and at a high altitude.
 
 Write one as a file when a mission is long-running, spans several increments
 or systems, or involves contested tradeoffs. For smaller work, the mission's
-Outcome and Success criteria carry the strategy instead of a separate file
+Outcome and any Success criteria carry the strategy instead of a separate file
 (see [Tracker Records](tracker-records.md#mission)).
 
 ## Where It Lives
@@ -31,7 +31,7 @@ because it describes tasks, order, or status, it is not strategy.
 
 | Material | Where it belongs |
 | --- | --- |
-| Outcome, success criteria, key decisions, boundaries, authority | The strategy |
+| Outcome, any success criteria, key decisions, boundaries, authority | The strategy |
 | Detailed design: components, APIs, data models, diagrams | Architecture docs, or a design doc linked from an increment |
 | Rationale for a decision that meets the [record test](tracker-records.md#decision) | A decision record (ADR), linked from the strategy |
 | Work packages ("briefs", workstreams) | Increments (parent issues) in the tracker |
@@ -57,7 +57,10 @@ What is true when the mission is done, stated so someone could observe it.
 Note any partial outcome that would still be worth shipping.
 
 # Success Criteria
-Observable claims, one `- <slug>: <claim>` bullet each, with a short
+Optional. Claims about the whole mission that no single item proves and that
+the mission's work can make true and check at close (see
+[Shaping a Mission](../procedures/plan.md#shaping-a-mission)). Observable
+claims, one `- <slug>: <claim>` bullet each, with a short
 kebab-case slug that names the claim (`- pipe-safe: ...`); older strategies
 use `S1`, `S2`, which still work. Increments, validation and evidence refer to
 these slugs. For each, say how it will be shown, such as a test, scenario, or
@@ -155,5 +158,5 @@ later increments in `backlog` with a preliminary goal and known unknowns, and
 plan each one when evidence justifies it. See
 [Tracker Records](tracker-records.md) for what each record contains.
 
-Close the mission against its success criteria, not the number of issues
-closed.
+Close the mission against its outcome and any success criteria, not the
+number of issues closed.

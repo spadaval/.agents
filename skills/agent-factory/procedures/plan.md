@@ -7,7 +7,7 @@ strategic revisions.
 
 ## Layers
 
-- **Strategy** is the governing intent: why, outcome, success criteria,
+- **Strategy** is the governing intent: why, outcome, any success criteria,
   shape, scope, and authority. For a substantial mission, write it as a short
   file (see [Strategic Plans](../references/strategic-plans.md)). For smaller
   work, the mission issue or PR description can serve.
@@ -25,6 +25,36 @@ for what goes in each. Detailed design goes in architecture docs or design
 docs linked from increments, not in the strategy. Do not keep a separate
 implementation-plan document, work briefs, or status tables alongside the
 tracker.
+
+## Shaping a Mission
+
+A mission is a container for changes that share a theme, plus a statement of
+why they belong together. It does not need to be one deliverable; it needs to
+be one thing a person can hold in their head, plan against, and finish.
+
+- **One outcome.** State the outcome in a sentence or two that explains why
+  each item is in the mission. If the sentence needs an "and" to cover
+  unrelated surfaces, or some items only fit by stretching it, it is two
+  missions or a mission plus loose backlog. Sharing an origin, such as the
+  same audit or another mission's leftovers, is not a theme.
+- **Finishable by its own work.** Everything in the mission can be done by
+  the agents working it, or by asking the human a question they can answer
+  now. Work that waits on calendar time, on other repositories or people
+  adopting a change, or on measuring behavior after the mission ships cannot
+  be finished this way. Put it in its own backlog item that says when to pick
+  it up, outside the mission, so the mission can close.
+- **Sized to finish.** A mission should close in weeks of work. When it grows
+  past what one reviewer can judge in one debrief, split it along the
+  outcome's natural seams rather than by item count.
+- **Success criteria are optional.** Most missions need none: the outcome and
+  each item's Done when already say what done means. Add a criterion only for
+  a claim about the whole that no single item proves, such as an end-to-end
+  scenario across items or a property every surface must share. Each one must
+  be something the mission's work can make true and an agent can check when
+  the mission closes: a test, a scenario, a measurement it can take, or a
+  named human judgment the agent asks for. A criterion that restates the
+  items adds nothing; one the work cannot reach stalls the mission, because
+  the agent correctly stops and asks what it is expected to do.
 
 ## Initial Planning
 
@@ -49,6 +79,25 @@ tracker.
 Use `$generate-html-plan` when an interactive visual plan would materially
 help deliberation. Publish its result into the repository strategy before
 execution.
+
+## Ready Missions
+
+A mission moves from draft to ready (`atelier issue transition <mission>
+ready`) when an orchestrator could start it without coming back to the human
+to ask what the mission means. Check that:
+
+- the outcome passes the [shaping](#shaping-a-mission) tests above, and every
+  item in scope fits it;
+- nothing in scope waits on calendar time, outside adoption, or post-ship
+  measurement;
+- the first items to be worked are [ready issues](#ready-issues); later items
+  may stay in backlog with a preliminary goal and their unknowns;
+- each choice the first work depends on is decided, and each question only
+  the human can answer is an open decision record or a `needs-human` item,
+  not an Unknown inside an issue;
+- any success criteria meet the rule above;
+- the planning has been independently reviewed and the human has approved
+  the plan (`atelier review approve <mission>`).
 
 ## Ready Issues
 
