@@ -21,14 +21,19 @@ Atelier's help, docs and `CONTEXT.md`:
   plan (`atelier brief`) and reviews its merged work (`atelier debrief`).
 - **land**: `atelier land`, run at every handoff: it judges committed records
   and the commits about to be pushed.
-- **done**: the status work gets when `atelier merge` integrates it; the
-  status a decision, loose end or validation gets on the base; and the status
-  of a closed mission. Superseded is the other terminal status.
+- **done**: a terminal status, as is `superseded`; the policy puts both in
+  its done category. Done means merged (work gets it when `atelier merge`
+  integrates it), done on the base (a decision, loose end or validation), or,
+  for a mission, closed. Superseded means retired by the `supersede`
+  transition.
 - **close**: what a mission does, by the orchestrator running `atelier issue
   transition <mission> close` with its report, once all its work is merged
   and its validation items, if any, are done (see
   [Closing a Mission](../procedures/orchestrate.md#closing-a-mission)).
-  Nothing else closes.
+  Nothing else closes. The `close_reason` field a policy requires is the
+  item's Report, not a close: every transition that requires it (`close`,
+  `decide`, `done` on the base, `supersede`) stores `--reason` as the
+  Report, or uses the Report already written.
 
 ## One Issue, in Order
 
@@ -62,9 +67,7 @@ orchestrator's steps too. The item's planning was reviewed before step 1.
    resolves the finding; it needs no disposition. The accountable agent (the
    reviewer, when that agent wrote the work) sets one with `atelier review
    disposition` for a finding deferred or dismissed instead, and for one recommended `defer` or `no_action` even if it was
-   fixed (`defer` names an existing follow-up). A non-trivial record change
-   after approval, such as a rewritten Done when line, gets a fresh approval
-   too.
+   fixed (`defer` names an existing follow-up).
 6. **Merge** (orchestrator). `atelier merge <id>` (try `--check` first)
    needs a current approval recorded after every `fix_now` finding left
    without a disposition, the dispositions step 5 calls for, and the merge
@@ -87,9 +90,11 @@ and `.atelier/evidence` since the approved commit, not counting a clean merge
 of the base. The workflow policy, config and strategy files count as code
 here, so a strategy edit on a work branch makes it stale. Record edits never
 make an approval stale: ticking lines, notes, links, the Report, status
-changes, findings and dispositions. That is Atelier's gate, not a waiver
-(step 5), and the review brief and `merge --check` show any Done when
-changed after start.
+changes, findings and dispositions. A Done when line rewritten after start
+is shown in the review brief and by `merge --check`, and refuses nothing.
+That is Atelier's gate, not a waiver of
+[Independent Review](../SKILL.md#independent-review), which still has a
+non-trivial rewrite reviewed.
 
 A base that moved on needs no catch-up: `merge` builds the merged tree
 itself, and the merge checks or CI test it where the repository has them.
@@ -141,16 +146,18 @@ validation of a mission or increment, which is a
 [validation item](tracker-records.md#validation-item). A loose end is its
 own issue (`atelier issue create --issue-type loose_end`), linked to the
 issue it waits on with `atelier issue link <loose-end> <issue> --role
-blocked_by`, which is stored on the loose end. File it when you plan the
-item, or as soon as such work turns up (an implementer reports it to
-whoever owns the plan): on the work branch while the item is in flight,
-otherwise on the base. Filing one is reviewed with the item it follows, or
-as a planning change once that item merged. It is never another issue's
+blocked_by`. File it when you plan the item, or as soon as such work turns
+up (an implementer reports it to whoever owns the plan). Filing it is
+planning like any other: commit it straight to the base and have it
+reviewed as a planning change (see
+[Planning on the Base](#planning-on-the-base)), even while the issue it
+waits on is in flight. The link is stored on the loose end, so the
+in-flight issue's record is not touched. It is never another issue's
 child and never advances a mission, so it never holds one open. Whatever
 part of it can run before merge, such as an emulator test, stays a Done when
 line of the item.
 
-A loose end takes no branch, review or merge. Once what it waits on is
+Doing a loose end takes no branch, review or merge. Once what it waits on is
 merged, do it on the base, tick its line if it held, and mark it done with
 a one-line result either way: `atelier issue transition <id> done --reason "<result>"`, then
 commit the record on the base. A bad result files a linked bug (`--discovered-from <loose-end>`);
@@ -163,8 +170,9 @@ commit it on a branch no issue owns, run `atelier review request` there with
 no ID, have the reviewer record `atelier review finding|approve --branch
 <name>`, and run `atelier merge` with no ID, never a plain `git merge`,
 which runs no gate. The same approval and merge checks apply; nothing is
-marked done. File a release's tag as a loose end on
-the release branch with no blocker, so it reaches the base with the merge.
+marked done. A release's tag is a loose end with no issue to wait on, so
+it is filed on the release branch with no blocker instead of on the base:
+it reaches the base only with the merge.
 
 ## Planning on the Base
 

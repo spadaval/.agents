@@ -53,7 +53,7 @@ When a repository is large enough to split these concerns, typical homes are:
 | Doc index: which doc owns what | `docs/index.md` or README |
 | Product behavior and public contracts | `docs/product/` or equivalent |
 | Architecture: boundaries, ownership, dependency direction | `docs/architecture/` or equivalent |
-| Decisions and rationale | Atelier `decision` records, or `docs/adr/` without Atelier |
+| Decisions and rationale | Atelier `decision` records and any ADRs they produce, or `docs/adr/` without Atelier |
 | Standards and how claims are proven | Contributing, quality, or testing docs |
 
 Split a document when it starts serving conflicting audiences. Product docs
@@ -63,12 +63,14 @@ than repeating one contract in all three.
 
 ## Decisions
 
-The [record test](tracker-records.md#decision) decides what gets an ADR,
-with or without Atelier: with Atelier the ADR is a `decision` record, and
-without it a file in `docs/adr/`. A choice that does not meet the test is a
-short note on its item, issue, or PR. A useful ADR has a stable
-identifier, a status, the context and forces behind it, the decision, and its
-consequences. When a decision changes, write a new ADR that supersedes the old
+The [record test](tracker-records.md#decision) decides which choices are
+recorded. With Atelier such a choice is a `decision` record, which holds the
+question and the decision and may produce an ADR, linked from the record
+(see [Decision](tracker-records.md#decision)); without Atelier it is an ADR
+in `docs/adr/`. A choice that does not meet the test is a short note on its
+item, issue, or PR. A useful ADR has a stable identifier, a status, the
+context and forces behind it, the decision, and its consequences. When a
+decision changes, write a new decision record or ADR that supersedes the old
 one rather than rewriting history.
 
 ## Docs as a Maintained System
