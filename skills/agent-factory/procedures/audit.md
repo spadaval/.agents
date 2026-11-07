@@ -1,35 +1,26 @@
 # Audit
 
-Use this subskill to find evidence-backed problems in architecture, process,
-or operability without designing or implementing fixes.
+Use this subskill to find evidence-backed problems in architecture, process or
+operability without designing or implementing fixes.
 
 ## Approach
 
-- Read the architecture, product, and quality docs and the ADRs relevant to
-  the scope, then compare them with what the code and workflows actually do.
-- Report problems, not preferences. A finding needs a concrete consequence.
+- Read the architecture, product and quality docs and the decisions relevant to
+  the scope, then compare them with what the code and workflows do.
+- Report problems, not preferences: a finding needs a concrete consequence.
 - Look especially for half-finished work: old and new paths coexisting with no
-  clear boundary, docs describing a target the code does not enforce,
-  migrations that reached only some call sites, tests that preserve stale
-  assumptions, and tracker items done while dependent cleanup has no owner.
-- Suggest a fix only when it is obvious. Otherwise say what kind of work
-  should follow.
+  clear boundary, docs describing a target the code does not enforce, migrations
+  that reached only some call sites, tests that preserve stale assumptions, and
+  done items whose dependent cleanup has no owner.
+- Suggest a fix only when it is obvious; otherwise say what kind of work should
+  follow.
 
 ## Findings
 
-For each finding give:
-
-- **Problem:** the mismatch or risk.
-- **Evidence:** the files, commands, tests, or behavior that show it.
-- **Impact:** what gets simpler, safer, or more reliable if it is fixed.
-- **Confidence:** high, medium, or low.
-- **Next step:** no action, spike, decision, implementation, migration, or
-  docs update.
-
-Add the likely cause, or the risk that a fix would be premature, when either
-is not obvious.
-
-If findings should become work, record them as tracker items, or in a plan
-file if there is no tracker. Record architecture decisions per the
-[record test](../references/tracker-records.md#decision), and keep the
-architecture docs current with them.
+For each finding give the **problem**, the **evidence** (files, commands, tests
+or behavior), the **impact** of fixing it, your **confidence** (high, medium or
+low), and the **next step** (no action, spike, decision, implementation,
+migration or docs update), adding the likely cause, or the risk that a fix would
+be premature, where either is not obvious. If findings should become work, file
+them as tracker items, and record architecture decisions per the [record
+test](../references/atelier.md#records).

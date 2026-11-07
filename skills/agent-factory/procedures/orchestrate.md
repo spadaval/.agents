@@ -1,185 +1,128 @@
 # Orchestrate
 
-Use this subskill to run a mission, an increment, or any workstream with several
-pieces. The orchestrator is accountable for the outcome. It decides what
-happens next, delegates or does the work, integrates results, keeps the plan
-current, and closes a mission against demonstrated outcomes.
+Use this subskill to run a mission, an increment or any workstream with several
+pieces. You are accountable for the outcome: you decide what happens next,
+delegate or do the work, integrate results, keep the plan current and close a
+mission against demonstrated outcomes.
 
 ## Before Starting
 
-Know the outcome you are driving toward and what governs it: the strategic
-plan for a mission, or the issue or user request for smaller work. Look at the
-workspace state and run a representative baseline before any mutating work (see
-[Branches and Worktrees](../references/branches-and-worktrees.md)). If a substantial
-mission has no agreed outcome or strategy, run `plan` first.
-
-Keep going through ready work without asking permission between steps. Stop
-and ask only when you reach a real authority boundary, an ambiguity that would
-change the result, a concrete current hazard, or a blocker you cannot resolve
+Know the outcome and what governs it: the strategy for a mission, or the issue
+or request for smaller work. If a substantial mission has no agreed outcome or
+strategy, run `plan` first. Then keep going through ready work without asking
+between steps. Stop and ask only at an authority boundary, an ambiguity that
+would change the result, a current hazard, or a blocker you cannot resolve
 within the strategy.
 
 ## Delegate or Do It Yourself
 
-Delegation costs a context handoff and loses detail. Do the work yourself when
-you already hold the context and the task is small. Delegate when:
-
-- slices can run in parallel;
-- a task would flood your context with material you will not need again;
-- the work needs a different model or reasoning level; or
-- the work must be independent of you, as review and validation of work you
-  did must be.
-
-Changes you make yourself follow the same review rule as any other author's.
+Delegation costs a handoff and loses detail, so do small work yourself when you
+already hold the context. Delegate when slices can run in parallel, when a task
+would flood your context with material you will not need again, when it needs a
+different model, or when it must be independent of you, as review and validation
+of your own work must be.
 
 ## Assignments
 
-A delegated assignment is self-contained. The assignee sees only what you give
-it and what it can pull from the repository. Include:
+An assignee sees only what you give it and what it can find in the repository.
+Give it:
 
-- **Goal and why:** the outcome, the reason it matters, and how it fits the
-  larger work. Assignees make better judgment calls when they know the intent.
-- **Subskill:** exactly one, such as `implement`, `diagnose`, or `review`.
-- **Context:** tracker IDs, relevant docs, ADRs, and constraints, and what has
-  been learned so far that the assignee cannot discover alone. Point to large
-  artifacts by path or ID instead of pasting them.
-- **Scope:** what it may change, and what it must leave alone.
-- **Workspace:** the branch to work on, which you create or choose, and a
-  worktree only if it must write at the same time as another agent. With
-  Atelier, start the item on that branch (`atelier start <id>`) or tell the
-  assignee to.
-  Read-only roles get none. Tell it to preserve changes it did not make and
-  to list anything it creates in its handoff.
+- **Goal and why:** the outcome, why it matters and how it fits.
+- **Subskill:** exactly one.
+- **Context:** tracker IDs, docs, decisions and constraints, and what has been
+  learned that it cannot discover alone; point to large artifacts by path or ID
+  instead of pasting them.
+- **Scope:** what it may change and what it must leave alone.
+- **Workspace:** the branch, which you create or choose (with Atelier, start the
+  item on it, or tell the assignee to), and a worktree only if it must write at
+  the same time as another agent. Read-only roles get neither: they read with
+  `git diff`, `show` and `log`, and one that must run code or commit review
+  records uses the author's checkout while the author is idle. Tell it to list
+  anything it creates in its handoff.
 - **Proof expected:** the observable result that would show the goal is met.
-- **Handoff:** anything beyond the standard handoff you need back.
+- **Handoff:** anything you need beyond the standard handoff.
 
-Set the model and reasoning effort when the runtime allows it (see
-[Submodel Selection](../references/submodel-selection.md)). Start subagents
-with fresh context unless essential context cannot be summarized.
+Start subagents with fresh context, not your conversation. Where the runtime
+allows, choose the cheapest model and effort likely to make the whole workflow
+succeed, counting retries, verification and the cost of a mistake: cheap
+attempts suit work an automated check verifies, and a long chain of reasoning,
+not a label like "security", is what calls for a stronger model.
 
-For spikes or competing implementations, add the candidate fields from
-[Implementation Candidates](../references/implementation-candidates.md).
+For a spike or competing implementations, also give each candidate its purpose
+(production candidate, spike or comparison), the question it should answer, and
+what it may see of other attempts; run competitors against the same requirements
+and proof, each on its own disposable branch.
+
+One branch serves one pull request, sized for review: usually an increment, not
+an issue. Review fixes and retries are commits on that branch. Atelier merges
+only into its base, so with Atelier do not stack one owner's branch on another's
+or plan an integration or rewrite branch: sequence the work, or put the slices
+under one parent so they share a branch, and ask the human if the work truly
+needs another arrangement.
 
 ## Review and Validation
 
-You arrange review. Every non-trivial change, including your own plans and
-code, gets an independent reviewer before it merges or its work starts (see
-[Independent Review](../SKILL.md#independent-review)). Batch reviews per
-slice, per PR, or per increment, whichever keeps the diff reviewable. You have
-read the author's handoff, so you are not an independent reviewer of its
-work.
+Brief reviewers as [Independent Review](../SKILL.md#independent-review) says,
+batching per slice, PR or increment so each diff stays reviewable, and tell them
+to report in [`review`](review.md#output)'s format. Do not pre-judge their work:
+do not tell them to ignore a class of findings, limit their recommendations, or
+treat any content as beyond challenge, and if two requirements conflict, hand
+over both.
 
-When dispatching a reviewer or validator:
-
-- Give it the diff or scenario, the governing requirements and constraints
-  quoted exactly, and the proof that was run. In Atelier,
-  `atelier review request <id>` prints this brief from the records once every
-  Done when line is ticked and the Report is written; it leaves out the
-  Report, so add the proof that ran (commands and results, not the author's
-  assessment). Tell the reviewer to
-  report in [`review`](review.md#output)'s format, which governs where the
-  brief asks for another, and to record its findings and approval under its
-  own identity.
-- Do not pass along the author's rationale or self-assessment.
-- Do not pre-judge its work: do not tell it to ignore a class of findings,
-  limit its recommendations, or treat any content as beyond challenge. If two
-  requirements conflict, hand over both and let the reviewer report the
-  conflict.
-
-When findings come back, read them in full and decide each one with
-[Finding Disposition](../references/finding-disposition.md). You decide scope;
-you do not need to redo the review. You do not decide findings on your own
-work (see
-[Finding Disposition](../references/finding-disposition.md#who-decides)). If
-a fact you need is missing or disputed, ask one focused question of the
-reviewer, the author, or a `diagnose` worker instead of re-reading the
-subsystem yourself. A `FIX NOW` finding goes back to the author and its fix
-to a reviewer; the approval after the fix resolves it. Record a disposition
-for each finding you defer or dismiss (see
-[Finding Disposition](../references/finding-disposition.md#recording)).
-
-Use an independent `validate` assignment for mission acceptance, for increments
-that change a user-facing or cross-boundary outcome, and for scenarios where
-deciding what to test needs an independent eye. Otherwise, author-run proof
-is sufficient evidence of behavior.
+Read the findings in full and decide each with [`review`'s
+recommendations](review.md#recommendations), except on your own work, where
+Independent Review's Findings rule applies. You decide scope; you do not redo
+the review. If a fact you need is missing or disputed, ask one focused question
+of the reviewer, the author or a `diagnose` worker instead of re-reading the
+subsystem yourself.
 
 ## Integrating Results
 
-Treat a returned implementation as a candidate until you have verified it.
-Passing tests show behavior, not construction quality. Before integrating,
-confirm the proof is fresh and exercises the claim and that the change fits
-the strategy. Unreviewed work may sit on a working branch while its review
-is pending, but it does not reach the default or protected branch until it
-has been reviewed. When a candidate works but is
-built wrong, decide whether to refactor, reimplement, or discard it using
-[Implementation Candidates](../references/implementation-candidates.md).
-
-### Merging Parallel Branches
-
-When several branches wait to merge, the base moves under the others each
-time one merges. Leave waiting branches alone: review a branch when its work
-is finished, and bring the base in only when Atelier says to (see
-[Atelier](../references/atelier.md#what-makes-an-approval-stale)) or a merge
-check fails on the merged tree, such as a stale lockfile. Then merge the base
-in once, regenerate generated files in that same step, and get the result
-reviewed if it differs from Git's own merge. A base merge records no new
-proof. A repository without CI puts its suite in the merge checks, so a
-broken merged tree fails before a reviewer has to notice it.
+A returned implementation is a candidate until you have verified that its proof
+is fresh and exercises the claim and that it fits the strategy. Passing tests
+show behavior, not construction, so judge a candidate's behavior, design and
+learning separately. Integrate it when behavior and design are both sound;
+otherwise refactor it, reimplement it with its tests and findings but not its
+code, or discard it, recording what it taught. Passing tests and effort already
+spent are not reasons to keep code. If candidates expose conflicting
+requirements or a strategic question, escalate instead of picking a side.
 
 ## Keeping the Plan Current
 
-The plan, whether an issue graph or a plan file, is a hypothesis. Revise it after each integrated increment,
-material discovery, failed assumption, or new blocker. Change the smallest
-layer that absorbs the new evidence:
+The plan is a hypothesis. After each integrated increment, material discovery,
+failed assumption or new blocker, revise the smallest layer that absorbs the
+evidence: clarify, retry or reassign an assignment; revise issues, dependencies,
+sequencing or proof within the strategy; or, for a strategy problem, pause the
+affected work, continue independent work and route the question through `decide`
+and `plan`. A current hazard stops the harmful work first.
 
-| Change | Action |
-| --- | --- |
-| Assignment problem | Clarify, retry, or reassign the same work. |
-| Plan problem | Revise issues, dependencies, sequencing, or proof within the strategy. |
-| Strategy problem | Pause the affected work, continue independent work, and route the question through `decide` and `plan`. |
-| Current hazard | Stop the harmful work first, then replan at the right layer. |
+Plan the next backlog increment when its predecessor's evidence arrives or ready
+work runs low. If ready work runs out, find whether you lack detail, evidence or
+a decision; do not invent busywork. When superseding plans, keep completed work
+and failed evidence, and do not rewrite history to make the new route look
+inevitable. Post progress on the mission as dated notes.
 
-A change is strategic when it alters the outcome, the target system shape, a
-governing tradeoff, a boundary, or an accepted ADR. Those need the authority
-described in the [Constitution](../constitution.md#strategy-changes-deliberately).
-
-Plan executable work only as far as current evidence supports. Keep later work
-as backlog increments with a preliminary goal and known unknowns, and plan the
-next one when its predecessor's evidence arrives or ready work runs low. If
-ready work runs out, figure out whether you are missing detail, evidence, or a
-decision. Do not invent busywork.
-
-When a worker finds a nearby bug, fix it in the current change only if it
-blocks the current outcome. Otherwise record it as follow-up work. Preserve
-completed work and failed evidence when superseding plans; do not rewrite
-history to make the new route look inevitable.
-
-When you take up low-priority follow-ups, such as deferred review findings,
-batch them instead of running each through its own branch and review. Make
-them children of one parent increment: they share the parent's branch, each
-keeps its own Done when and proof, one independent review of the branch,
-approved on the parent, covers them all, and one merge marks them all done.
-In Atelier, the children `atelier start` onto the parent's branch, and
-`atelier review request <parent>` briefs every started child's Done when.
+Batch low-priority follow-ups, such as deferred findings, as children of one
+parent: each is started on the parent's branch with its own Done when, and one
+review and one merge of the parent cover them all.
 
 ## Closing a Mission
 
-A mission closes when all its work is merged and its validation items, if
-any, are done. Close against demonstrated outcomes, not issue count:
+A mission closes when all its work is merged and its validation items are done,
+judged by demonstrated outcomes, not issue count:
 
-1. Run the proof for each acceptance claim fresh, with independent validation
-   where the scaling rules call for it.
-2. Confirm all non-trivial changes have been independently reviewed.
-3. Confirm no debug residue, temporary breakage, or orphaned paths remain,
-   and that branches and worktrees created for the work are removed or
-   archived.
-4. Confirm that work only possible after a merge or release, other than
-   validation items, is filed as
-   [loose ends](../references/atelier.md#loose-ends), outside the mission,
-   and update the docs and tracker items or plan file the work affected.
-5. Close it: `atelier issue transition <mission> close --reason
-   "<report>"`, then walk the human through `atelier debrief <mission>`.
+1. Run the proof for each acceptance claim fresh, through a validator where a
+   validation item calls for one.
+2. Confirm every loose end is filed.
+3. Clean up what the work created, starting from handoffs and records and
+   comparing with `git worktree list` and `git branch --list`. Tag an unmerged
+   branch `archive/<branch>` before deleting it, and ask before deleting
+   anything you cannot trace to this work, anything with uncommitted changes, or
+   a branch with an open PR; remote branches follow repository policy.
+4. Close it with `atelier issue transition <mission> close --reason
+   "<report>"`, then walk the human through `atelier debrief <mission> --html`
+   and record their direction as review records, decisions, notes and issues.
 
 In the handoff, also report delivered and deferred outcomes, open loose ends,
-plan changes, paused questions, and workspace state, including every branch
-and worktree created during the work and whether it was removed, archived, or
-kept (and why).
+plan changes, paused questions, and each branch or worktree created, with
+whether it was removed, archived or kept and why.
