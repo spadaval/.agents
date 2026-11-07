@@ -64,10 +64,10 @@ A mission is ready (draft to todo) when an orchestrator could start it without
 asking the human what it means: it passes the shaping tests and every item fits
 its outcome; its first items are ready issues; each question only the human can
 answer is an open decision record or a `needs-human` item, not an issue's
-Unknown; and the planning has been reviewed. The human then approves the plan,
-after a walk through `atelier brief <mission> --html`, recorded under their name
-with `atelier review approve <mission> --identity <the human>`, unless the
-strategy's Authority section delegates that.
+Unknown; and the planning has been reviewed and the human has approved it after
+a walk through `atelier brief <mission> --html` (recorded under their name with
+`atelier review approve <mission> --identity <the human>`), unless the
+strategy's Authority section delegates that approval.
 
 An issue is ready when a worker without your context could do it from its body
 alone: a Goal saying what to change and why; Done when lines, each an observable
