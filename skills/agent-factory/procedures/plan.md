@@ -114,6 +114,14 @@ the [issue template](../references/tracker-records.md#issue): the goal and why
 it matters, how you will know it is done, scope, context (including the target
 environment when it affects risk), and dependencies.
 
+Decide when each Done when check can be proven. Everything that can be
+checked on the branch is checked before merge. Mark a check to run after
+merge only when it needs the deployed or merged system, a device or place no
+agent can reach, the human's judgment, or time and real use, and name its
+nearest stand-in that runs before merge (see
+[After-Merge Checks](../references/tracker-records.md#after-merge-checks)).
+Do not split such a check off as its own item.
+
 Avoid placeholders such as "TBD", "handle edge cases", or "similar to #12".
 If you cannot state something concretely, you have found an evidence
 boundary. Make it a spike, a decision, or a blocked issue instead of

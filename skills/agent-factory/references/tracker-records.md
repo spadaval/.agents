@@ -68,7 +68,8 @@ able to do it from the body alone. It is typically 10 to 30 lines.
 
 ## Done when
 <The observable proof: a test, command, check, or scenario that could fail
-if the work were wrong or missing.>
+if the work were wrong or missing. Each line is checked before merge unless
+it is an [after-merge check](#after-merge-checks).>
 
 ## Scope
 <What may change. Name anything that must not change, if it is not obvious.>
@@ -92,6 +93,32 @@ would say nothing. Express dependencies as `blocked_by` links, not body text.
 Put follow-up findings in new issues, not in the body of a closed one. Mark
 work only a human can do, such as an account approval or a step at a
 particular machine, with the `needs-human` label so agents do not pick it up.
+
+### After-Merge Checks
+
+Validate everything you can before the merge. Post-merge validation is only
+what cannot be checked before it: a check that needs the deployed or merged
+system, a device or place no agent can reach, the human's judgment, or time
+and real use. Mark such a line of Done when with its reason and its nearest
+stand-in, which still runs before merge (an emulator for a device, a test
+server for production); the after-merge check covers only the gap between
+the two:
+
+```md
+- [ ] After merge (device): the launcher opens on Sumeet's phone. Stand-in: the emulator test `launch_opens` passes.
+```
+
+Decide the split when you plan the item. Moving a check to after merge once
+the item has started is a plan change that the reviewer sees.
+
+The item closes and merges as usual. Validate on the base as a planning
+change, with no reviewer identity: run the check, record its receipt, tick
+the box (`- [x] After merge ...`) and commit the record. If it fails, do not
+reopen the merged item: file a follow-up bug with `atelier issue create
+--discovered-from <item>`, and add `carried to <bug>` to the line, so the bug
+holds the check from then on. Atelier shows done work with an open
+after-merge check as awaiting validation and warns when its mission closes,
+but nothing refuses.
 
 ### Close Reason and the Implementer Report
 
@@ -156,7 +183,10 @@ children and dependencies as native links.
 ## Validation Item
 
 Create one when an independent `validate` assignment is needed, such as for
-mission acceptance or an increment that changes a user-facing outcome. It uses the
+mission acceptance or an increment that changes a user-facing outcome. A
+check of one item that can only run after its merge is an
+[after-merge check](#after-merge-checks) on that item, not a validation item.
+It uses the
 `validation` issue type and the ordinary issue body:
 
 ```md

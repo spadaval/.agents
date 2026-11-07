@@ -32,6 +32,11 @@ way to guarantee this, but the order is your call.
 check available, such as a build, typecheck, schema validation, dry run,
 rendering, or screenshot. They need review like any other change.
 
+A Done when check marked to run after merge is not proven on the branch, but
+its stand-in is: run the stand-in like any other check. Do not move a check to
+after merge yourself to get past it; that is a plan change for whoever owns
+the plan, and the reviewer sees it.
+
 When a failing observation before the change is impractical, name the reason
 and use the cheapest proof that could still show the change is wrong. That is
 not a license to ship with no check at all.
