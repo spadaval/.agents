@@ -26,18 +26,17 @@ alone takes the orchestrator's too.
 3. **Finish the record** (author): tick each Done when line once it holds and
    write the `## Report` ([implement](../procedures/implement.md#handoff)).
 4. **Request review** (orchestrator): give the reviewer the brief `atelier
-   review request <id>` prints, plus the proof that ran. The reviewer records
-   its findings with the commands the brief prints.
+   review request <id>` prints, plus the proof that ran as commands and results.
+   The reviewer records its findings with the commands the brief prints.
 5. **Fix and re-review** (author, then a reviewer): the author fixes each
-   `fix_now` finding in a later commit, and a reviewer reviews the fix, however
-   small. A finding not fixed as `fix_now`, including one recommended `defer` or
-   `no_action` and fixed anyway, gets a disposition from the accountable agent,
-   or from a reviewer when that is the author.
+   `fix_now` finding in a later commit, and a reviewer reviews the fix. A
+   finding deferred or dismissed gets a disposition from the accountable agent,
+   or from a reviewer when that is the author; merge's refusal names any finding
+   still waiting for one.
 6. **Approve** (reviewer), with the command the brief prints.
 7. **Merge** (orchestrator): `atelier merge <id>` also marks every open child
-   done, started or not, so move out or supersede any child that should not
-   merge. Never use a plain `git merge`, which runs no gate and marks nothing
-   done.
+   done, started or not, so move out or supersede any that should not merge.
+   Never use plain `git merge`, which runs no gate and marks nothing done.
 
 A change that needs no issue, such as small work, a release, docs or a mockup,
 takes the light path that `atelier --help` and `review approve --help`
@@ -65,11 +64,12 @@ reviews pin commits.
 Commits that touch only records and the strategy files missions link go on the
 base directly, so every branch sees the plan. A non-trivial one is reviewed
 before the work it defines starts: brief the reviewer with the planning commits
-(`review request` is for finished work), and it records its review against the
-issue, the mission (for a strategy) or the decision. The result that marks a
-loose end or validation done is an observation and needs no review. Everything
-else goes through a branch and `atelier merge`, except a trivial commit exempted
-with `atelier review trivial --base` where policy allows.
+(`review request` is for finished work), and it records `review approve` or
+`finding` on the base against the issue, the mission (for a strategy) or the
+decision. The result that marks a loose end or validation done is an observation
+and needs no review. Everything else goes through a branch and `atelier merge`,
+except a trivial commit exempted with `atelier review trivial --base` where
+policy allows.
 
 ## Records
 

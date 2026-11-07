@@ -34,9 +34,10 @@ or ownership. After the final edit, rerun the focused proof and relevant
 regression tests and read the full output.
 
 Tick a Done when line only when it holds. A line that cannot hold is a plan
-change for whoever owns the plan, the orchestrator or else the user, not a line
-to rewrite yourself; one that can only be shown after a merge or release becomes
-a [loose end](../references/atelier.md#loose-ends-and-validation-items).
+change, not a line to rewrite yourself: report it to whoever owns the plan, the
+orchestrator or else the user, who files a [loose
+end](../references/atelier.md#loose-ends-and-validation-items) for work that can
+only follow a merge or release.
 
 ## Review
 

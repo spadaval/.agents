@@ -103,8 +103,8 @@ and failed evidence, and do not rewrite history to make the new route look
 inevitable. Post progress on the mission as dated notes.
 
 Batch low-priority follow-ups, such as deferred findings, as children of one
-parent: they share its branch, each keeps its own Done when, and one review and
-one merge of the parent cover them all.
+parent: each is started on the parent's branch with its own Done when, and one
+review and one merge of the parent cover them all.
 
 ## Closing a Mission
 

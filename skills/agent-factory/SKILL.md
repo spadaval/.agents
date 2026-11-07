@@ -45,9 +45,9 @@ and offer to install Atelier for a mission without stopping work for it.
 Every non-trivial change is reviewed before it merges by someone who did not
 write it and does not carry its author's reasoning, such as a fresh subagent; an
 orchestrator that has read the author's handoff does not qualify. Until then the
-change stays off the default and protected branches ([planning
-records](references/atelier.md#planning-on-the-base) have their own rule), its
-PR is not marked ready, and its mission does not close.
+change stays off the default and protected branches, its PR is not marked ready,
+and its mission does not close. [Planning
+records](references/atelier.md#planning-on-the-base) follow their own rule.
 
 - **What it covers:** everything committed, docs and tracker records included,
   since agents act on what they read. Trivial changes, whose correctness is

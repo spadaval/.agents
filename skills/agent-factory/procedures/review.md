@@ -14,9 +14,9 @@ scenarios is `validate`.
 - Report every finding you can support, ordered by impact, citing files and
   lines with a failure scenario where one exists. Ignore style preferences
   unless they break an explicit project standard.
-- Approve only when no finding you would recommend `FIX NOW` is open, unless the
-  accountable agent deferred or dismissed it. Reviewing a fix may cover only its
-  diff.
+- Approve only when no finding you would recommend `FIX NOW` is open, unless
+  someone other than its author deferred or dismissed it. Reviewing a fix may
+  cover only its diff.
 
 ## What to Look For
 
@@ -41,7 +41,8 @@ appear only when acceptable changes interact.
 
 ## Recommendations
 
-Recommend one per finding; the accountable agent decides by the same rules.
+Recommend one per finding; whoever decides it, as Independent Review's Findings
+rule says, uses the same rules.
 
 - **FIX NOW** blocks the current work. It names the blocking condition and shows
   it exists on a current path in the target environment: a contract failure (a
