@@ -63,7 +63,8 @@ reviews pin commits.
 ## Planning on the Base
 
 Commits that touch only records and the strategy files missions link go on the
-base directly, so every branch sees the plan. A non-trivial one is reviewed
+base directly, so every branch sees the plan; a started item's own record
+changes only on its work branch. A non-trivial planning commit is reviewed
 before the work it defines starts: brief the reviewer with the planning commits
 (`review request` is for finished work), and it records `review approve` or
 `finding` against the issue, the mission (for a strategy) or the decision. The
@@ -86,12 +87,11 @@ new record that supersedes the old one. Label work only a human can do
 loose_end`, then `issue link <loose-end> <issue> --role blocked_by`) when you
 plan the item, or as soon as such work turns up, on the base as a planning
 change reviewed like any other, even while the issue it waits on is in flight.
-The link lives on the loose end, so that issue's record stays untouched on the
-base; whoever owns the plan rewrites or drops the Done when line the loose end
-replaces, on the work branch. A release's tag, with no issue to wait on, is
-filed on the release branch instead and reaches the base with the merge. A part
-that can run before merge, such as an emulator test, stays a Done when line. A
-loose end never advances a mission, so it never holds one open.
+The link lives on the loose end; whoever owns the plan rewrites or drops the
+Done when line it replaces, on the work branch. A release's tag, with no issue
+to wait on, is filed on the release branch instead and reaches the base with the
+merge. A part that can run before merge, such as an emulator test, stays a Done
+when line. A loose end never advances a mission, so it never holds one open.
 
 A validation item, which holds an independent `validate` assignment and advances
 its mission, is needed for mission acceptance, an increment that changes a
