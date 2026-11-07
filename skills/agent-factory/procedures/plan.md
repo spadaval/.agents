@@ -34,7 +34,7 @@ A mission is one thing a person can hold in their head, plan against and finish:
   human a question they can answer now. Work that waits on calendar time, on
   other repositories or people adopting a change, or on measuring behavior after
   it ships goes in its own backlog item that says when to pick it up, or in a
-  loose end, so the mission can close.
+  loose end if it can only follow a merge or release, so the mission can close.
 - **Sized to finish:** one reviewer can judge it in one debrief, usually days to
   a few weeks of work. Split a larger one along the outcome's seams, not by item
   count.
@@ -43,9 +43,9 @@ A mission is one thing a person can hold in their head, plan against and finish:
   must be something the work can make true and an agent can verify at close: a
   test, a scenario, a measurement it can take, or a named human judgment. A
   criterion that restates items adds nothing, and one the work cannot reach
-  stalls the mission. When an existing one fails this test, propose a rewrite or
-  a backlog item to whoever holds authority over the strategy instead of
-  dropping it.
+  stalls the mission. When one already set fails this test, propose a rewrite or
+  backlog item to whoever holds authority over the strategy instead of dropping
+  it.
 
 ## Strategy File
 

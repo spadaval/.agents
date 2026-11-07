@@ -8,15 +8,15 @@ scenarios is `validate`.
 ## Stance
 
 - Read the change, the requirements and constraints it answers to, and enough
-  surrounding code, docs and decisions to judge it.
+  surrounding code, docs and decision records to judge it.
 - Stay read-only unless asked to fix things; the review records you write are
   part of the review.
 - Report every finding you can support, ordered by impact, citing files and
   lines with a failure scenario where one exists. Ignore style preferences
   unless they break an explicit project standard.
 - Approve only when no finding you would recommend `FIX NOW` is open, unless
-  someone other than its author deferred or dismissed it. Reviewing a fix may
-  cover only its diff.
+  someone other than the change's author deferred or dismissed it. Reviewing a
+  fix may cover only its diff.
 
 ## What to Look For
 

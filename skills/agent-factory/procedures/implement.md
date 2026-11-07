@@ -42,9 +42,9 @@ only follow a merge or release.
 ## Review
 
 Get review as [Independent Review](../SKILL.md#independent-review) says; under
-an orchestrator, report it as outstanding. Fix each `FIX NOW` finding one at a
-time and rerun its proof. Do not silently drop a finding or widen scope to
-address it.
+an orchestrator, report it as outstanding. Fix each `FIX NOW` finding the
+accountable agent does not overturn, one at a time, and rerun its proof. Do not
+silently drop a finding or widen scope to address it.
 
 ## Handoff
 
