@@ -34,9 +34,9 @@ Say which subskill you are using, and why, before you start it.
 
 ## Scale
 
-Small work (one agent, one session) needs no tracker or plan, only a clear
-commit and PR description, multi-step work uses tracker issues, and a mission
-adds a strategy and increments (`plan`). The tracker is
+Small work (one agent, one session) needs no issue or plan, only a clear commit
+and PR description, multi-step work uses tracker issues, and a mission adds a
+strategy and increments (`plan`). The tracker is
 [Atelier](references/atelier.md); without it, keep the plan, follow-ups and
 decisions in a plan file or the PR, and offer to install Atelier for a mission
 without stopping work for it.
@@ -50,7 +50,7 @@ change stays off the default and protected branches, its PR is not marked ready,
 and its mission does not close. [Planning
 records](references/atelier.md#planning-on-the-base) follow their own rule.
 
-- **What it covers:** everything committed, docs and tracker records included,
+- **What it covers:** everything committed, docs and planning records included,
   since agents act on what they read. Trivial changes, whose correctness is
   fully evident from the diff, are exempt: a typo, formatting, a tool-driven
   rename, a status change adding no content, a patch-level bump with passing
@@ -62,7 +62,7 @@ records](references/atelier.md#planning-on-the-base) follow their own rule.
   the proof that was run. Whoever briefs it leaves out the author's rationale
   and self-assessment, which carry the bias review exists to avoid, and any the
   reviewer meets in the diff it weighs as claims.
-- **After review:** a finding's fix is reviewed again, however small, as is a
+- **After review:** a finding's fix is reviewed again, however small, as is any
   non-trivial conflict resolution or rewritten requirement, by any reviewer.
 - **Findings:** the accountable agent decides each with [`review`'s
   recommendations](procedures/review.md#recommendations), but an author never
@@ -73,7 +73,8 @@ records](references/atelier.md#planning-on-the-base) follow their own rule.
 - **No reviewer:** keep it unmerged, report review outstanding (your own reread
   is not review) and ask the user to review or arrange it. A prior request to
   merge does not waive this; a user who knowingly directs an unreviewed merge is
-  obeyed unless policy forbids it, and the review stays open.
+  obeyed unless policy or a gate forbids it (then say so), and review stays
+  open.
 
 ## Handoff
 

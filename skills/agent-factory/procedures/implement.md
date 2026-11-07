@@ -35,7 +35,7 @@ regression tests and read the full output.
 
 Tick a Done when line only when it holds. A line that cannot hold is a plan
 change, not a line to rewrite yourself: report it to whoever owns the plan, the
-orchestrator or else the user, who files a [loose
+orchestrator or, working alone, the user, who files a [loose
 end](../references/atelier.md#loose-ends-and-validation-items) for work that can
 only follow a merge or release.
 

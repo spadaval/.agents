@@ -55,9 +55,10 @@ rule says, uses the same rules.
   The fix is the smallest change that removes the problem; if none fits the
   strategy, remove or simplify the surface, or escalate.
 - **DEFER**: real and actionable but not blocking, such as a pre-existing
-  problem the change did not worsen or a risk to a surface not yet built. It
-  gets a follow-up issue. When you cannot tell whether a finding blocks, defer
-  it, unless one small test would settle it; then run the test.
+  problem the change did not worsen or a risk to a surface not yet built.
+  Whoever records the decision files a follow-up issue for it. When you cannot
+  tell whether a finding blocks, defer it, unless one small test would settle
+  it; then run the test.
 - **NO ACTION**: wrong, a duplicate, purely stylistic or without consequence,
   with a one-line reason.
 

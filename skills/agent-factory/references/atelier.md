@@ -26,8 +26,9 @@ alone takes the orchestrator's too.
 3. **Finish the record** (author): tick each Done when line once it holds and
    write the `## Report` ([implement](../procedures/implement.md#handoff)).
 4. **Request review** (orchestrator): give the reviewer the brief `atelier
-   review request <id>` prints, plus the proof that ran as commands and results.
-   The reviewer records its findings with the commands the brief prints.
+   review request <id>` prints, adding the proof that ran (commands and results)
+   and any constraint it lacks, such as the item's Scope. The reviewer records
+   its findings with the commands the brief prints.
 5. **Fix and re-review** (author, then a reviewer): the author fixes each
    `fix_now` finding that stands in a later commit, and a reviewer reviews the
    fix. A finding deferred or dismissed gets a disposition from the accountable
@@ -83,14 +84,14 @@ new record that supersedes the old one. Label work only a human can do
 
 `atelier --help` says what a loose end is. File it (`issue create --issue-type
 loose_end`, then `issue link <loose-end> <issue> --role blocked_by`) when you
-plan the item, or as soon as such work turns up, on the base as planning even
-while the issue it waits on is in flight. The link lives on the loose end, so
-that issue's record stays untouched on the base; whoever owns the plan rewrites
-or drops the Done when line the loose end replaces, on the work branch. A
-release's tag, with no issue to wait on, is filed on the release branch instead
-and reaches the base with the merge. A part that can run before merge, such as
-an emulator test, stays a Done when line. A loose end never advances a mission,
-so it never holds one open.
+plan the item, or as soon as such work turns up, on the base as a planning
+change reviewed like any other, even while the issue it waits on is in flight.
+The link lives on the loose end, so that issue's record stays untouched on the
+base; whoever owns the plan rewrites or drops the Done when line the loose end
+replaces, on the work branch. A release's tag, with no issue to wait on, is
+filed on the release branch instead and reaches the base with the merge. A part
+that can run before merge, such as an emulator test, stays a Done when line. A
+loose end never advances a mission, so it never holds one open.
 
 A validation item, which holds an independent `validate` assignment and advances
 its mission, is needed for mission acceptance, an increment that changes a
