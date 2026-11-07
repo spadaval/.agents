@@ -48,7 +48,9 @@ one of the following:
    temporary code, or unnecessary complexity (see below).
 
 Fix blocking findings with the smallest change that removes the problem, not
-with a framework for future problems. If a blocking finding cannot be fixed
+with a framework for future problems. The fix is reviewed again before it
+merges; that re-review may cover only the fix's diff, and the reviewer who
+raised the finding may do it. If a blocking finding cannot be fixed
 within the current strategy, remove or simplify the affected surface, or
 escalate. Never quietly downgrade it.
 
@@ -89,9 +91,10 @@ does not survive this test.
 
 ## Recording
 
-In Atelier, each finding is a review event and each decision is a
-disposition event against it (see [Atelier](atelier.md#branches-review-and-integration)).
-Give each a short reason. Without Atelier, record the decisions in the PR or
+In Atelier, each finding is a review record that carries its decision as a
+disposition field, set with `atelier review disposition` (see
+[Atelier](atelier.md#branches-review-and-integration)). Setting it again
+replaces it; Git keeps the earlier decisions. Give each a short reason. Without Atelier, record the decisions in the PR or
 plan file:
 
 ```text

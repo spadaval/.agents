@@ -132,14 +132,19 @@ what each record contains.
   with no owner issue or work branch: `atelier review trivial --base
   <commit>` covers exactly that commit.
 - Record each [finding disposition](finding-disposition.md) with
-  `atelier review disposition`. `fix_now` needs a later resolution commit and
-  fresh independent approval; `defer` needs an existing follow-up issue;
-  `defer` and `no_action` need acceptance from a non-author identity.
+  `atelier review disposition`. The disposition is a field of the finding,
+  with who set it and at which commit; setting it again replaces it, and the
+  Git history of the finding's file keeps earlier ones. `fix_now` needs a
+  later resolution commit and a fresh independent approval: that re-review
+  may cover only the fix's diff, and the reviewer who raised the finding may
+  do it. `defer` needs an existing follow-up issue. `defer` and `no_action`
+  must be set by a non-author identity: the author may propose one, and the
+  reviewer accepts it by setting it again.
 - File work found along the way with `atelier issue create
   --discovered-from <item, finding or receipt id>`.
 - Material changes after approval (code, policy, acceptance, relationships)
-  make it stale. Adding evidence or review records and in-scope status changes
-  do not.
+  make it stale. Adding evidence or review records, setting a finding's
+  disposition, and in-scope status changes do not.
 - Integrate only with `atelier merge`, never a plain `git merge` into the
   base branch, which skips every gate. `atelier merge <id> --check` evaluates
   the gates without integrating; `atelier merge <id>` integrates the
