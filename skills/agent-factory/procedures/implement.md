@@ -35,7 +35,9 @@ rendering, or screenshot. They need review like any other change.
 Every Done when line holds before review. If one can only be shown after
 the merge, do not tick it or rewrite it to get past it: that is a plan change
 for whoever owns the plan, the orchestrator or else the user (it becomes a
-loose end), and the reviewer sees a Done when edited after the start.
+loose end, filed on the base). The line it replaces is rewritten or dropped
+on the work branch, never on the base, and the reviewer sees a Done when
+edited after the start.
 
 When a failing observation before the change is impractical, name the reason
 and use the cheapest proof that could still show the change is wrong. That is

@@ -214,11 +214,13 @@ when deciding.>
 
 Context and Background are optional. Open decisions are the human's by
 default and never appear as agent-ready work. In an Atelier repository the
-decision record is the ADR: docs link to it instead of restating its
-rationale. A changed decision gets a new record linked to the old one with
-`atelier issue link <new> <old> --role supersedes`; a decided record cannot
-take the `supersede` transition (see
-[`decide`](../procedures/decide.md#authority-and-recording)).
+decision record holds the question and the decision, and docs link to it,
+or to the ADR it produced, instead of restating its rationale. Where the
+repository keeps ADRs, a decision record may also produce one, a document
+such as `docs/adr/<n>.md` written for readers of the code; the record names
+it with `atelier issue update <id> --adr <path>`. A changed decision gets a
+new record linked to the old one with `atelier issue link <new> <old> --role
+supersedes`; a decided record cannot take the `supersede` transition.
 
 ### Decision Notes
 
@@ -233,10 +235,9 @@ atelier issue note <id> --kind decision "<the choice>" --reason "<why>" \
   [--rejected "<alternative>"]...
 ```
 
-A choice that meets the record test in [Decision](#decision) is a decision
-record, not a note. Do not use `issue note --one-way`: a choice that is
-costly to reverse is a record. `atelier work decisions <mission>` lists notes
-and records together.
+A choice that meets the record test in [Decision](#decision), such as one
+that is costly to reverse, is a decision record, not a note. `atelier work
+decisions <mission>` lists notes and records together.
 
 ## Evidence
 

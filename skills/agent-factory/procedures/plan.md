@@ -151,7 +151,8 @@ tradeoff must change:
 4. Edit the strategy in place and record what changed, why, and on whose
    authority, as described in
    [Strategic Plans](../references/strategic-plans.md#changing-it). Write a
-   superseding decision record or ADR for any decision the change replaces.
+   superseding decision record (an ADR without Atelier) for any decision the
+   change replaces.
 5. Reconcile the tracker. Mark each affected item as still valid, needing
    revision, or obsolete. Preserve completed work and its evidence.
 
