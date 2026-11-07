@@ -251,7 +251,8 @@ or records, and the note
 points at it and holds the remaining handoff fields: changes, proof, review
 status, and any a subskill adds.
 
-**Reviews and finding dispositions:** review events, not notes. See
+**Reviews and finding dispositions:** review records, not notes: each
+finding's disposition is a field of the finding's record. See
 [Finding Disposition](finding-disposition.md#recording).
 
 ## Deferred Follow-Up
