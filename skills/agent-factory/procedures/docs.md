@@ -14,7 +14,8 @@ as fixing drift, recording decisions, or updating guidance after a change.
 - Test claims against reality. Where docs describe commands, behavior, or
   configuration, run or inspect the real thing rather than trusting the old
   text.
-- When a decision changes, write a superseding decision record or ADR (see
+- When a decision changes, write a superseding decision record, or ADR
+  without Atelier (see
   [Tracker Records](../references/tracker-records.md#decision)); do not
   rewrite accepted history.
 - When you find a gap you cannot resolve, such as an unclear owner or an

@@ -49,7 +49,8 @@ orchestrator's steps too. The item's planning was reviewed before step 1.
 2. **Implement** (author), committing code and records together.
 3. **Finish the record** (author). Tick each Done when line (`- [x]`) once
    it holds, and write the item's `## Report` (see
-   [Report](tracker-records.md#report)).
+   [Report](tracker-records.md#report)) in its Markdown file, the path
+   `atelier issue show` prints.
 4. **Ask for review** (orchestrator). `atelier review request <id>` prints
    the brief for an independent reviewer and writes nothing; naming the
    owner covers its started children too. It refuses while any line is
@@ -123,7 +124,9 @@ branch after review is recorded: findings and approvals pin its commits.
   their blockers. Keep planned but not near-term work in `backlog` (`--status
   backlog`, or the `defer` transition, unrelated to a finding's DEFER; `plan`
   brings it back). A mission moves from `draft` to `todo` with `ready`, once
-  it meets [Ready Missions](../procedures/plan.md#ready-missions).
+  it meets [Ready Missions](../procedures/plan.md#ready-missions), and to
+  `in_progress` with the `start` transition once the human approved its
+  plan; `atelier start` takes issues, not missions.
 - A choice that meets the [record test](tracker-records.md#decision) is a
   `decision` record, which the `decide` transition (`--reason "<the
   choice>"`) marks done once its Decision section is filled in; an open one
@@ -134,8 +137,10 @@ branch after review is recorded: findings and approvals pin its commits.
   the way with `issue create --discovered-from <item, finding or receipt>`.
   Append handoffs with `issue note`. Run `bundle preview <file>` before
   `bundle apply`.
-- `--commit-records` commits the records a command wrote (`--stage-records`
-  groups several commands into one commit).
+- `--commit-records`, on the transition, review and evidence commands,
+  commits the records the command wrote (`--stage-records` groups several
+  commands into one commit). Commit the records other commands write with
+  Git.
 
 ## Loose Ends
 
@@ -149,7 +154,7 @@ issue it waits on with `atelier issue link <loose-end> <issue> --role
 blocked_by`. File it when you plan the item, or as soon as such work turns
 up (an implementer reports it to whoever owns the plan). Filing it is
 planning like any other: commit it straight to the base and have it
-reviewed as a planning change (see
+reviewed as a planning change, recorded against the loose end (see
 [Planning on the Base](#planning-on-the-base)), even while the issue it
 waits on is in flight. The link is stored on the loose end, so the
 in-flight issue's record is not touched. It is never another issue's
@@ -180,9 +185,9 @@ Commits that touch only records and the strategy files linked from missions
 (filing, grooming, decisions, strategy edits, marking loose ends done) may go
 on the base directly. So may the commit that installs Atelier, and one
 commit whose correctness is evident from its diff, such as a typo fix,
-exempted with `atelier review trivial --base <commit>` where repository
-policy allows it. Everything else goes through a branch and `atelier
-merge`. A non-trivial planning change is still reviewed before the work it
+exempted with `atelier review trivial --base <commit>` where the
+repository's guidance allows it. Everything else goes through a branch and
+`atelier merge`. A non-trivial planning change is still reviewed before the work it
 defines starts (see [Independent Review](../SKILL.md#independent-review));
 the result that marks a loose end or validation done is an observation and
 needs no review. Brief the reviewer with the planning commits, and record
