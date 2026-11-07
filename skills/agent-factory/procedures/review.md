@@ -9,8 +9,8 @@ scenarios is `validate`.
 
 - Read the change, the requirements and constraints it answers to, and enough
   surrounding code, docs and decision records to judge it.
-- Stay read-only unless asked to fix things; the review records you write are
-  part of the review.
+- Stay read-only unless asked to fix things; your review records, and the
+  follow-up issue for a deferral you decide, are part of the review.
 - Report every finding you can support, ordered by impact, citing files and
   lines with a failure scenario where one exists. Ignore style preferences
   unless they break an explicit project standard.
