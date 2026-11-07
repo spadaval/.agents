@@ -109,24 +109,24 @@ built wrong, decide whether to refactor, reimplement, or discard it using
 
 When several branches wait to land, the base moves under the others each time
 one lands. Bringing the base into every waiting branch after each landing
-multiplies catch-up merges, reruns of proof, and reviews of conflict
-resolutions, and none of that work is needed until a branch is next to land.
+multiplies catch-up merges and reviews of conflict resolutions, and none of
+that work is needed until a branch is next to land.
 
 - Review a branch when its work is done. Leave waiting branches alone when
   the base moves.
 - When a branch is next to land:
   1. merge the base into it once;
   2. regenerate generated files, such as lockfiles, in that same step;
-  3. rerun its proof;
-  4. get the merge reviewed if its result differs from Git's own merge,
+  3. get the merge reviewed if its result differs from Git's own merge,
      because it needed resolving or regenerating anything;
-  5. then integrate it (with Atelier, `atelier merge`).
+  4. then integrate it (with Atelier, `atelier merge`).
 
+  CI or the merge checks test the merged tree, so a base merge records no
+  new proof. A repository without CI puts its suite in the merge checks.
   When the integration step itself creates and checks the merged tree
   (Atelier under `merge_strategy: merge_commit`), a branch that merges
-  cleanly can skip merging the base in, provided the merge checks run the
-  proof that step 3 would rerun. Follow the steps above when the merge
-  conflicts, a merge check fails on the merged tree (such as a stale
+  cleanly can skip merging the base in. Follow the steps above when the
+  merge conflicts, a merge check fails on the merged tree (such as a stale
   lockfile), or merge refuses because the base changed records about the
   item.
 - Check generated files mechanically. Put consistency checks in required

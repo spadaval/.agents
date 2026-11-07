@@ -72,6 +72,13 @@ what each record contains.
 
 ## Evidence
 
+- Record a receipt only for a check that leaves no other record: a manual,
+  browser, device or deployed check, a mission criterion, a measurement, or
+  a failure (including a test that fails before its fix). Suites, fmt and
+  lint that CI or the policy's `merge_checks` run need no receipt, and none
+  is re-recorded after a review fix or a base merge. Still run each check
+  fresh and read its output; the Close Reason names the targeted test or
+  check that proves each claim, with its result.
 - Use `atelier evidence record` with `--target`, `--kind`, and a summary.
   Capture a command after `--` to pin current HEAD and derive the result from
   the exit status. Manual receipts require an explicit `--result`.
@@ -85,9 +92,11 @@ what each record contains.
   `evidence record` refuses a slug the mission does not define.
   `atelier work mission <id>` marks each criterion proven, failing, or
   unproven from the newest receipt in HEAD's history.
-- Every receipt names a full Git commit and one result. Presence alone is not
-  passing proof: an older pass does not cover a later relevant change, and a
-  newer failure blocks completion.
+- Every receipt names a full Git commit and one result; command capture
+  refuses uncommitted code. A fail blocks closing, landing and merging its
+  item until a pass is recorded after it, and that pass clears it for good,
+  even once later commits make the pass stale. Having no receipt is not a
+  gap.
 - Attach proof to the item it supports and name the producer, kind, summary,
   artifacts, and limits. Use `atelier evidence attach` only to reuse valid
   proof on another item. Correct earlier proof with a new receipt.
