@@ -71,7 +71,8 @@ orchestrator's steps too. The item's planning was reviewed before step 1.
    checks passing. It makes one merge commit, which marks the owner and
    every open child done, started or not (so move out or supersede what
    should not merge), deletes the local work branch, and does not push. Work
-   items have no close step.
+   items have no close step. Never use a plain `git merge` into the base,
+   which runs no gate and marks nothing done.
 
 Run `atelier land` before every handoff. On a work branch it reports what is
 open and refuses nothing; on the base it refuses uncommitted records and
@@ -160,8 +161,9 @@ merged work is never reopened.
 A release, a docs change or a mockup can skip the issue (the light path):
 commit it on a branch no issue owns, run `atelier review request` there with
 no ID, have the reviewer record `atelier review finding|approve --branch
-<name>`, and run `atelier merge` with no ID. The same approval and merge
-checks apply; nothing is marked done. File a release's tag as a loose end on
+<name>`, and run `atelier merge` with no ID, never a plain `git merge`,
+which runs no gate. The same approval and merge checks apply; nothing is
+marked done. File a release's tag as a loose end on
 the release branch with no blocker, so it reaches the base with the merge.
 
 ## Planning on the Base

@@ -42,7 +42,7 @@ separate rewrite or integration branch yet (see
 with Atelier, prefer an atomic change or expand-and-contract, and ask the
 human before planning a rewrite branch.
 
-Do not break the default branch deliberately. Failing tests there hide real
+Do not break the default branch deliberately. Failing checks there hide real
 regressions and block everyone else.
 
 ## Principles
@@ -53,7 +53,7 @@ regressions and block everyone else.
 - **Do not keep shims** unless compatibility is the explicit deliverable. The
   temporary old path in expand-and-contract is the only exception, and it has
   a removal trigger and an owner.
-- **Prefer the repository's own tests** to prove each step.
+- **Prefer the repository's own checks** to prove each step.
 - **Keep it proportional.** One PR with a clear description is enough for an
   atomic change. Tracker items for each step are only worth creating for an
   expand-and-contract migration that spans several PRs or sessions.
@@ -61,7 +61,7 @@ regressions and block everyone else.
 ## Completion
 
 Before declaring a migration complete, run the residue search and the
-repository's tests fresh. Get independent `validate` confirmation when the
+repository checks fresh. Get independent `validate` confirmation when the
 migration changes a public, persisted, or cross-team contract. For
 internal-only migrations, author-run proof plus the normal code review is
 enough.

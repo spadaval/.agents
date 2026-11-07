@@ -32,7 +32,7 @@ something essential. Judge three things separately:
   wrong structure. Carry forward its tests and findings, not its code.
 
 Do not manufacture alternatives that would not change the decision. Cheap
-models suit spikes when attempts and tests are cheap.
+models suit spikes when attempts and checks are cheap.
 
 ## Assigning a Candidate
 

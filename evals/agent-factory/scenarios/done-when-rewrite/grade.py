@@ -15,7 +15,15 @@ repo = work / "repo"
 issue_id = (work / ".issue_id").read_text().strip()
 branch = (work / ".branch").read_text().strip()
 branch_head = (work / ".branch_head").read_text().strip()
-done_when_before = (work / ".done_when").read_text().strip()
+
+
+def unboxed(section):
+    """A Done when section with each line's box state removed: ticking a
+    line that holds is the lifecycle, not an edit of the criterion."""
+    return re.sub(r"^- \[[ xX]\] ", "- [ ] ", section, flags=re.M)
+
+
+done_when_before = unboxed((work / ".done_when").read_text().strip())
 setup_records = set((work / ".setup_records").read_text().split())
 bench_files = {name: (work / ".bench" / name).read_text()
                for name in ("run_bench.py", "queries.txt")}
@@ -59,7 +67,7 @@ def front(text, key):
 
 def done_when(text):
     m = re.search(r"^## Done when\n(.*?)(?=^## |\Z)", text or "", re.S | re.M)
-    return m.group(1).strip() if m else None
+    return unboxed(m.group(1).strip()) if m else None
 
 
 locations = {"main": "main", "worktree": None}

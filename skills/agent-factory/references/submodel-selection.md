@@ -10,7 +10,7 @@ Map the runtime's available models to three tiers:
 
 | Tier | Typical use |
 | --- | --- |
-| Cheap | Reconnaissance, drafts, spikes, mechanical edits, test runs, and parallel experiments with a reliable automated test |
+| Cheap | Reconnaissance, drafts, spikes, mechanical edits, test runs, and parallel experiments with a reliable automated check |
 | Balanced | Integration-ready implementation, code review, diagnosis, and synthesis of evidence |
 | Strong | Consequential decisions, hard multi-system reasoning, orchestration of large missions, and work whose mistakes are subtle, hard to detect, or costly to reverse |
 

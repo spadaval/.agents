@@ -22,7 +22,7 @@ as fixing drift, recording decisions, or updating guidance after a change.
 
 ## Verification
 
-Run whatever proves the changed surface: link tests, doc builds, command
+Run whatever proves the changed surface: link checks, doc builds, command
 help, or executing documented examples. Non-trivial doc changes then get
 independent review like any other change (see
 [Independent Review](../SKILL.md#independent-review)).

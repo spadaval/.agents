@@ -17,7 +17,7 @@ reason from the Constitution.
 ## Core Rules
 
 - **Prove claims with fresh evidence.** Before saying something works, is
-  fixed, or is finished, run the test that proves that specific claim after
+  fixed, or is finished, run the check that proves that specific claim after
   your last relevant change, and read its full output. A green suite that never
   exercises the claim, an earlier run, or another agent's report is not proof.
 - **Get non-trivial changes reviewed by someone other than their author.**
@@ -86,7 +86,7 @@ ready, and a mission does not close until its changes have been reviewed.
   from the diff. Examples are typo fixes, formatting, tool-driven renames,
   status changes that add no content (such as start or the backlog `defer`),
   and
-  patch-level dependency bumps with passing tests.
+  patch-level dependency bumps with passing checks.
   Rewording a document is not trivial, because it changes what readers do. If
   you have to think about whether a change is trivial, it is not.
 - **Planning records:** records and strategy files may be committed on the
@@ -140,7 +140,7 @@ Every assignment ends with a handoff. It contains:
    results. Label anything verified only by inspection.
 4. **Review:** who reviewed it, whether review is outstanding, or why the
    change is trivial. Put unresolved `FIX NOW` findings first.
-5. **Open items:** unverified claims, risks, skipped tests with reasons,
+5. **Open items:** unverified claims, risks, skipped checks with reasons,
    blockers, and recommended follow-up.
 
 Subskills name any additional fields they need. Leave out fields that do not
@@ -158,7 +158,7 @@ at them instead of repeating them (see
 | `plan` | Creating or revising strategy, and shaping increments and issues for new work | [plan.md](procedures/plan.md) |
 | `decide` | A consequential product or architecture choice with several credible paths | [decide.md](procedures/decide.md) |
 | `implement` | Building one bounded slice with proof | [implement.md](procedures/implement.md) |
-| `diagnose` | Finding the cause of a bug, failing test, regression, or unexplained behavior | [diagnose.md](procedures/diagnose.md) |
+| `diagnose` | Finding the cause of a bug, failing check, regression, or unexplained behavior | [diagnose.md](procedures/diagnose.md) |
 | `review` | Independent review of code or other changes someone else produced | [review.md](procedures/review.md) |
 | `validate` | Independently testing scenarios or acceptance claims | [validate.md](procedures/validate.md) |
 | `migrate` | Breaking changes: choosing atomic, expand-and-contract, or rewrite, and removing the old path | [migrate.md](procedures/migrate.md) |

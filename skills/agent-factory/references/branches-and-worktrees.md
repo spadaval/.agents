@@ -14,7 +14,7 @@ delete. Create as few as possible, and clean up after the work.
 2. Preserve changes you did not make. Never discard or overwrite them.
 3. Decide where to work using the rules below. Usually that is the current
    checkout or the branch you were assigned.
-4. Run a small, representative baseline test. If it already fails, note
+4. Run a small, representative baseline check. If it already fails, note
    whether the failure is pre-existing, an environment problem, or blocks the
    work, so it is not blamed on your change later.
 
@@ -103,7 +103,7 @@ with an open PR.
 
 ## Finishing
 
-Run the final proof and any integration tests the repository requires. Then
+Run the final proof and any integration checks the repository requires. Then
 inventory what the work created, starting from handoffs and tracker records
 and comparing with `git worktree list`, `git branch --list`, and the remote
 branches. Those listings include other missions' work.

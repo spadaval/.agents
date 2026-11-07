@@ -1,7 +1,7 @@
 # Diagnose
 
 Use this subskill when something fails and the cause is not yet understood:
-a bug, failing test, performance regression, integration failure, or
+a bug, failing check, performance regression, integration failure, or
 unexpected behavior. The goal is a verified root cause. A patch that makes the
 symptom disappear is not a diagnosis.
 

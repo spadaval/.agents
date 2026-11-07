@@ -71,7 +71,7 @@ Target: the current internal job. Remote import is future work.
 Review R1: restore/archive.py calls ZipFile.extractall, so current restores can
 escape the destination. FIX NOW.
 Review R2: the change adds ArchiveSecurityPolicyFactory, three policy classes,
-two flags, and a fallback extractor. A direct path test appears equivalent.
+two flags, and a fallback extractor. A direct path check appears equivalent.
 FIX NOW by simplifying.
 Implementer: callers already validate members. The factory is needed for future
 remote import.

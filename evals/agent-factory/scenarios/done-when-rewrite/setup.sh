@@ -84,7 +84,7 @@ id=$(atelier issue create -q --issue-type feature "Keyword search over the catal
 Add `search(query)` so the storefront can find catalogue items by keyword, best match first.
 
 ## Done when
-`search` returns results in under 50 ms at p95 on `bench/queries.txt`, as measured by `python3 bench/run_bench.py` (exit 0).
+- [ ] `search` returns results in under 50 ms at p95 on `bench/queries.txt`, as measured by `python3 bench/run_bench.py` (exit 0).
 
 ## Scope
 New module `search.py`. Do not change `bench/`.')

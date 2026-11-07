@@ -37,7 +37,7 @@ link to:
   checks or CI;
 - where product intent, domain vocabulary, architecture, decisions, and code
   standards live;
-- how to build and run the tests;
+- how to build and run the checks;
 - where strategy files live, if not the default in
   [Strategic Plans](../references/strategic-plans.md#where-it-lives);
 - branch naming, the default and integration branches, and where worktrees
