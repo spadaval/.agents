@@ -1,67 +1,58 @@
 # Install
 
-Use this subskill to connect Agent Factory to a repository: identify, or
-create where missing, the durable sources and tracker entry points agents
-need. Installation points agents at existing sources. It does not copy a
-workflow manual into the repository.
+Use this subskill to connect Agent Factory to a repository, or to assess how
+easily agents can work in one. Installing points agents at the repository's own
+sources; it does not copy a workflow manual into it.
 
-Read [Repository Shape](../references/repository-shape.md) first.
+## Readiness
+
+A fresh agent should be able to answer these from the repository's entry point
+(usually `AGENTS.md` or the README) and the sources it links:
+
+1. What is this product trying to achieve, and for whom?
+2. What do its core terms mean?
+3. Where is current work tracked, and what state is it in?
+4. What behavior is public, and what constraints are architectural?
+5. Why were important non-obvious choices made?
+6. How is the code built and checked, and what standards apply?
+7. Which state is durable, and which is generated or local and safe to rebuild?
+8. Does it use Atelier, and what are its merge policy and base branch?
+
+Judge whether the answers exist and can be found, not whether particular files
+exist: one clear README can answer what a larger repository splits across docs.
+Then try what a new agent would: find the instructions, build, run the checks
+and locate current work. To assess only, report an overall judgment, strengths
+and gaps with evidence and why each gap matters to an agent, and fixes ordered
+by value with the subskill for each.
 
 ## Tracker
 
-Agent Factory's tracker is [Atelier](../references/atelier.md). If the
-repository does not use it yet and the user agrees to install it:
+Installing Atelier changes how the repository merges, so get the user's
+agreement first. Then run `atelier init`, read the policy it writes (its base
+branch and merge checks; without CI, put the test suite in the merge checks),
+and follow the steps it prints. Run `atelier setup claude` if the team uses
+Claude Code, committing its hook settings with the install, then `atelier
+check`.
 
-1. Confirm the `atelier` CLI is on `PATH`.
-2. Run `atelier init` in the Git repository. It detects the base branch,
-   writes a starter policy that can merge as it is, and prints the next
-   steps. Read the generated `.atelier/workflow.yaml` (its `base_branch` and
-   any `merge_checks`) and commit it on the base branch: merge gates are read
-   from the base branch's committed policy, and this install commit predates
-   them, so `land` accepts it. Everything after it follows the gates.
-3. Run `atelier setup claude` when the team uses Claude Code, and commit the
-   shared hook settings in the install commit, or later through a branch.
-4. Run `atelier check`.
+## Entry Point
 
-Installing Atelier changes how the repository merges work, so get the user's
-agreement first. Without it, use the plan-file fallback described in the
-skill.
+Make the agent instructions answer the readiness questions or link to where they
+are answered, and add what an agent could not work out alone: the session
+commands (`atelier status` to start, `atelier land` before handoff), merge
+checks or CI, where strategy files live, branch naming and where worktrees go,
+and any unusual setup, permissions, generated state to rebuild rather than edit,
+or review and merge policy.
 
-## Approach
-
-Make sure the repository's agent instructions (usually `AGENTS.md`) say, or
-link to:
-
-- that the repository uses Atelier, the session commands agents run
-  (`atelier status` to start, `atelier land` before handoff), and its merge
-  checks or CI;
-- where product intent, domain vocabulary, architecture, decisions, and code
-  standards live;
-- how to build and run the checks;
-- where strategy files live, if not the default in
-  [Strategic Plans](../references/strategic-plans.md#where-it-lives);
-- branch naming, the default and integration branches, and where worktrees
-  go, when these differ from
-  [Branches and Worktrees](../references/branches-and-worktrees.md);
-- anything unusual an agent must know first, such as setup steps,
-  permissions, generated state that should be rebuilt rather than edited, or
-  review and merge policy.
-
-Do not copy record templates into `AGENTS.md`. Agent Factory's
-[Tracker Records](../references/tracker-records.md) define issue contents.
-Record only where the repository deliberately differs, or point to the
-repository's own issue templates.
-
-Keep `AGENTS.md` short. It is a map and a list of repository-specific
-constraints, not a command cookbook. Prefer linking existing docs over
-creating new ones. Create a new doc only when the information is needed and
-has no home.
-
-When an important source is missing and you cannot create it now, such as a
-product intent nobody has written down, record it as follow-up work rather
-than inventing the content.
+Keep it a short map to each concern's home, not a command cookbook, and copy
+neither record templates nor the docs it links. Split a doc only when it serves
+conflicting audiences, and keep tracker configuration with its owner, such as
+merge policy in `.atelier/workflow.yaml`. Anything that must survive a fresh
+clone lives in version control or the tracker; caches and generated output are
+marked as such and rebuildable by a documented command. When an important source
+is missing and you cannot write it now, such as an unwritten product intent,
+record it as follow-up work instead of inventing it.
 
 ## Handoff
 
-Also report the sources found or created, gaps remaining, and how a new agent
-should orient in the repository.
+Also report the sources found or created, the gaps remaining, and how a new
+agent should orient in the repository.

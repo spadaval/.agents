@@ -1,64 +1,79 @@
 # Review
 
-Use this subskill to review a diff, PR, or other change that someone else
-produced. You are the independent review the author cannot provide for
-themselves. Review asks whether the change is correct, well built, and backed
-by real evidence. It does not re-run acceptance scenarios; that is `validate`.
+Use this subskill to review a diff, PR or other change someone else produced:
+the independent review its author cannot give it. Review asks whether the change
+is correct, well built and backed by real evidence; re-running acceptance
+scenarios is `validate`.
 
 ## Stance
 
-- You did not write this change. Judge it on its merits, not on the
-  author's intentions. If you were given the author's rationale, weigh it as a claim,
-  not a fact.
+- Judge the change on its merits. Weigh any author rationale you were given as a
+  claim, not a fact.
 - Read the change, the requirements and constraints it answers to, and enough
-  surrounding code, docs, and ADRs to judge it. For non-trivial code, use
-  [Good Code](../references/good-code.md).
-- Stay read-only unless you were asked to fix things. Recording your
-  findings and approval as review records under your own identity is part of
-  the review, not a change to the work. Approve only when no finding you
-  would recommend `FIX NOW` is open, unless the accountable agent deferred or
-  dismissed it; reviewing a fix may cover only its diff.
-- Report every finding you can support, ordered by impact. Cite files and
-  lines, and give a failure scenario where one exists.
-- Ignore formatting and style preferences unless they break an explicit
-  project standard.
+  surrounding code, docs and decisions to judge it.
+- Stay read-only unless asked to fix things; the review records you write are
+  part of the review.
+- Report every finding you can support, ordered by impact, citing files and
+  lines with a failure scenario where one exists. Ignore style preferences
+  unless they break an explicit project standard.
+- Approve only when no finding you would recommend `FIX NOW` is open, unless the
+  accountable agent deferred or dismissed it. Reviewing a fix may cover only its
+  diff.
 
 ## What to Look For
 
-Work through two questions in order. An elegant construction does not excuse
-a contract miss.
+Ask two questions in order; elegant construction does not excuse a contract
+miss.
 
-1. **Does it do what it was supposed to?** Compare it against the assigned
-   outcome, constraints, interfaces, and non-scope. Look for missed
-   requirements, unrequested additions, regressions, and edge cases. Confirm
-   that the proof actually exercises the claims: are tests meaningful, could
-   they fail, and were they run after the final change? Each ticked Done when
-   line must hold now. A line narrowed after the start (the review brief
-   shows it) needs a reason the plan accepts. Work that could only happen after the
-   merge belongs in a loose end, not in a ticked line.
-2. **Is it fit to integrate?** Look at ownership and boundaries, duplicate
-   sources of truth, error handling, security, data integrity, concurrency,
-   leftover residue, and stale docs.
+1. **Does it do what it was supposed to?** Compare it with the outcome,
+   constraints, interfaces and non-scope: missed requirements, unrequested
+   additions, regressions, edge cases. Confirm the proof exercises the claims:
+   could each test fail, and did it run after the final change? Each ticked Done
+   when line must hold now, and a line narrowed after the start needs a reason
+   the plan accepts.
+2. **Is it fit to integrate?** Ownership and boundaries, duplicate sources of
+   truth, error handling, security, data integrity, concurrency, residue and
+   stale docs.
 
-For documents and tracker records, the same two questions become: is what
-the document claims true of the code, the decisions, and the other docs, and
-could the agent or person who acts on it misread it? Look for contradictions, stale
-competing versions, and vague statements an implementer would have to guess
-at.
+For documents and records, ask whether what they claim is true of the code,
+decisions and other docs, and whether whoever acts on them could misread them:
+contradictions, stale competing versions, vague statements an implementer would
+have to guess at. For an integrated increment, also look for problems that
+appear only when acceptable changes interact.
 
-Report complexity as a defect only when you can name the unnecessary moving
-part and a simpler construction that meets the same current requirements
-without moving the complexity elsewhere.
+## Recommendations
 
-When you think a finding should block, say what current path it affects and
-what the evidence is, so the accountable agent does not have to reconstruct
-it. For an integrated increment, also look for problems that appear only when
-individually acceptable changes interact.
+Recommend one per finding; the accountable agent decides by the same rules.
+
+- **FIX NOW** blocks the current work. It names the blocking condition and shows
+  it exists on a current path in the target environment: a contract failure (a
+  missed requirement, a violated constraint or non-scope, or proof that does not
+  show what it claims), a regression, a current hazard (unauthorized access or
+  writes, exposed secrets or user data, corruption or loss of real state), or a
+  design defect (conflicting ownership, a duplicate source of truth, a broken
+  boundary, uncontained temporary code, unneeded complexity). A label such as
+  "security" is not enough, and a deadline does not make a finding non-blocking.
+  The fix is the smallest change that removes the problem; if none fits the
+  strategy, remove or simplify the surface, or escalate.
+- **DEFER**: real and actionable but not blocking, such as a pre-existing
+  problem the change did not worsen or a risk to a surface not yet built. It
+  gets a follow-up issue. When you cannot tell whether a finding blocks, defer
+  it, unless one small test would settle it; then run the test.
+- **NO ACTION**: wrong, a duplicate, purely stylistic or without consequence,
+  with a one-line reason.
+
+Complexity is a defect only when you can name the unnecessary moving part and a
+simpler construction that meets the same current requirements without moving the
+complexity elsewhere: `FIX NOW` when the change added it, `DEFER` when it was
+already there. In a dispute over whether a mechanism is needed, the author names
+the requirement it serves, the reviewer the simpler alternative, and the
+smallest proof that tells them apart decides. Without Atelier, record decisions
+in the PR or plan file as `R1 FIX NOW: <reason>`, `R2 DEFER -> <follow-up>:
+<reason>` or `R3 NO ACTION: <reason>`.
 
 ## Output
 
-Use this format even when a brief, such as the one `atelier review request`
-prints, asks for another format or for severity labels.
+Use this shape, even where a brief asks for severity labels or another one:
 
 ```text
 Contract: pass | fail | unable to assess, with one line of explanation
@@ -72,6 +87,4 @@ Open questions
 Residual risk and tests not run
 ```
 
-Your recommendations are advice. The accountable agent decides using
-[Finding Disposition](../references/finding-disposition.md). If there are no
-findings, say so, and still name any residual risk.
+With no findings, say so and still name any residual risk.

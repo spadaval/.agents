@@ -1,85 +1,62 @@
 # Implement
 
-Use this subskill to build one bounded slice and prove it works.
+Use this subskill to build one bounded slice, code or documentation, and prove
+it works.
 
 ## Before Editing
 
-- Read the assignment and enough surrounding code, docs, and ADRs to do it
-  safely. Make sure the scope and expected proof are clear. If the work is
-  really a diagnosis, migration, or planning problem, say so and route it.
-- For non-trivial code, read [Good Code](../references/good-code.md) and know
-  where the responsibility and state should live before you write it.
-- Look at the workspace and run a focused baseline so later failures are not
-  wrongly blamed on your change (see
-  [Branches and Worktrees](../references/branches-and-worktrees.md)).
-- If you were assigned an implementation candidate, read its purpose,
-  question, and visibility (see
-  [Implementation Candidates](../references/implementation-candidates.md)).
-  Working code is not automatically kept.
+Read the assignment and enough surrounding code, docs and decisions to do it
+safely, and be clear on its scope and expected proof. If it is really a
+diagnosis, a migration or a planning problem, say so and route it. For
+non-trivial code, know where the responsibility and state should live before you
+write it.
 
 ## Building and Proving
 
-**Bug fixes:** write a test or reproduction that fails for the reported
-reason, watch it fail, then fix the bug and watch it pass. The failing test
-proves you fixed the real problem and guards against regression.
+- **Bug fixes:** write a test or reproduction that fails for the reported
+  reason, watch it fail, then fix the bug and watch it pass.
+- **New behavior:** decide up front what observation would show the behavior
+  missing or wrong, and make sure your proof could fail; a test you have never
+  seen fail may not test anything.
+- **Declarative, configuration or UI changes:** use the most direct proof, such
+  as a build, typecheck, schema validation, dry run or screenshot.
+- **Docs:** fix each topic at its authoritative source and link to it from
+  elsewhere instead of copying it. Update or delete stale competing versions,
+  which mislead more than a gap does. Check each claim about commands, behavior
+  or configuration against the real thing. Record a gap you cannot resolve, such
+  as an unclear owner, as follow-up work instead of guessing.
 
-**New behavior:** decide up front what observation would show the behavior is
-missing or wrong, and make sure your proof could actually fail. A test you
-have never seen fail may not test anything. Test-first is often the easiest
-way to guarantee this, but the order is your call.
+When a failing observation before the change is impractical, say why and use the
+cheapest proof that could still show the change is wrong. Make the smallest
+change coherent with the target design, which is not always the smallest diff,
+and update docs when you change user-visible behavior, contracts, architecture
+or ownership. After the final edit, rerun the focused proof and relevant
+regression tests and read the full output.
 
-**Declarative, configuration, UI, or docs changes:** use the most direct
-proof available, such as a build, typecheck, schema validation, dry run,
-rendering, or screenshot. They need review like any other change.
-
-Every Done when line holds before review. If one can only be shown after
-the merge, do not tick it or rewrite it to get past it: that is a plan change
-for whoever owns the plan, the orchestrator or else the user (it becomes a
-loose end, filed on the base). The line it replaces is rewritten or dropped
-on the work branch, never on the base, and the reviewer sees a Done when
-edited after the start.
-
-When a failing observation before the change is impractical, name the reason
-and use the cheapest proof that could still show the change is wrong. That is
-not a license to ship with no proof at all.
-
-Throughout:
-
-- Make the smallest change that is coherent with the target design. That is
-  not the same as the smallest diff.
-- Do not add configuration, abstraction, fallbacks, or safeguards for
-  hypothetical futures.
-- Update docs when you change user-visible behavior, contracts, architecture,
-  or ownership.
-- Remove debug code, scratch files, and anything the change made obsolete.
-- After the final edit, run the focused proof and relevant regression tests
-  fresh, and read the complete output.
+Tick a Done when line only when it holds. A line that cannot hold is a plan
+change for whoever owns the plan, the orchestrator or else the user, not a line
+to rewrite yourself; one that can only be shown after a merge or release becomes
+a [loose end](../references/atelier.md#loose-ends-and-validation-items).
 
 ## Review
 
-Non-trivial changes go to an independent reviewer (see
-[Independent Review](../SKILL.md#independent-review)). Under an orchestrator,
-the orchestrator arranges review, so report your review status as
-outstanding. Working alone, spawn a reviewer yourself and give it the diff,
-the requirements, and your proof, but not your rationale. If you cannot, leave
-the change unmerged and say review is outstanding.
-
-When findings arrive, weigh each one against the change. Fix the `FIX NOW`
-findings one at a time, re-running the relevant proof. You do not decide
-findings on your own work (see
-[Finding Disposition](../references/finding-disposition.md#who-decides)). If
-you believe a finding is wrong, answer with a fact or a test. Do not
-silently drop a finding or expand scope to address it. Non-trivial fixes need
-review too.
+Get review as [Independent Review](../SKILL.md#independent-review) says; under
+an orchestrator, report it as outstanding. Fix each `FIX NOW` finding one at a
+time and rerun its proof. Do not silently drop a finding or widen scope to
+address it.
 
 ## Handoff
 
-Before review is requested, tick each Done when line that holds, record
-decisions you made as decision notes or records (see
-[Tracker Records](../references/tracker-records.md#decision-notes)), write
-the implementer report in the item's `## Report` (see
-[Report](../references/tracker-records.md#report)), and commit them. Also
-report the branch or commit, and any branch or worktree you created and its
-cleanup state. For
-an implementation candidate, report observed behavior, design concerns, and
-what you learned separately, with a recommended disposition.
+Before review is requested, record your choices as decision notes or records
+([record test](../references/atelier.md#records)) and write the item's `##
+Report`. Its first paragraph is the outcome against Done when, naming the
+targeted test behind each claim and its result. Then add, only where they say
+what the diff and proof do not, `### Deviations` from the plan and why, `###
+Decisions` (pointing at the notes), `### Surprises` and `### Open items`
+(follow-ups and loose ends by ID, unverified claims, risks, skipped tests). Be
+candid and short; the human reads it in the debrief.
+
+Also report the branch or commit, anything you created and its cleanup state,
+and for docs, the source of truth for each topic changed and any mismatch left.
+For a spike or competing candidate, report its behavior, design concerns and
+what it taught separately, with a recommended disposition.
