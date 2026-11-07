@@ -119,9 +119,9 @@ judged by demonstrated outcomes, not issue count:
    branch `archive/<branch>` before deleting it, and ask before deleting
    anything you cannot trace to this work, anything with uncommitted changes, or
    a branch with an open PR; remote branches follow repository policy.
-4. Close it with `atelier issue transition <mission> close --reason "<report>"`,
-   then walk the human through `atelier debrief <mission> --html` and record
-   their direction as review records, decisions, notes and issues.
+4. Close it with `atelier issue transition <mission> close --reason
+   "<report>"`, then walk the human through `atelier debrief <mission> --html`
+   and record their direction as review records, decisions, notes and issues.
 
 In the handoff, also report delivered and deferred outcomes, open loose ends,
 plan changes, paused questions, and each branch or worktree created, with

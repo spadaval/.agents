@@ -23,15 +23,15 @@ diff.
 Give each claim a result: `pass` (shown with observable proof), `fail` (shown
 not to hold; give the first concrete failure), `blocked` (could not be tested;
 say what is missing) or `not-applicable` (say why). For each `fail`, give
-reproduction steps, expected and actual results, and the likely cause: `defect
-in this change`, `expected breakage` (only on a rewrite branch the plan
+reproduction steps, expected and actual results, and the likely cause:
+`defect in this change`, `expected breakage` (only on a rewrite branch the plan
 declares), `environment/tooling` or `pre-existing`. Findings go to the
 accountable agent, who decides what happens next.
 
-With Atelier, record a receipt for each claim on the validation item (`atelier
-evidence record --help` covers mission success criteria too), and finish the
-item as [Atelier](../references/atelier.md#loose-ends-and-validation-items)
-says.
+With Atelier, record a receipt for each claim on the validation item
+(`atelier evidence record --help` covers mission success criteria too), and
+finish the item as
+[Atelier](../references/atelier.md#loose-ends-and-validation-items) says.
 
 ## Handoff
 

@@ -9,8 +9,8 @@ names what is missing.
 
 Tracker words mean only this: **check** is `atelier check`, the merge checks or
 `merge --check`; **review** is independent review, or the human's of a mission's
-plan (`atelier brief`) and merged work (`atelier debrief`); **land** is `atelier
-land`; **done** is the terminal status of merged work, of a loose end,
+plan (`atelier brief`) and merged work (`atelier debrief`); **land** is
+`atelier land`; **done** is the terminal status of merged work, of a loose end,
 validation or decision finished on the base, and of a closed mission; only a
 mission **closes**
 ([orchestrate](../procedures/orchestrate.md#closing-a-mission)).
@@ -25,10 +25,10 @@ alone takes the orchestrator's too.
 2. **Implement** (author), committing code and records together.
 3. **Finish the record** (author): tick each Done when line once it holds and
    write the `## Report` ([implement](../procedures/implement.md#handoff)).
-4. **Request review** (orchestrator): give the reviewer the brief `atelier
-   review request <id>` prints, adding the proof that ran (commands and results)
-   and any constraint it lacks, such as the item's Scope. The reviewer records
-   its findings with the commands the brief prints.
+4. **Request review** (orchestrator): give the reviewer the brief
+   `atelier review request <id>` prints, adding the proof that ran (commands and
+   results) and any constraint it lacks, such as the item's Scope. The reviewer
+   records its findings with the commands the brief prints.
 5. **Fix and re-review** (author, then a reviewer): the author fixes each
    `fix_now` finding that stands in a later commit, and a reviewer reviews the
    fix. A finding deferred or dismissed gets a disposition from the accountable
@@ -83,15 +83,16 @@ new record that supersedes the old one. Label work only a human can do
 
 ## Loose Ends and Validation Items
 
-`atelier --help` says what a loose end is. File it (`issue create --issue-type
-loose_end`, then `issue link <loose-end> <issue> --role blocked_by`) when you
-plan the item, or as soon as such work turns up, on the base as a planning
-change reviewed like any other, even while the issue it waits on is in flight.
-The link lives on the loose end; whoever owns the plan rewrites or drops the
-Done when line it replaces, on the work branch. A release's tag, with no issue
-to wait on, is filed on the release branch instead and reaches the base with the
-merge. A part that can run before merge, such as an emulator test, stays a Done
-when line. A loose end never advances a mission, so it never holds one open.
+`atelier --help` says what a loose end is. File it
+(`issue create --issue-type loose_end`, then `issue link <loose-end> <issue>
+--role blocked_by`) when you plan the item, or as soon as such work turns up, on
+the base as a planning change reviewed like any other, even while the issue it
+waits on is in flight. The link lives on the loose end; whoever owns the plan
+rewrites or drops the Done when line it replaces, on the work branch. A
+release's tag, with no issue to wait on, is filed on the release branch instead
+and reaches the base with the merge. A part that can run before merge, such as
+an emulator test, stays a Done when line. A loose end never advances a mission,
+so it never holds one open.
 
 A validation item, which holds an independent `validate` assignment and advances
 its mission, is needed for mission acceptance, an increment that changes a

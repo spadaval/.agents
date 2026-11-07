@@ -36,16 +36,14 @@ A mission is one thing a person can hold in their head, plan against and finish:
   it ships goes in its own backlog item that says when to pick it up, or in a
   loose end if it can only follow a merge or release, so the mission can close.
 - **Sized to finish:** one reviewer can judge it in one debrief, usually days to
-  weeks of work. Split a larger one along the outcome's seams, not by item
-  count.
+  weeks of work. Split a larger one along the outcome's seams, not item count.
 - **Success criteria are optional.** Add one only for a claim about the whole
   that no single item proves, such as an end-to-end scenario across items. Each
   must be something the work can make true and an agent can verify at close: a
   test, a scenario, a measurement it can take, or a named human judgment. A
   criterion that restates items adds nothing, and one the work cannot reach
   stalls the mission. When one already set fails this test, propose a rewrite or
-  backlog item to whoever holds authority over the strategy, rather than drop
-  it.
+  backlog item to whoever has authority over the strategy; do not drop it.
 
 ## Strategy File
 

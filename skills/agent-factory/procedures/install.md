@@ -31,8 +31,8 @@ Installing Atelier changes how the repository merges, so get the user's
 agreement first. Then run `atelier init`, read the policy it writes (its base
 branch and merge checks; without CI, put the test suite in the merge checks),
 and follow the steps it prints. Run `atelier setup claude` if the team uses
-Claude Code, committing its hook settings with the install, then `atelier
-check`.
+Claude Code, committing its hook settings with the install, then
+`atelier check`.
 
 ## Entry Point
 

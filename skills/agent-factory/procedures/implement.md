@@ -49,11 +49,11 @@ Do not silently drop a finding or widen scope to address it.
 ## Handoff
 
 Before review is requested, record your choices as decision notes or records
-([record test](../references/atelier.md#records)) and write the item's `##
-Report`. Its first paragraph is the outcome against Done when, naming the
+([record test](../references/atelier.md#records)) and write the item's
+`## Report`. Its first paragraph is the outcome against Done when, naming the
 targeted test behind each claim and its result. Then add, only where they say
-what the diff and proof do not, `### Deviations` from the plan and why, `###
-Decisions` (pointing at the notes), `### Surprises` and `### Open items`
+what the diff and proof do not, `### Deviations` from the plan and why,
+`### Decisions` (pointing at the notes), `### Surprises` and `### Open items`
 (follow-ups and loose ends by ID, unverified claims, risks, skipped tests). Be
 candid and short; the human reads it in the debrief.
 

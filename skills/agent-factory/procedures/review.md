@@ -68,8 +68,8 @@ complexity elsewhere: `FIX NOW` when the change added it, `DEFER` when it was
 already there. In a dispute over whether a mechanism is needed, the author names
 the requirement it serves, the reviewer the simpler alternative, and the
 smallest proof that tells them apart decides. Without Atelier, record decisions
-in the PR or plan file as `R1 FIX NOW: <reason>`, `R2 DEFER -> <follow-up>:
-<reason>` or `R3 NO ACTION: <reason>`.
+in the PR or plan file as `R1 FIX NOW: <reason>`,
+`R2 DEFER -> <follow-up>: <reason>` or `R3 NO ACTION: <reason>`.
 
 ## Output
 
