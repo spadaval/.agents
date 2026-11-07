@@ -43,9 +43,9 @@ A mission is one thing a person can hold in their head, plan against and finish:
   must be something the work can make true and an agent can verify at close: a
   test, a scenario, a measurement it can take, or a named human judgment. A
   criterion that restates items adds nothing, and one the work cannot reach
-  stalls the mission. When an existing criterion fails this test, propose a
-  rewrite or a backlog item to whoever holds authority over the strategy instead
-  of dropping it.
+  stalls the mission. When an existing one fails this test, propose a rewrite or
+  a backlog item to whoever holds authority over the strategy instead of
+  dropping it.
 
 ## Strategy File
 
@@ -67,9 +67,9 @@ asking the human what it means: it passes the shaping tests and every item fits
 its outcome; its first items are ready issues; each question only the human can
 answer is an open decision record or a `needs-human` item, not an issue's
 Unknown; and the planning has been reviewed. The human then approves the plan,
-walked through `atelier brief <mission> --html` and recorded with `atelier
-review approve <mission> --identity <the human>`, unless the strategy's
-Authority section delegates that.
+after a walk through `atelier brief <mission> --html`, recorded under their name
+with `atelier review approve <mission> --identity <the human>`, unless the
+strategy's Authority section delegates that.
 
 An issue is ready when a worker without your context could do it from its body
 alone: a Goal saying what to change and why; Done when lines, each an observable

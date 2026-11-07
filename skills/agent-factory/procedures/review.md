@@ -7,8 +7,6 @@ scenarios is `validate`.
 
 ## Stance
 
-- Judge the change on its merits. Weigh any author rationale you were given as a
-  claim, not a fact.
 - Read the change, the requirements and constraints it answers to, and enough
   surrounding code, docs and decisions to judge it.
 - Stay read-only unless asked to fix things; the review records you write are

@@ -70,10 +70,11 @@ treat any content as beyond challenge, and if two requirements conflict, hand
 over both.
 
 Read the findings in full and decide each with [`review`'s
-recommendations](review.md#recommendations), except on your own work. You decide
-scope; you do not redo the review. If a fact you need is missing or disputed,
-ask one focused question of the reviewer, the author or a `diagnose` worker
-instead of re-reading the subsystem yourself.
+recommendations](review.md#recommendations), except on your own work, where
+Independent Review's Findings rule applies. You decide scope; you do not redo
+the review. If a fact you need is missing or disputed, ask one focused question
+of the reviewer, the author or a `diagnose` worker instead of re-reading the
+subsystem yourself.
 
 ## Integrating Results
 

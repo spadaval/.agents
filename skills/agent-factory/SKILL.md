@@ -34,21 +34,20 @@ Say which subskill you are using, and why, before you start it.
 
 ## Scale
 
-Record as much as the work will need if resumed or handed off: small work (one
-agent, one session) needs only a clear commit and PR description, multi-step
-work uses tracker issues, and a mission adds a strategy and increments (`plan`).
-The tracker is [Atelier](references/atelier.md); without it, keep the plan,
-follow-ups and decisions in a plan file or the PR, and offer to install Atelier
-for a mission without stopping work for it.
+Small work (one agent, one session) needs only a clear commit and PR
+description, multi-step work uses tracker issues, and a mission adds a strategy
+and increments (`plan`). The tracker is [Atelier](references/atelier.md);
+without it, keep the plan, follow-ups and decisions in a plan file or the PR,
+and offer to install Atelier for a mission without stopping work for it.
 
 ## Independent Review
 
 Every non-trivial change is reviewed before it merges by someone who did not
 write it and does not carry its author's reasoning, such as a fresh subagent; an
 orchestrator that has read the author's handoff does not qualify. Until then the
-change stays off the default and protected branches, except [planning
-records](references/atelier.md#planning-on-the-base), its PR is not marked
-ready, and its mission does not close.
+change stays off the default and protected branches ([planning
+records](references/atelier.md#planning-on-the-base) have their own rule), its
+PR is not marked ready, and its mission does not close.
 
 - **What it covers:** everything committed, docs and tracker records included,
   since agents act on what they read. Trivial changes, whose correctness is
@@ -56,11 +55,13 @@ ready, and its mission does not close.
   rename, a status change adding no content, a patch-level bump with passing
   checks. Rewording a document is not trivial; if you have to ask, it is not.
 - **Who arranges it:** the orchestrator dispatches reviewers, for its own
-  changes too; an author working alone spawns its own. The reviewer records its
-  own findings and approval.
+  changes too; an author working alone spawns its own. Findings and approvals
+  are recorded under the reviewer's identity, by the reviewer itself when it is
+  an agent.
 - **What the reviewer gets:** the diff, the requirements and constraints, and
-  the proof that was run, but not the author's rationale or self-assessment,
-  which carry the bias review exists to avoid.
+  the proof that was run. Whoever briefs it leaves out the author's rationale
+  and self-assessment, which carry the bias review exists to avoid, and any the
+  reviewer meets in the diff it weighs as claims.
 - **After review:** a non-trivial fix, conflict resolution or rewritten
   requirement is reviewed again, by any reviewer.
 - **Findings:** the accountable agent decides each with [`review`'s
@@ -69,11 +70,10 @@ ready, and its mission does not close.
   is also the accountable agent fixes every finding recommended `FIX NOW`, or
   sends its rebuttal (a fact or a test) to a reviewer, who decides and records
   it. An open `FIX NOW` blocks the merge.
-- **No reviewer available:** leave the change unmerged, say review is
-  outstanding (rereading your own work is not review), and ask the user to
-  review or arrange it. An earlier request to merge does not waive review; a
-  user who knowingly directs an unreviewed merge is obeyed unless policy forbids
-  it, and the review stays open.
+- **No reviewer:** keep it unmerged, report review outstanding (your own reread
+  is not review) and ask the user to review or arrange it. A prior request to
+  merge does not waive this; a user who knowingly directs an unreviewed merge is
+  obeyed unless policy forbids it, and the review stays open.
 
 ## Handoff
 
@@ -81,8 +81,8 @@ End every assignment with **Outcome**; **Changes** (files, commits, branches,
 tracker items); **Proof** (the commands or observations behind each claim, with
 results, marking claims only read); **Review** (who reviewed, what is
 outstanding or why it is trivial, unresolved `FIX NOW` first); and **Open
-items** (unverified claims, risks, skipped checks, blockers). Subskills add
-fields. On a tracker item, append it as a note pointing at its Report.
+items** (unverified claims, risks, skipped checks, blockers). On a tracker item,
+append it as a note pointing at its Report.
 
 ## Subskills
 
