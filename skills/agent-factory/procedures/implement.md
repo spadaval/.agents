@@ -32,6 +32,11 @@ way to guarantee this, but the order is your call.
 check available, such as a build, typecheck, schema validation, dry run,
 rendering, or screenshot. They need review like any other change.
 
+A Done when check marked to run after merge is not proven on the branch, but
+its stand-in is: run the stand-in like any other check. Do not move a check to
+after merge yourself to get past it; that is a plan change for whoever owns
+the plan, and the reviewer sees it.
+
 When a failing observation before the change is impractical, name the reason
 and use the cheapest proof that could still show the change is wrong. That is
 not a license to ship with no check at all.
@@ -71,6 +76,8 @@ Before the close transition, record decisions you made as decision notes or
 records (see [Tracker Records](../references/tracker-records.md#decision-notes)), and
 write the implementer report in the item's Close Reason (see
 [Close Reason](../references/tracker-records.md#close-reason-and-the-implementer-report)).
+Its Open items name the item's open after-merge checks, each with its reason
+and the stand-in you ran.
 Also report the branch or commit, and any branch or worktree you created and
 its cleanup state. For
 an implementation candidate, report observed behavior, design concerns, and

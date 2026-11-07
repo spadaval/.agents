@@ -174,7 +174,12 @@ request <parent>` briefs every child's Done when.
 Close against demonstrated outcomes, not issue count:
 
 1. Run the proof for each acceptance claim fresh, with independent validation
-   where the scaling rules call for it.
+   where the scaling rules call for it. Validate every open
+   [after-merge check](../references/tracker-records.md#after-merge-checks)
+   of the mission's merged items that can be validated now. Carry one only
+   when it failed, to its follow-up bug, or when it needs time and real use
+   beyond the mission, and name each carried check in the mission's close
+   report.
 2. Confirm all non-trivial changes have been independently reviewed.
 3. Confirm no debug residue, temporary breakage, or orphaned paths remain,
    and that branches and worktrees created for the work are removed or

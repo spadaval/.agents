@@ -30,7 +30,11 @@ a contract miss.
    outcome, constraints, interfaces, and non-scope. Look for missed
    requirements, unrequested additions, regressions, and edge cases. Check
    that the proof actually exercises the claims: are tests meaningful, could
-   they fail, and were they run after the final change?
+   they fail, and were they run after the final change? A Done when check
+   marked to run after merge must need the deployed or merged system, a
+   device or place no agent can reach, the human's judgment, or time and
+   real use, and its stand-in must run before merge. Record a finding for any
+   that could be checked before merge, or that lacks a reason or a stand-in.
 2. **Is it fit to integrate?** Check ownership and boundaries, duplicate
    sources of truth, error handling, security, data integrity, concurrency,
    leftover residue, and stale docs.

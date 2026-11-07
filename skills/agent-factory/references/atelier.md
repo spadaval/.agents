@@ -100,6 +100,17 @@ what each record contains.
 - Attach proof to the item it supports and name the producer, kind, summary,
   artifacts, and limits. Use `atelier evidence attach` only to reuse valid
   proof on another item. Correct earlier proof with a new receipt.
+- A Done when line marked `After merge (<reason>): ... Stand-in: ...` is
+  checked after the merge (see
+  [After-Merge Checks](tracker-records.md#after-merge-checks)); every other
+  line is checked on the branch. `atelier review request` lists each with its
+  reason and stand-in; `status`, `work all` and `work mission` list merged
+  work still awaiting validation; closing a mission with one open warns and
+  names it. Validate every check that can be validated now on the base by
+  ticking the line's box. Carry one with `carried to <id>` (an existing
+  issue) only when it failed, to the bug filed with `--discovered-from`, or
+  when it needs time and real use beyond the mission, and name each carried
+  check in the mission's close report.
 - `atelier evidence list <id>` shows an item's receipts, each marked fresh,
   held at close, stale or superseded as the gates judge it, and ends with
   its proof verdict; read it instead of searching `.atelier/evidence`.

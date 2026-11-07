@@ -35,6 +35,15 @@ or `pre-existing`. Include reproduction steps and expected versus actual results
 Findings go to the accountable agent, who decides what happens next using
 [Finding Disposition](../references/finding-disposition.md).
 
+## After-Merge Checks
+
+When you validate an [after-merge check](../references/tracker-records.md#after-merge-checks)
+on the base, record the receipt, then tick the check's box and commit the
+record as a planning change; it needs no reviewer identity. If the check
+fails, do not reopen the merged item: file a follow-up bug with `atelier
+issue create --discovered-from <item>` and write `carried to <bug>` on the
+check's line.
+
 ## Handoff
 
 Also report each claim with its result and proof, and any claims you could not
