@@ -39,6 +39,17 @@ python3 evals/agent-factory/harness/run.py refused-land-push trivial-typo \
   `--setting-sources project`, no MCP servers, and an allowlisted
   environment. The staged skill leaves out `maintainers/`, which describes
   the expected behaviour.
+- Claude Code loads instruction files (`CLAUDE.md`, `AGENTS.md`,
+  `.claude/CLAUDE.md`, `.claude/rules/` and the like) from every directory
+  above its working directory, whatever `--setting-sources` says, so a run
+  under `$HOME` sees your `~/.claude/CLAUDE.md`. Work directories are
+  therefore made under `--work-root` (default `/var/tmp/af-evals`), which
+  must be outside `$HOME`. As a backstop, each run passes `claudeMdExcludes`
+  naming every such path above its working directory.
+- Before the matrix, a canary run on Haiku in the same setup lists the
+  instruction files it was given. The harness aborts, running no scenario,
+  unless it reports its repository's own `AGENTS.md` and nothing else. Its
+  transcript is kept in `--out`.
 - Every run's init event is checked. A run that loaded MCP servers, had the
   skill in the wrong arm, exited non-zero, timed out or produced no result
   gets `"pass": null` and an `"invalid"` reason instead of a grade.
@@ -47,12 +58,14 @@ python3 evals/agent-factory/harness/run.py refused-land-push trivial-typo \
   so run scenarios you have read.
 - The harness stages the skill from the ref when each run starts. Don't
   commit skill changes during a matrix, or pin `--ref` to a SHA.
-- Each run directory keeps `transcript.jsonl`, `final.md` and
-  `result.json`. Work directories are deleted for passing runs unless
-  `--keep` is given. `results.jsonl` gathers every run.
+- Each run directory in `--out` keeps `transcript.jsonl`, `final.md` and
+  `result.json`, with `work` linking to its work directory. Work
+  directories are deleted for passing runs unless `--keep` is given; nothing
+  deletes the others. `results.jsonl` gathers every run.
 - Grades are provisional. Some graders key on wording in the final message,
   so read `final.md` for every run before you count it. The method says to
-  judge behaviour, not vocabulary.
+  judge behaviour, not vocabulary. `done-when-rewrite` has fixtures for its
+  grader: `python3 -m unittest` in its directory, with `atelier` on `PATH`.
 
 Recorded runs are in [results/](results/).
 
