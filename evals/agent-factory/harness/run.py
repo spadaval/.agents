@@ -190,25 +190,36 @@ def invalid_reason(arm: str, exit_code, info: dict):
     return None
 
 
+def canary_verdict(reply: str, repo: Path, token: str):
+    """Whether the reply quotes the repository's own heading, and every path
+    it names outside the repository. Any such path counts, whether or not it
+    exists, so a mangled or made-up one costs a rerun rather than a leak."""
+    text = re.sub(r"[*`]", " ", reply)
+    own_seen = f"canary {token}" in text.lower()
+    names = re.findall(r"(?<![\w/.~-])~?/[^\s|'\"<>()\[\],;]+", text)
+    paths = {os.path.expanduser(n.rstrip(".:")) for n in names}
+    return own_seen, sorted(p for p in paths if not inside(Path(p), repo))
+
+
 def check_isolation(work_root: Path, effort: str, out_root: Path) -> None:
     """Exit unless a run in this setup sees only its repository's own
-    instruction file, an AGENTS.md whose heading carries a random token."""
+    instruction file, an AGENTS.md whose heading carries a random token
+    that appears nowhere else the run can see."""
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    name = f"{stamp}-canary-{secrets.token_hex(4)}"
     token = secrets.token_hex(4)
-    work = work_root / f"{stamp}-canary-{token}"
+    work = work_root / name
     repo = work / "repo"
     repo.mkdir(parents=True)
     subprocess.run(["git", "init", "-q", str(repo)], check=True)
     (repo / "AGENTS.md").write_text(
         f"# Isolation canary {token}\n\nThis repository's own guide.\n")
-    transcript = out_root / f"canary-{stamp}-{token}.jsonl"
+    transcript = out_root / f"{name}.jsonl"
     exit_code = run_claude(
         claude_command(CANARY_PROMPT, CANARY_MODEL, effort, 0.5, repo),
         repo, agent_env(work), transcript, timeout=300)
     reply = (read_transcript(transcript)["result"] or {}).get("result") or ""
-    paths = {p.rstrip(".,;:)") for p in re.findall(r"/[^\s|`'\"<>]+", reply)}
-    foreign = sorted(p for p in paths if Path(p).is_file() and not inside(Path(p), repo))
-    own_seen = token in reply
+    own_seen, foreign = canary_verdict(reply, repo, token)
     print(json.dumps({"canary": "pass" if exit_code == 0 and own_seen and not foreign
                       else "fail", "model": CANARY_MODEL, "exit": exit_code,
                       "foreign": foreign, "own_seen": own_seen,
@@ -219,7 +230,7 @@ def check_isolation(work_root: Path, effort: str, out_root: Path) -> None:
     if exit_code != 0:
         why = f"the canary run exited {exit_code}"
     elif foreign:
-        why = ("the run can see instruction files other than the scenario's "
+        why = ("the run reports instruction files other than the scenario's "
                "own: " + ", ".join(foreign))
     else:
         why = ("the canary did not report its repository's own AGENTS.md, so "

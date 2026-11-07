@@ -49,7 +49,7 @@ python3 evals/agent-factory/harness/run.py refused-land-push trivial-typo \
 - Before the matrix, a canary run on Haiku in the same setup lists the
   instruction files it was given. The harness aborts, running no scenario,
   unless it reports its repository's own `AGENTS.md` and nothing else. Its
-  transcript is kept in `--out`.
+  transcript is kept in `--out`, and `harness/test_run.py` tests its verdict.
 - Every run's init event is checked. A run that loaded MCP servers, had the
   skill in the wrong arm, exited non-zero, timed out or produced no result
   gets `"pass": null` and an `"invalid"` reason instead of a grade.
@@ -60,8 +60,11 @@ python3 evals/agent-factory/harness/run.py refused-land-push trivial-typo \
   commit skill changes during a matrix, or pin `--ref` to a SHA.
 - Each run directory in `--out` keeps `transcript.jsonl`, `final.md` and
   `result.json`, with `work` linking to its work directory. Work
-  directories are deleted for passing runs unless `--keep` is given; nothing
-  deletes the others. `results.jsonl` gathers every run.
+  directories are deleted for passing runs unless `--keep` is given. The
+  harness keeps the others, but the system may age out `/var/tmp`
+  (systemd-tmpfiles commonly removes files there after 30 days). To keep
+  them longer, pass a `--work-root` that nothing cleans, outside `$HOME`.
+  `results.jsonl` gathers every run.
 - Grades are provisional. Some graders key on wording in the final message,
   so read `final.md` for every run before you count it. The method says to
   judge behaviour, not vocabulary. `done-when-rewrite` has fixtures for its
