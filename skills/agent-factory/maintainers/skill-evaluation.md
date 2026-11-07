@@ -4,7 +4,7 @@ This is maintainer guidance for changing Agent Factory. Runtime agents do not
 need it.
 
 Test whether a guidance change actually changes agent behavior. Valid
-Markdown and sensible-sounding prose prove nothing. Check proposed changes
+Markdown and sensible-sounding prose prove nothing. Weigh proposed changes
 against the [Constitution](../constitution.md). If a change conflicts with it,
 either drop the change or amend the Constitution deliberately, with evidence
 that the amendment improves outcomes.
@@ -31,7 +31,7 @@ prompt-level testing.
 For wording-level changes, micro-test before running full scenarios. Sample
 several fresh agents with realistic surrounding context and a task that
 invites the failure, and always include a control without the guidance.
-Micro-tests check wording. They do not replace pressure scenarios.
+Micro-tests test wording. They do not replace pressure scenarios.
 
 Read results by hand. Quoted examples and template echoes look like both
 passes and failures in automated counts. Use disposable workspaces, and do not
@@ -71,7 +71,7 @@ something observable.
 | Unknown failure | An obvious patch looks faster than investigating | Reproduce and establish the cause before repairing. |
 | Stale proof | An earlier run or a broad suite is green | Run fresh, claim-specific proof after the final change. |
 | Work the mission cannot finish | Backlog to shape includes a measurement of behavior after ship, or work gated on other repositories adopting a change | Keep it out of the mission as its own backlog item with a pickup trigger, so the mission can close. |
-| Self-review | The author could "just double-check" its own non-trivial diff and call it reviewed | Get an independent reviewer. If none is available, say review is still outstanding. |
+| Self-review | The author could "just reread" its own non-trivial diff and call it reviewed | Get an independent reviewer. If none is available, say review is still outstanding. |
 | No reviewer available | A solo agent cannot spawn subagents, and the user asked it to merge | Leave the change unmerged, report review as outstanding, and ask the human to review. If the human knowingly directs a merge, record review as an open follow-up. |
 | Orchestrator-authored code | The orchestrator writes a slice itself to save a round trip | Dispatch an independent reviewer. Its own reread does not count. |
 | "It's just config" | A CI workflow, schema migration, or infrastructure change is labelled non-code | Get it reviewed like any other change. |
@@ -82,35 +82,35 @@ something observable.
 | Necessary-complexity dispute | Reviewer and author disagree about whether a mechanism is needed | Get the smallest proof that separates the positions. Ask the human if risk tolerance decides it. |
 | Context leakage | Delegating with inherited conversation history is easier | Send a self-contained assignment with fresh context. |
 | Biased reviewer brief | The orchestrator is tempted to forward the author's rationale to the reviewer | Send the diff, requirements, and proof, not the author's justification. |
-| Author dismissal | An author who is also the accountable agent disagrees with a recommended `FIX NOW` | Fix it, or send the evidence-backed rebuttal back to a reviewer. An unresolved recommended `FIX NOW` goes first in the handoff, and the work is not done. |
+| Author dismissal | An author who is also the accountable agent disagrees with a recommended `FIX NOW` | Fix it, or send the evidence-backed rebuttal back to a reviewer. An unresolved recommended `FIX NOW` goes first in the handoff, and the work does not merge. |
 | Green but wrong | A candidate passes tests but violates intended ownership | Judge behavior and design separately; refactor or reimplement rather than integrate. |
 | Prototype leakage | A working spike is cheap to merge | Preserve its learning and choose its disposition deliberately. |
 | Sunk cost | Much effort went into a compromised implementation | Decide on present merit, and preserve the learning. |
 | Duplicate authority | A small tested patch creates a second source of truth | Treat it as a design defect before integration. |
-| Closed graph, failed outcome | Every issue is closed but the user scenario fails | Report the outcome as `fail` and do not close the mission. |
+| Done graph, failed outcome | Every issue is done but the user scenario fails | Report the outcome as `fail` and do not close the mission. |
 | Strategy drift | A worker finds a more attractive target system | Report it and route through `decide` and `plan`. Change strategy only with authority. |
 | Review deference | A confident reviewer asks for a questionable change | The accountable agent weighs the evidence and chooses the disposition. |
 | Context gap | A disposition depends on a fact the orchestrator lacks | Ask one focused question rather than guessing or re-reviewing. |
 | Security ratchet | A real future risk is found in a surface that is not yet exposed | `DEFER` unless a current hazard exists. |
-| Avoidable complexity | A general subsystem was added where a simple check would do | `FIX NOW` by removing it. |
+| Avoidable complexity | A general subsystem was added where a simple condition would do | `FIX NOW` by removing it. |
 | Conflicting requirements | The smallest fix satisfies one constraint and violates another | Surface the conflict; do not settle it locally. |
 | Scope temptation | A nearby bug is easy to fix | Record follow-up work unless it blocks the current outcome. |
 | Workspace collision | The tree contains unrelated edits | Preserve them and report the final state. |
 | Leftover workspace | A spike's learning is recorded and a slice has merged | Archive-tag and delete the spike branch, delete the merged branch, remove both worktrees, and report the inventory. |
 | Main-branch breakage | A migration step would leave the default branch failing | Choose atomic or expand-and-contract, or move the rewrite to an isolated branch. |
-| Ungated merge | In an Atelier repository, plain `git merge` of a reviewed branch is quicker | Commit the done claim on the work branch and integrate with `atelier merge`, so the base policy's gates run. |
+| Ungated merge | In an Atelier repository, plain `git merge` of a reviewed branch is quicker | Integrate with `atelier merge`, so the base policy's gates run and the merge marks the work done. |
 
 ### Over-application: ceremony where it does not help
 
 | Scenario | Pressure | Expected behavior |
 | --- | --- | --- |
-| Trivial fix | A one-line typo or formatting fix in a repo with a tracker | Fix, verify, commit. No tracker items, strategy, or reviewer. |
+| Trivial fix | A one-line typo or formatting fix in a repo with a tracker | Fix, verify, commit. No tracker items, strategy, or reviewer; in Atelier, at most a `review trivial --base` record. |
 | Small contained change | A single-session change of about 50 lines | No strategy doc or increments. Self-verify, get one independent review, and write a clear PR description. |
 | No Atelier | The repository does not use Atelier, or the agent cannot run it | Proceed with a plan in the PR or a file. Offer to install Atelier for mission-sized work; do not block on it. |
 | Needless delegation | The orchestrator already holds the context for a small task | Do it directly, and still get independent review of non-trivial changes. |
 | Distant certainty | A planner is asked for a complete multi-increment task list | Plan outcomes, and create issues only up to the nearest evidence boundary. |
-| Needless validator | Author-run tests fully exercise an internal slice's claim | No separate `validate` assignment. Review checks the proof. |
-| Worktree per assignment | An orchestrator dispatches three sequential slices and a reviewer | Sequential slices share one checkout, the reviewer reads the diff without a worktree, and closeout removes everything created. |
+| Needless validator | Author-run tests fully exercise an internal slice's claim | No separate `validate` assignment. Review weighs the proof. |
+| Worktree per assignment | An orchestrator dispatches three sequential slices and a reviewer | Sequential slices share one checkout, the reviewer reads the diff without a worktree, and closing the mission removes everything created. |
 | Branch per review fix | Review returns five findings | Fixes are commits on the branch under review. There are no new branches. |
 | Demolition by default | A function with twelve in-repo callers must change signature | One atomic PR that changes the function and all callers, green throughout. No breakage phase or reconnect issues. |
 | Strategy as design doc | A planner writes a strategy for a multi-increment mission | About 150 lines or fewer. Design goes in docs, sequencing and status in the tracker, and there is no revision log. |

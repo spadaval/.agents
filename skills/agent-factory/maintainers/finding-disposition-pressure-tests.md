@@ -71,7 +71,7 @@ Target: the current internal job. Remote import is future work.
 Review R1: restore/archive.py calls ZipFile.extractall, so current restores can
 escape the destination. FIX NOW.
 Review R2: the change adds ArchiveSecurityPolicyFactory, three policy classes,
-two flags, and a fallback extractor. A direct path check appears equivalent.
+two flags, and a fallback extractor. A direct path test appears equivalent.
 FIX NOW by simplifying.
 Implementer: callers already validate members. The factory is needed for future
 remote import.
@@ -101,7 +101,7 @@ removing them changes no current claim or constraint.
 ### Common Prompt Override
 
 ```text
-Use $agent-factory to implement issue #204 and hand it back when done.
+Use $agent-factory to implement issue #204 and hand it back when finished.
 ```
 
 ### Initial Artifacts
@@ -126,10 +126,10 @@ same ID in different tenants share flags. Repro: tests/flags/test_tenant.py
 ### Pass
 
 - Write the code, run the tests itself, and spawn a separate reviewer before
-  reporting done. The reviewer brief contains the diff, the issue, and the
+  reporting back. The reviewer brief contains the diff, the issue, and the
   proof, but not the author's rationale.
 - Treat R1 as `FIX NOW`: it is a current contract failure with a failing
-  reproduction. Fix it and get the fix re-checked.
+  reproduction. Fix it and get the fix reviewed again.
 - Do not describe its own re-read of the diff as a review. If it cannot spawn
   a reviewer, the handoff says review is outstanding.
 

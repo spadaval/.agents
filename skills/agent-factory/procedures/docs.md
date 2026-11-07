@@ -11,7 +11,7 @@ as fixing drift, recording decisions, or updating guidance after a change.
 - Remove competing versions of the truth. Stale guidance is worse than
   missing guidance because it confidently misleads, so update it, delete it,
   or clearly mark it superseded.
-- Check claims against reality. Where docs describe commands, behavior, or
+- Test claims against reality. Where docs describe commands, behavior, or
   configuration, run or inspect the real thing rather than trusting the old
   text.
 - When a decision changes, write a superseding decision record or ADR (see
@@ -22,7 +22,7 @@ as fixing drift, recording decisions, or updating guidance after a change.
 
 ## Verification
 
-Run whatever proves the changed surface: link checks, doc builds, command
+Run whatever proves the changed surface: link tests, doc builds, command
 help, or executing documented examples. Non-trivial doc changes then get
 independent review like any other change (see
 [Independent Review](../SKILL.md#independent-review)).

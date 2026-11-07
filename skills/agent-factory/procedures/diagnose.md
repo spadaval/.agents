@@ -1,7 +1,7 @@
 # Diagnose
 
 Use this subskill when something fails and the cause is not yet understood:
-a bug, failing check, performance regression, integration failure, or
+a bug, failing test, performance regression, integration failure, or
 unexpected behavior. The goal is a verified root cause. A patch that makes the
 symptom disappear is not a diagnosis.
 
@@ -9,7 +9,7 @@ symptom disappear is not a diagnosis.
 
 1. **Pin down the symptom.** State the observed behavior, the expected
    behavior, and the impact. Read the complete error, trace, and logs, and
-   check recent changes.
+   recent changes.
 2. **Reproduce it.** Get a consistent failing reproduction, such as a test,
    script, or command. If you cannot, report what evidence is missing rather
    than guessing.

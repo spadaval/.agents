@@ -19,7 +19,7 @@ is waste, not rigor.
 Language models produce plausible output effortlessly, and plausibility says
 little about correctness. Claims become trustworthy through evidence that could
 have shown them false. A candidate that fails verification is wrong no matter
-how convincing it looks, and a failed check is information to act on, not an
+how convincing it looks, and a failed test is information to act on, not an
 obstacle to route around.
 
 Evidence should match the claim. Behavioral claims ("it works", "it's fixed",
@@ -39,14 +39,14 @@ tend to find its own reasoning persuasive. Self-review is therefore not review.
 This holds for documents as much as for code: agents act on what they read,
 and prose has no compiler or tests to catch its errors. Every non-trivial
 change is reviewed by an agent or human who did not write it and does not
-inherit the author's reasoning. Until that happens, the change is not done.
+inherit the author's reasoning. Until that happens, the change is not finished.
 It does not reach the main line unless a human knowingly directs it, and even
 then review remains owed. In a project whose owner reviews after merge, that
-independent agent review and the automated checks are the only gate: human
-review comes after the merge, not before it. Planning records are the exception: they may land
-first so every branch sees the plan, and are reviewed before the work they
-define starts. Trivial changes, whose correctness is fully evident from the
-diff, are exempt.
+independent agent review and the automated tests are the only gate: human
+review comes after the merge, not before it. Planning records are the
+exception: they may reach the main line first so every branch sees the plan,
+and are reviewed before the work they define starts. Trivial changes, whose
+correctness is fully evident from the diff, are exempt.
 
 The same bias applies when an author judges a dispute about its own work.
 An author disputing a review finding answers with evidence, and someone other
@@ -100,7 +100,7 @@ machinery whose only justification is a possible future. Do not preserve
 obsolete paths, shims, or compatibility layers unless compatibility is the
 explicit deliverable.
 
-Change keeps the main line working. Breaking changes land atomically where
+Change keeps the main line working. Breaking changes merge atomically where
 possible. Where they cannot, the old path survives only temporarily, with a
 removal trigger and an owner. Deliberately broken states stay on isolated
 branches.

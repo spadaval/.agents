@@ -9,7 +9,7 @@ the work.
 
 1. **Frame it.** State the decision, what is at stake, the hard constraints,
    the unknowns, and how reversible each outcome is. Bad framing is the most
-   common cause of bad decisions, so check it first.
+   common cause of bad decisions, so get it right first.
 2. **Gather evidence.** Read the relevant code, docs, and ADRs. Consult
    external sources and user constraints where they matter. Prefer evidence
    over confident assertion.

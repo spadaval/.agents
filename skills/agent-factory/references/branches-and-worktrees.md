@@ -1,7 +1,7 @@
 # Branches and Worktrees
 
-Use this reference when starting, integrating, or closing work that changes
-files. The repository's and the harness's own conventions come first.
+Use this reference when starting, integrating, or finishing work that
+changes files. The repository's and the harness's own conventions come first.
 
 Branches and worktrees are cheap to create and expensive to leave behind.
 Every one is state that a later agent or human must understand, reconcile, or
@@ -9,12 +9,12 @@ delete. Create as few as possible, and clean up after the work.
 
 ## Starting
 
-1. Check the current branch, uncommitted changes, and repository
+1. Look at the current branch, uncommitted changes, and repository
    instructions.
 2. Preserve changes you did not make. Never discard or overwrite them.
 3. Decide where to work using the rules below. Usually that is the current
    checkout or the branch you were assigned.
-4. Run a small, representative baseline check. If it already fails, note
+4. Run a small, representative baseline test. If it already fails, note
    whether the failure is pre-existing, an environment problem, or blocks the
    work, so it is not blamed on your change later.
 
@@ -37,24 +37,17 @@ delete. Create as few as possible, and clean up after the work.
 - **Spikes** get one disposable branch each, deleted once their learning is
   recorded (see [Implementation Candidates](implementation-candidates.md)).
 - **Naming:** follow the repository's convention. With Atelier, `atelier
-  start` names the branch `<issue_type>/<id>`. Otherwise use
-  `agent/<issue>-<short-slug>`.
+  start` on the base names the branch with the item's ID, and on any other
+  branch takes the one you are on. Otherwise use `agent/<issue>-<short-slug>`.
 
 ### Atelier Limits
 
-Atelier integrates an owner's branch only into the base branch named in
-`.atelier/workflow.yaml`, and `atelier start` records the branch you run it
-from as the new branch's base, permanently. So with Atelier:
-
-- run `atelier start` from the base branch;
-- do not stack one owner's branch on another's; sequence the work, or put
-  both slices under one parent issue so they share a branch;
-- do not plan a mission integration branch or an isolated rewrite branch
-  under gated merge. If the work needs one, say so in the plan and ask the
-  human how to integrate it.
-
-An owner started from the wrong branch fails `atelier land` and
-`atelier merge`, and recovering requires hand-editing the record.
+Atelier merges an owner's branch only into the base branch named in
+`.atelier/workflow.yaml`. So with Atelier, do not stack one owner's branch on
+another's: sequence the work, or put both slices under one parent issue so
+they share a branch. Do not plan a mission integration branch or an isolated
+rewrite branch either; if the work needs one, say so in the plan and ask the
+human how to integrate it.
 
 ## Worktrees
 
@@ -67,51 +60,53 @@ An owner started from the wrong branch fails `atelier land` and
 - **Read-only work does not get its own worktree.** Reviewers, auditors, and
   diagnosticians investigating without instrumenting read branches with
   `git diff`, `git show`, and `git log`. Validators and others who must run
-  code use the author's checkout while the author is idle, and leave it as
+  code, and reviewers committing their review records, use the author's
+  checkout while the author is idle, and leave it as
   they found it. If that is not possible, the orchestrator may keep one
   scratch checkout per mission, detached at the commit under test, reused by
-  every read-only role, and removed at closeout. A diagnostician who
+  every read-only role, and removed when the mission closes. A diagnostician who
   instruments code or writes a fix is a writer.
 - **Prefer the harness's native worktree support** over manual `git
   worktree add`. Put manual worktrees where repository policy says, or beside
   the repository with a name that matches the branch.
 
-## Ownership and Cleanup
+## Responsibility and Cleanup
 
-The agent accountable for the work owns the branches and worktrees created
-for it. Under an orchestrator, that includes everything its assignees
-created. The orchestrator names the branch in each assignment, and assignees
-list anything else they created in their handoff. Working alone, you own what
-you create. Record what was created in handoffs or the tracker, so ownership
-survives a lost context.
+The agent accountable for the work is responsible for the branches and
+worktrees created for it, including everything its assignees created. The
+orchestrator names the branch in each assignment, and assignees list
+anything else they created in their handoff. Working alone, you are
+responsible for what you create. Record what was created in handoffs or the
+tracker, so that survives a lost context.
 
 Remove things once they are no longer needed: after the work merges, after a
 spike's learning is recorded, or when the work is superseded. Do it as part
 of finishing, not as a later chore.
 
-You may do the following without asking, for branches and worktrees you own:
+You may do the following without asking, for branches and worktrees you are
+responsible for:
 
-- Delete branches whose work is merged. Confirm this with `git branch
+- Delete local branches whose work is merged; remote branches follow
+  repository policy. Confirm this with `git branch
   --merged <target>` or the PR's merged state, since squash and rebase merges
   do not show as merged to Git. Never force-delete on inference.
 - Remove worktrees that have no uncommitted changes.
 - Archive a branch whose work is unmerged, such as a spike or a superseded
   attempt: tag it `archive/<branch-name>`, push the tag if the branch was
   pushed, then delete the branch. Archive tags are a safety net, not a record.
-  The learning belongs in the tracker. At mission close, list the archive
-  tags in the closeout handoff and delete them once the human confirms.
+  The learning belongs in the tracker. When the mission closes, list the
+  archive tags in its handoff and delete them once the human confirms.
 
 Ask first before deleting anything whose origin you cannot establish from
 handoffs or tracker records, anything with uncommitted changes, or a branch
-with an open PR. Close or retarget the PR first.
+with an open PR.
 
-## Closing
+## Finishing
 
-Run the final proof and any integration checks the repository requires. Then
+Run the final proof and any integration tests the repository requires. Then
 inventory what the work created, starting from handoffs and tracker records
-and cross-checking with `git worktree list`, `git branch --list` for the
-repository's work-branch patterns (with Atelier, `<issue_type>/*`), and the
-remote branches. Those listings include other missions' work.
+and comparing with `git worktree list`, `git branch --list`, and the remote
+branches. Those listings include other missions' work.
 Anything you cannot trace to this work is not yours to delete. Remove or
 archive what is finished, and run `git worktree prune` to clear stale
 entries.

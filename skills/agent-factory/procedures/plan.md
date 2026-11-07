@@ -18,7 +18,10 @@ strategic revisions.
 - **Issues** are executable slices, created only as far ahead as evidence
   supports.
 - **Validation issues**, when the tracker is used, hold an independent
-  `validate` assignment for an increment or mission outcome.
+  `validate` assignment for an increment or mission outcome, done on the base.
+- **Loose ends** hold work that changes no code and can only follow a merge
+  or release, outside any mission (see
+  [Tracker Records](../references/tracker-records.md#loose-end)).
 
 Each record has one job; see [Tracker Records](../references/tracker-records.md)
 for what goes in each. Detailed design goes in architecture docs or design
@@ -43,7 +46,8 @@ be one thing a person can hold in their head, plan against, and finish.
   now. Work that waits on calendar time, on other repositories or people
   adopting a change, or on measuring behavior after the mission ships cannot
   be finished this way. Put it in its own backlog item that says when to pick
-  it up, outside the mission, so the mission can close.
+  it up, or a loose end when it can only follow a merge or release, outside
+  the mission, so the mission can close.
 - **Sized to finish.** Size a mission so one reviewer can judge it in one
   debrief; in practice that is usually days to a few weeks of work. When it
   outgrows that, split it along the outcome's natural seams rather than by
@@ -52,13 +56,13 @@ be one thing a person can hold in their head, plan against, and finish.
   each item's Done when already say what done means. Add a criterion only for
   a claim about the whole that no single item proves, such as an end-to-end
   scenario across items or a property every surface must share. Each one must
-  be something the mission's work can make true and an agent can check when
+  be something the mission's work can make true and an agent can verify when
   the mission closes: a test, a scenario, a measurement it can take, or a
   named human judgment the agent asks for. A criterion that restates the
   items adds nothing; one the work cannot reach stalls the mission, because
   the agent correctly stops and asks what it is expected to do. When an
   existing criterion fails this test, propose a rewrite the work can reach,
-  or a backlog item that says when to check it, and let whoever holds
+  or a backlog item that says when to measure it, and let whoever holds
   authority over the strategy decide; do not drop it yourself.
 
 ## Initial Planning
@@ -87,9 +91,9 @@ execution.
 
 ## Ready Missions
 
-A mission moves from draft to ready (`atelier issue transition <mission>
+A mission moves from draft to todo (`atelier issue transition <mission>
 ready`) when an orchestrator could start it without coming back to the human
-to ask what the mission means. Check that:
+to ask what the mission means. Confirm that:
 
 - the outcome passes the [shaping](#shaping-a-mission) tests above, and every
   item in scope fits it;
@@ -104,8 +108,8 @@ to ask what the mission means. Check that:
 - any success criteria meet the rule above;
 - the planning has been independently reviewed, and, because the human holds
   authority over a mission's outcome, the human has approved the plan
-  (`atelier review approve <mission>`), unless the strategy's Authority
-  section delegates that.
+  (`atelier review approve <mission> --identity <the human>`), unless the
+  strategy's Authority section delegates that.
 
 ## Ready Issues
 
@@ -114,13 +118,12 @@ the [issue template](../references/tracker-records.md#issue): the goal and why
 it matters, how you will know it is done, scope, context (including the target
 environment when it affects risk), and dependencies.
 
-Decide when each Done when check can be proven. Everything that can be
-checked on the branch is checked before merge. Mark a check to run after
-merge only when it needs the deployed or merged system, a device or place no
-agent can reach, the human's judgment, or time and real use, and name its
-nearest stand-in that runs before merge (see
-[After-Merge Checks](../references/tracker-records.md#after-merge-checks)).
-Do not split such a check off as its own item.
+Every Done when line must hold before review. Work that changes no code and
+can only happen after a merge or a release, because it needs the merged or
+deployed system, a device or place no agent can reach, the human's judgment,
+or a tag, is a [loose end](../references/tracker-records.md#loose-end):
+file it `blocked_by` the issue, outside the mission, and keep whatever part
+of it can run before merge, such as an emulator test, as a Done when line.
 
 Avoid placeholders such as "TBD", "handle edge cases", or "similar to #12".
 If you cannot state something concretely, you have found an evidence
@@ -128,7 +131,7 @@ boundary. Make it a spike, a decision, or a blocked issue instead of
 papering over it. Do not plan components whose only justification is
 possible future work.
 
-Before handing off, reread the ready issues. Check that together they cover
+Before handing off, reread the ready issues. Confirm that together they cover
 the increment's outcome, that their interfaces agree with one another, and
 that each has a proof that could fail. Then get the new planning
 independently reviewed; work does not start on an issue until it has been

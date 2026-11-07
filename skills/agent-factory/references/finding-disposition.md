@@ -14,7 +14,7 @@ Use this reference to decide what happens to a review or validation finding.
   produced the work. So when the author is also the accountable agent,
   it fixes every finding a reviewer recommended as `FIX NOW`, or sends its
   rebuttal to a reviewer to weigh. A recommended `FIX NOW` left unresolved is
-  reported first in the handoff, and the work is not done.
+  reported first in the handoff, and the work does not merge.
 - **A human** decides when the answer depends on risk tolerance or authority
   that no durable source settles.
 
@@ -63,8 +63,7 @@ it, or add a follow-up entry to the PR description or plan file if there is no
 tracker. It is not a blocker unless you explicitly make it one.
 
 When a finding is real but you cannot tell whether it blocks, defer it,
-unless one small check could settle the question. In that case, run the
-check.
+unless one small test could settle the question. In that case, run it.
 
 ## NO ACTION
 
@@ -91,11 +90,11 @@ does not survive this test.
 
 ## Recording
 
-In Atelier, each finding is a review record that carries its decision as a
-disposition field, set with `atelier review disposition` (see
-[Atelier](atelier.md#branches-review-and-integration)). Setting it again
-replaces it; Git keeps the earlier decisions. Give each a short reason. Without Atelier, record the decisions in the PR or
-plan file:
+In Atelier, a finding recommended `FIX NOW` and fixed needs no record of its
+decision: the approval that follows its fix resolves it. Any other finding,
+including one recommended `DEFER` or `NO ACTION` and fixed anyway, gets a
+disposition, set with `atelier review disposition` with a short reason (see [Atelier](atelier.md#one-issue-in-order)); when the
+author is the accountable agent, the reviewer records each one. Without Atelier, record the decisions in the PR or plan file:
 
 ```text
 R1 FIX NOW: <reason>

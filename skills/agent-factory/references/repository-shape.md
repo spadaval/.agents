@@ -15,7 +15,7 @@ point (usually `AGENTS.md` or the README) and the sources it links to:
 3. Where is current work tracked, and what state is it in?
 4. What behavior is public, and what constraints are architectural?
 5. Why were important non-obvious choices made?
-6. How is the code built and checked, and what standards apply?
+6. How is the code built and tested, and what standards apply?
 7. Which state is durable, and which is generated or local and safe to
    rebuild?
 8. Does it use Atelier, and what are its merge policy and base branch?
@@ -54,7 +54,7 @@ When a repository is large enough to split these concerns, typical homes are:
 | Product behavior and public contracts | `docs/product/` or equivalent |
 | Architecture: boundaries, ownership, dependency direction | `docs/architecture/` or equivalent |
 | Decisions and rationale | Atelier `decision` records, or `docs/adr/` without Atelier |
-| Standards and how claims are checked | Contributing, quality, or testing docs |
+| Standards and how claims are proven | Contributing, quality, or testing docs |
 
 Split a document when it starts serving conflicting audiences. Product docs
 say what users can expect, architecture docs say how the system is

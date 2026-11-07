@@ -1,198 +1,217 @@
 # Atelier
 
 Agent Factory uses [Atelier](https://github.com/spadaval/atelier) as its
-tracker. Atelier keeps missions, issues, evidence, and reviews as
-Markdown records under `.atelier/`, committed with the code they describe, and
-checks a small set of invariants at the point of action. Agent Factory owns
-the process; Atelier owns the records and the guards.
+tracker: Markdown records under `.atelier/`, committed with the code they
+describe, and gates where records are written, review is requested, work
+merges and sessions hand off. This reference is a map: `atelier help
+<command>` is authoritative for flags, `.atelier/workflow.yaml` for policy,
+and [Tracker Records](tracker-records.md) for what each record contains.
 
-This reference maps Agent Factory concepts to Atelier commands. It is a map,
-not a syntax manual: `atelier help <command>` is authoritative for flags and
-fields, and the repository's docs and `.atelier/workflow.yaml` are
-authoritative for its policy. [Tracker Records](tracker-records.md) defines
-what each record contains.
+## Words
 
-## Orienting
+As tracker terms, these words carry only these meanings, here and in
+Atelier's help, docs and `CONTEXT.md`:
 
-- Start a fresh session with `atelier status`: checkout and owner context,
-  ready and active work, and labeled summaries of other local work branches.
-- Review a mission with the human through `atelier brief <mission> --html`
-  before work starts and `atelier debrief <mission> --html` after it ends:
-  link the printed page in your reply (do not paste or re-render it), and
-  record the human's direction as review events, decisions, notes, and
-  issues. A plan approval is `atelier review approve <mission>`.
-- Use `atelier work ready`, `blocked`, `active`, `all`, or `missions` for
-  operational views, and `atelier work mission <id>`, `atelier work parent <id>`,
-  or `atelier issue show <id>` for focused context.
-- `work ready` lists only work an agent can start. Parents with open
-  children and missions appear as context, not as ready work. Items labeled
-  `needs-human` and open decisions are listed separately for the human
-  (`atelier work human`); do not start them.
-- Records are branch-local. A done claim on a work branch is not base
-  completion. Use Git history for past state.
+- **check**: `atelier check` (record and graph rules), the policy's merge checks
+  (commands that run on the merged tree, or confirm CI did), or `atelier
+  merge --check` (the merge gates without merging). An item's Done when is
+  made of **lines**.
+- **review**: independent review by someone who did not write the work: an
+  agent reviewing a change or plan, or the human, who approves a mission's
+  plan (`atelier brief`) and reviews its merged work (`atelier debrief`).
+- **land**: `atelier land`, run at every handoff: it judges committed records
+  and the commits about to be pushed.
+- **done**: the status work gets when `atelier merge` integrates it; the
+  status a decision, loose end or validation gets on the base; and the status
+  of a closed mission. Superseded is the other terminal status.
+- **close**: what a mission does, by the orchestrator running `atelier issue
+  transition <mission> close` with its report, once all its work is merged
+  and its validation items, if any, are done (see
+  [Closing a Mission](../procedures/orchestrate.md#closing-a-mission)).
+  Nothing else closes.
 
-## Managing Records
+## One Issue, in Order
 
-- Use `atelier issue create`, `show`, `update`, `transition`, `note`, `link`,
-  and `unlink`. Author bodies with typed `--body` Markdown using the headings
-  in [Tracker Records](tracker-records.md), and revise them with
-  `atelier issue update --body`.
-- Use parent fields for an increment's direct children (one level deep),
-  `advances` links for mission scope, `blocked_by` for dependencies, and
-  labels for themes. Missions are never parents.
-- Set a mission's strategy file with `--strategy <path>` on `issue create` or
-  `issue update`. The mission's path is the canonical link; the strategy file
-  need not name the mission.
-- Omit the transition name to see valid transitions and blockers:
-  `atelier issue transition <id>`.
-- Keep planned but not near-term work in `backlog`: create it there with
-  `--status backlog`, or move it with the `defer` transition. The `plan`
-  transition brings it back to `todo`. A backlog parent parks its unstarted
-  children. Missions begin in `draft` and become `todo` with `ready`, once
-  they meet [Ready Missions](../procedures/plan.md#ready-missions).
-- Record each choice that meets the record test in
-  [Decision](tracker-records.md#decision) as a `decision` record and close it with
-  the `decide` transition (`--reason "<the choice>"`) once its Decision
-  section is filled in. An open
-  decision waits for the human; an agent recording a choice within its own
-  authority fills in the Decision section and runs `decide` in the same
-  change.
-- Use the `supersede` transition with a reason when evidence makes planned
-  work obsolete. Preserve completed work and its evidence.
-- For a prepared multi-record graph, run `atelier bundle preview <file>` before
-  `atelier bundle apply`.
-- Append handoffs and progress with `atelier issue note`. Records have no
-  comment threads.
-- Record a decision made inside an item with `atelier issue note <id> --kind
-  decision "<choice>" --reason "<why>"`, unless it meets the
-  [record test](tracker-records.md#decision) (see
-  [Decision Notes](tracker-records.md#decision-notes)).
-  `atelier work decisions <mission>` lists a mission's decision notes and
-  records.
+Each step names who does it; an author working alone does the
+orchestrator's steps too. The item's planning was reviewed before step 1.
+
+1. **Start** (orchestrator or author). `atelier start <id>` records the
+   item's work branch and starts it. An item with a recorded branch switches
+   to it; otherwise, on the base it creates a branch named `<id>`, and on any
+   other branch, such as one made with `git switch -c <id>` or a worktree's,
+   it takes that branch. Children share their parent's branch. The start
+   record is committed with the first commit on the branch.
+2. **Implement** (author), committing code and records together.
+3. **Finish the record** (author). Tick each Done when line (`- [x]`) once
+   it holds, and write the item's `## Report` (see
+   [Report](tracker-records.md#report)).
+4. **Ask for review** (orchestrator). `atelier review request <id>` prints
+   the brief for an independent reviewer and writes nothing; naming the
+   owner covers its started children too. It refuses while any line is
+   unticked or the Report is empty, since asking means the work is
+   implemented and every line holds, to the best of the author's knowledge.
+   The brief leaves out the author's notes and Report, so whoever briefs the
+   reviewer adds the proof that ran.
+5. **Fix and re-review** (reviewer, author, orchestrator). The reviewer
+   records each finding and, when none that must be fixed is open, its
+   approval: `atelier review finding|approve <id> --identity <reviewer>`,
+   committed on the work branch with the brief's `--commit-records`. The
+   author fixes each `fix_now` finding in a later commit, and the
+   orchestrator gets the fix reviewed; that re-review may cover only the
+   fix's diff and may be by the same reviewer. The approval after the fix
+   resolves the finding; it needs no disposition. The accountable agent (the
+   reviewer, when that agent wrote the work) sets one with `atelier review
+   disposition` for a finding deferred or dismissed instead, and for one recommended `defer` or `no_action` even if it was
+   fixed (`defer` names an existing follow-up). A non-trivial record change
+   after approval, such as a rewritten Done when line, gets a fresh approval
+   too.
+6. **Merge** (orchestrator). `atelier merge <id>` (try `--check` first)
+   needs a current approval recorded after every `fix_now` finding left
+   without a disposition, the dispositions step 5 calls for, and the merge
+   checks passing. It makes one merge commit, which marks the owner and
+   every open child done, started or not (so move out or supersede what
+   should not merge), deletes the local work branch, and does not push. Work
+   items have no close step.
+
+Run `atelier land` before every handoff. On a work branch it reports what is
+open and refuses nothing; on the base it refuses uncommitted records and
+commits that change more than records and linked strategies without a
+review or trivial exemption. Push afterwards as repository policy says, only
+when land exited zero (never behind a pipe, which hides its status).
+
+## What Makes an Approval Stale
+
+Only a change to code: anything outside `.atelier/issues`, `.atelier/reviews`
+and `.atelier/evidence` since the approved commit, not counting a clean merge
+of the base. The workflow policy, config and strategy files count as code
+here, so a strategy edit on a work branch makes it stale. Record edits never
+make an approval stale: ticking lines, notes, links, the Report, status
+changes, findings and dispositions. That is Atelier's gate, not a waiver
+(step 5), and the review brief and `merge --check` show any Done when
+changed after start.
+
+A base that moved on needs no catch-up: `merge` builds the merged tree
+itself, and the merge checks or CI test it where the repository has them.
+Merge the base in only when the
+branch is next to merge and it conflicts, a merge check fails on the merged
+tree, or merge refuses with `merge_base_records` (an in-flight item's
+records changed on the base, so leave those alone); `atelier merge
+<id> --sync` does that and reports whether the approval survived. A merge
+that resolves code by hand needs that resolution reviewed. Never rebase a
+branch after review is recorded: findings and approvals pin its commits.
+
+## Records
+
+- Use `atelier issue create|show|update|transition|note|link|unlink`, with
+  typed `--body` Markdown under [Tracker Records](tracker-records.md)'
+  headings.
+- Atelier refuses an invalid record when it is written, naming each problem.
+  A finding or other review record may be corrected or deleted until it
+  reaches the base; an approval or trivial exemption stays as first
+  committed, so record a new one instead.
+- Parent fields hold an increment's direct children (one level deep);
+  `advances` links hold mission scope; `blocked_by` holds dependencies;
+  labels hold themes. Missions are never parents. Set a mission's strategy
+  with `--strategy <path>`.
+- `atelier issue transition <id>` with no transition lists the valid ones and
+  their blockers. Keep planned but not near-term work in `backlog` (`--status
+  backlog`, or the `defer` transition, unrelated to a finding's DEFER; `plan`
+  brings it back). A mission moves from `draft` to `todo` with `ready`, once
+  it meets [Ready Missions](../procedures/plan.md#ready-missions).
+- A choice that meets the [record test](tracker-records.md#decision) is a
+  `decision` record, which the `decide` transition (`--reason "<the
+  choice>"`) marks done once its Decision section is filled in; an open one
+  waits for the human. Smaller choices are
+  [decision notes](tracker-records.md#decision-notes) (`issue note <id>
+  --kind decision "<choice>" --reason "<why>"`).
+- Retire obsolete work with `supersede` and a reason. File work found along
+  the way with `issue create --discovered-from <item, finding or receipt>`.
+  Append handoffs with `issue note`. Run `bundle preview <file>` before
+  `bundle apply`.
+- `--commit-records` commits the records a command wrote (`--stage-records`
+  groups several commands into one commit).
+
+## Loose Ends
+
+Work that changes no code and can only happen after a merge or a release,
+such as pushing a tag, a play-test on a device, an eval run or a look at the
+deployed service, is a **loose end**, unless it is an independent
+validation of a mission or increment, which is a
+[validation item](tracker-records.md#validation-item). A loose end is its
+own issue (`atelier issue create --issue-type loose_end`), linked to the
+issue it waits on with `atelier issue link <loose-end> <issue> --role
+blocked_by`, which is stored on the loose end. File it when you plan the
+item, or as soon as such work turns up (an implementer reports it to
+whoever owns the plan): on the work branch while the item is in flight,
+otherwise on the base. Filing one is reviewed with the item it follows, or
+as a planning change once that item merged. It is never another issue's
+child and never advances a mission, so it never holds one open. Whatever
+part of it can run before merge, such as an emulator test, stays a Done when
+line of the item.
+
+A loose end takes no branch, review or merge. Once what it waits on is
+merged, do it on the base, tick its line if it held, and mark it done with
+a one-line result either way: `atelier issue transition <id> done --reason "<result>"`, then
+commit the record on the base. A bad result files a linked bug (`--discovered-from <loose-end>`);
+merged work is never reopened.
+
+## A Change With No Issue
+
+A release, a docs change or a mockup can skip the issue (the light path):
+commit it on a branch no issue owns, run `atelier review request` there with
+no ID, have the reviewer record `atelier review finding|approve --branch
+<name>`, and run `atelier merge` with no ID. The same approval and merge
+checks apply; nothing is marked done. File a release's tag as a loose end on
+the release branch with no blocker, so it reaches the base with the merge.
+
+## Planning on the Base
+
+Commits that touch only records and the strategy files linked from missions
+(filing, grooming, decisions, strategy edits, marking loose ends done) may go
+on the base directly. So may the commit that installs Atelier, and one
+commit whose correctness is evident from its diff, such as a typo fix,
+exempted with `atelier review trivial --base <commit>` where repository
+policy allows it. Everything else goes through a branch and `atelier
+merge`. A non-trivial planning change is still reviewed before the work it
+defines starts (see [Independent Review](../SKILL.md#independent-review));
+the result that marks a loose end or validation done is an observation and
+needs no review. Brief the reviewer with the planning commits, and record
+the result with `atelier review approve` or `finding` against the issue, the
+mission (for a strategy), or the decision. Record the human's plan approval
+with `atelier review approve <mission> --identity <the human>`.
 
 ## Evidence
 
-- Record a receipt only for a check that leaves no other record: a manual,
-  browser, device or deployed check, a mission criterion, a measurement, or
-  a failure (including a test that fails before its fix). Suites, fmt and
-  lint that CI or the policy's `merge_checks` run need no receipt, and none
-  is re-recorded after a review fix or a base merge. Still run each check
-  fresh and read its output; the Close Reason names the targeted test or
-  check that proves each claim, with its result.
-- Use `atelier evidence record` with `--target`, `--kind`, and a summary.
-  Capture a command after `--` to pin current HEAD and derive the result from
-  the exit status. Manual receipts require an explicit `--result`.
-- A receipt that judges mission success criteria names each with its own
-  result: `--result fail --criterion pipe-safe=pass --criterion
-  quiet-tokens=fail` for manual proof, or a bare `--criterion <slug>` that
-  takes a captured command's result. A manual receipt's `--result` is the
-  receipt's overall result, and a `fail` blocks closing or merging its target
-  until a later pass, so it is `pass` only when every criterion it names
-  passes. Target the mission, or an item only that mission holds.
-  `evidence record` refuses a slug the mission does not define.
-  `atelier work mission <id>` marks each criterion proven, failing, or
-  unproven from the newest receipt in HEAD's history.
-- Every receipt names a full Git commit and one result; command capture
-  refuses uncommitted code. A fail blocks closing, landing and merging its
-  item until a pass is recorded after it, and that pass clears it for good,
-  even once later commits make the pass stale. Having no receipt is not a
-  gap.
-- Attach proof to the item it supports and name the producer, kind, summary,
-  artifacts, and limits. Use `atelier evidence attach` only to reuse valid
-  proof on another item. Correct earlier proof with a new receipt.
-- A Done when line marked `After merge (<reason>): ... Stand-in: ...` is
-  checked after the merge (see
-  [After-Merge Checks](tracker-records.md#after-merge-checks)); every other
-  line is checked on the branch. `atelier review request` lists each with its
-  reason and stand-in; `status`, `work all` and `work mission` list merged
-  work still awaiting validation; closing a mission with one open warns and
-  names it. Validate every check that can be validated now on the base by
-  ticking the line's box. Carry one with `carried to <id>` (an existing
-  issue) only when it failed, to the bug filed with `--discovered-from`, or
-  when it needs time and real use beyond the mission, and name each carried
-  check in the mission's close report.
-- `atelier evidence list <id>` shows an item's receipts, each marked fresh,
-  held at close, stale or superseded as the gates judge it, and ends with
-  its proof verdict; read it instead of searching `.atelier/evidence`.
+A receipt is an optional note for proof nothing else records: a manual,
+browser, device or deployed observation, a mission criterion, a
+measurement, or a failure such as a test that fails before its fix. No gate
+reads receipts. Suites, formatting and lint that CI or the merge checks run
+need none, and nothing is recorded again after a fix or a base merge; the
+Report names the targeted test that proves each claim.
 
-## Branches, Review, and Integration
+- `atelier evidence record --target <id> --kind <kind>` with a summary and
+  `--result`, or with a command after `--`, which pins HEAD and takes the
+  result from its exit status (it refuses uncommitted code).
+- A receipt that judges mission success criteria names each one:
+  `--criterion pipe-safe=pass`, or a bare `--criterion <slug>` that takes a
+  captured command's result. Target the mission, or an item only that
+  mission holds, such as its validation item. `atelier work mission <id>`
+  marks each criterion proven, failing or unproven from the newest receipt.
+- `atelier evidence list <id>` shows an item's receipts and their freshness.
 
-- Run `atelier start <id> --base <base>` from any checkout, or plain `atelier start <id>` from the base branch. It resolves the branch
-  owner (the parent, or a standalone issue), checks out or creates its work
-  branch (`<issue_type>/<owner-id>` by default), records the branch and its
-  base, and starts the item. The recorded base is never replaced. Children
-  share their parent's branch, and the parent closes only after every child
-  is terminal. Commit those record changes with the work. Missions and
-  decisions own no branch.
-- Planning changes need no work branch. Commits that touch only records and
-  the strategy files linked from missions (filing, grooming, decisions,
-  strategy edits) may go on the base branch directly, as may a trivial
-  change exempted with `atelier review trivial --base` (below); everything
-  else goes through a work branch and `atelier merge`. Landing directly is not an
-  exemption from review: a non-trivial planning change is reviewed before
-  the work it defines starts (see
-  [Independent Review](../SKILL.md#independent-review)). `atelier review
-  request` needs a started owner, so brief the reviewer with the planning
-  commits instead, and record the result with `atelier review approve` or
-  `finding` against the increment or issue, the mission for a strategy edit,
-  or the decision record itself. On the base branch Atelier cannot tell who authored the plan, so it
-  does not stop the planner accepting `defer` or `no_action` on findings
-  about its own plan; follow
-  [Finding Disposition](finding-disposition.md#who-decides) anyway.
-- Atelier creates no commits except the merge commit described below and,
-  when asked with `--commit-records` (or `--stage-records` to group several
-  commands), the records the command wrote. Commit records with the
-  implementation, and commit the done claim on the
-  work branch so it is reviewed with the code.
-- Record review against the branch owner with `atelier review record`,
-  `approve`, `finding`, and `trivial`, each with an explicit `--identity` and
-  summary. Approval must come from an identity other than the code's Git
-  authors. `trivial` is the visible form of the trivial-change exemption.
-  A trivial change can also be committed on the base and exempted there,
-  with no owner issue or work branch: `atelier review trivial --base
-  <commit>` covers exactly that commit.
-- Record each [finding disposition](finding-disposition.md) with
-  `atelier review disposition`. The disposition is a field of the finding,
-  with who set it and at which commit; setting it again replaces it, and the
-  Git history of the finding's file keeps earlier ones. `fix_now` needs a
-  later resolution commit and a fresh independent approval: that re-review
-  may cover only the fix's diff, and the reviewer who raised the finding may
-  do it. `defer` needs an existing follow-up issue. `defer` and `no_action`
-  must be set by a non-author identity: the author may propose one, and the
-  reviewer accepts it by setting it again.
-- File work found along the way with `atelier issue create
-  --discovered-from <item, finding or receipt id>`.
-- Material changes after approval (code, policy, acceptance, relationships)
-  make it stale. Adding evidence or review records, setting a finding's
-  disposition, and in-scope status changes do not.
-- Integrate only with `atelier merge`, never a plain `git merge` into the
-  base branch, which skips every gate. `atelier merge <id> --check` evaluates
-  the gates without integrating; `atelier merge <id>` integrates the
-  reviewed work and deletes the local work branch. Under
-  `branch_policy.merge_strategy: fast_forward_only` (the default unless
-  `merge_checks` include a `shell.check`) it fast-forwards the
-  base, so the branch must already contain it. Under `merge_commit` it
-  always creates a merge commit of the branch into the current base, runs the
-  policy's `merge_checks` on that merged tree, and moves the base to it only
-  when every gate passes, so a branch behind the base lands without a
-  catch-up merge when the merge is clean. Gates come from the base branch's
-  committed policy. Merge writes no records and does not push; pushing
-  follows repository policy.
-- Merge integrates only into the base branch named in
-  `.atelier/workflow.yaml`, so mission integration branches, isolated rewrite
-  branches, and stacked owner branches are not supported yet. See
-  [Atelier Limits](branches-and-worktrees.md#atelier-limits).
-- Before handoff, commit canonical records and run `atelier land`. On the
-  base branch it also refuses unpushed commits that are neither reviewed nor
-  records-only. Active work
-  may stay open with an honest handoff; done claims must satisfy their gates.
+## Orienting and Administration
 
-## Administration
-
-- `atelier init` installs Atelier in a repository. `atelier setup claude`
-  installs SessionStart and Stop hooks that run `status` and `land`.
-- `atelier check` validates every record and stops at the first structural
-  error. Repair canonical records through reviewed edits and rerun it.
-- `atelier prune` lists cleanup candidates; `atelier prune --apply` removes
-  them. Commit canonical deletions yourself. Git history keeps the audit
-  trail.
+- Start a session with `atelier status`. `atelier work ready`, `blocked`,
+  `active`, `all`, `missions`, `mission <id>` and `parent <id>`, and
+  `atelier issue show <id>`, give focused views. Work labelled `needs-human`
+  and open decisions are the human's (`atelier work human`); do not start
+  them. Records are branch-local: use Git history for past state.
+- Walk the human through a mission with `atelier brief <mission> --html`
+  before work starts and `atelier debrief <mission> --html` after it: link
+  the printed page, and record their direction as review records, decisions,
+  notes and issues.
+- `atelier init` installs Atelier; `atelier setup claude` installs hooks
+  that run `status` and `land`; `atelier doctor` judges every done item and
+  the whole review history; `atelier prune --apply` removes old records.
+- Atelier merges only into the policy's base branch (see
+  [Atelier Limits](branches-and-worktrees.md#atelier-limits)).
