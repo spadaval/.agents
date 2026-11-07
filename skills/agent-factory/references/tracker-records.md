@@ -97,9 +97,10 @@ particular machine, with the `needs-human` label so agents do not pick it up.
 
 Close Reason is written when the item closes. Its first paragraph is the
 Outcome: one or two sentences giving the observable result against Done
-when, or for `supersede` why the work will not happen. Test names,
-measurements, and review status go in evidence receipts, review records, or
-the handoff note, not in Close Reason.
+when, or for `supersede` why the work will not happen. After it, name the
+targeted test or check that proves each claim, with its result.
+Measurements and review status go in evidence receipts, review records, or
+the handoff note.
 
 Close Reason also carries the implementer report: what a reviewer of the
 finished mission needs that the diff and the proof do not show. Repository
@@ -226,10 +227,14 @@ and records together.
 
 ## Evidence
 
-Record evidence in the tracker when later work or a later agent will rely on
-it: increment or mission acceptance, independent validation, migrations, and
-non-pass results. For ordinary slices, proof in the handoff is enough unless
-the repository's merge policy requires a receipt.
+Record a receipt only for a check that leaves no other record: a manual,
+browser, device or deployed check (a page at phone width, a real build host,
+a live service), a mission criterion, independent validation, a measurement,
+or a failure, including a test that fails before its fix. Suites, fmt and
+lint that CI or the repository's merge checks run need no receipt, and
+nothing is re-recorded after a review fix or a base merge; the Close Reason
+names the targeted test or check that proves each claim. Record one anyway
+when the repository's merge policy requires a receipt.
 
 A receipt states the claim, the check, the result, the commit, and links to
 transcripts or artifacts. Use this vocabulary verbatim so evidence stays
