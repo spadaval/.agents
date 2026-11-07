@@ -3,13 +3,13 @@
 Use this subskill to run a mission, an increment, or any workstream with several
 pieces. The orchestrator is accountable for the outcome. It decides what
 happens next, delegates or does the work, integrates results, keeps the plan
-current, and closes against demonstrated outcomes.
+current, and closes a mission against demonstrated outcomes.
 
 ## Before Starting
 
 Know the outcome you are driving toward and what governs it: the strategic
-plan for a mission, or the issue or user request for smaller work. Check the
-workspace state and a representative baseline before any mutating work (see
+plan for a mission, or the issue or user request for smaller work. Look at the
+workspace state and run a representative baseline before any mutating work (see
 [Branches and Worktrees](../references/branches-and-worktrees.md)). If a substantial
 mission has no agreed outcome or strategy, run `plan` first.
 
@@ -44,7 +44,9 @@ it and what it can pull from the repository. Include:
   artifacts by path or ID instead of pasting them.
 - **Scope:** what it may change, and what it must leave alone.
 - **Workspace:** the branch to work on, which you create or choose, and a
-  worktree only if it must write at the same time as another agent.
+  worktree only if it must write at the same time as another agent. With
+  Atelier, start the item on that branch (`atelier start <id>`) or tell the
+  assignee to.
   Read-only roles get none. Tell it to preserve changes it did not make and
   to list anything it creates in its handoff.
 - **Proof expected:** the observable result that would show the goal is met.
@@ -60,7 +62,7 @@ For spikes or competing implementations, add the candidate fields from
 ## Review and Validation
 
 You arrange review. Every non-trivial change, including your own plans and
-code, gets an independent reviewer before it counts as done (see
+code, gets an independent reviewer before it merges or its work starts (see
 [Independent Review](../SKILL.md#independent-review)). Batch reviews per
 slice, per PR, or per increment, whichever keeps the diff reviewable. You have
 read the author's handoff, so you are not an independent reviewer of its
@@ -70,9 +72,13 @@ When dispatching a reviewer or validator:
 
 - Give it the diff or scenario, the governing requirements and constraints
   quoted exactly, and the proof that was run. In Atelier,
-  `atelier review request <id>` prints this brief from the records. Tell the
-  reviewer to report in [`review`](review.md#output)'s format, which governs
-  where the brief asks for another.
+  `atelier review request <id>` prints this brief from the records once every
+  Done when line is ticked and the Report is written; it leaves out the
+  Report, so add the proof that ran (commands and results, not the author's
+  assessment). Tell the reviewer to
+  report in [`review`](review.md#output)'s format, which governs where the
+  brief asks for another, and to record its findings and approval under its
+  own identity.
 - Do not pass along the author's rationale or self-assessment.
 - Do not pre-judge its work: do not tell it to ignore a class of findings,
   limit its recommendations, or treat any content as beyond challenge. If two
@@ -86,52 +92,38 @@ work (see
 [Finding Disposition](../references/finding-disposition.md#who-decides)). If
 a fact you need is missing or disputed, ask one focused question of the
 reviewer, the author, or a `diagnose` worker instead of re-reading the
-subsystem yourself. Record each disposition (see
+subsystem yourself. A `FIX NOW` finding goes back to the author and its fix
+to a reviewer; the approval after the fix resolves it. Record a disposition
+for each finding you defer or dismiss (see
 [Finding Disposition](../references/finding-disposition.md#recording)).
 
 Use an independent `validate` assignment for mission acceptance, for increments
 that change a user-facing or cross-boundary outcome, and for scenarios where
-deciding what to check needs an independent eye. Otherwise, author-run proof
+deciding what to test needs an independent eye. Otherwise, author-run proof
 is sufficient evidence of behavior.
 
 ## Integrating Results
 
-Treat a returned implementation as a candidate until you have checked it.
+Treat a returned implementation as a candidate until you have verified it.
 Passing tests show behavior, not construction quality. Before integrating,
 confirm the proof is fresh and exercises the claim and that the change fits
-the strategy. Unreviewed work may be integrated into a working or mission
-branch while its review is pending, but it does not reach the default or
-protected branch until review is done. When a candidate works but is
+the strategy. Unreviewed work may sit on a working branch while its review
+is pending, but it does not reach the default or protected branch until it
+has been reviewed. When a candidate works but is
 built wrong, decide whether to refactor, reimplement, or discard it using
 [Implementation Candidates](../references/implementation-candidates.md).
 
-### Landing Parallel Branches
+### Merging Parallel Branches
 
-When several branches wait to land, the base moves under the others each time
-one lands. Bringing the base into every waiting branch after each landing
-multiplies catch-up merges and reviews of conflict resolutions, and none of
-that work is needed until a branch is next to land.
-
-- Review a branch when its work is done. Leave waiting branches alone when
-  the base moves.
-- When a branch is next to land:
-  1. merge the base into it once;
-  2. regenerate generated files, such as lockfiles, in that same step;
-  3. get the merge reviewed if its result differs from Git's own merge,
-     because it needed resolving or regenerating anything;
-  4. then integrate it (with Atelier, `atelier merge`).
-
-  CI or the merge checks test the merged tree, so a base merge records no
-  new proof. A repository without CI puts its suite in the merge checks.
-  When the integration step itself creates and checks the merged tree
-  (Atelier under `merge_strategy: merge_commit`), a branch that merges
-  cleanly can skip merging the base in. Follow the steps above when the
-  merge conflicts, a merge check fails on the merged tree (such as a stale
-  lockfile), or merge refuses because the base changed records about the
-  item.
-- Check generated files mechanically. Put consistency checks in required
-  proof or in the base policy's merge checks, so a merge that leaves a
-  generated file broken fails a check before a reviewer has to notice it.
+When several branches wait to merge, the base moves under the others each
+time one merges. Leave waiting branches alone: review a branch when its work
+is finished, and bring the base in only when Atelier says to (see
+[Atelier](../references/atelier.md#what-makes-an-approval-stale)) or a merge
+check fails on the merged tree, such as a stale lockfile. Then merge the base
+in once, regenerate generated files in that same step, and get the result
+reviewed if it differs from Git's own merge. A base merge records no new
+proof. A repository without CI puts its suite in the merge checks, so a
+broken merged tree fails before a reviewer has to notice it.
 
 ## Keeping the Plan Current
 
@@ -164,29 +156,30 @@ history to make the new route look inevitable.
 When you take up low-priority follow-ups, such as deferred review findings,
 batch them instead of running each through its own branch and review. Make
 them children of one parent increment: they share the parent's branch, each
-keeps its own Done when and proof and closes there, and one independent
-review of the branch, approved on the parent, covers them all. In Atelier,
-the children `atelier start` onto the parent's branch, and `atelier review
-request <parent>` briefs every child's Done when.
+keeps its own Done when and proof, one independent review of the branch,
+approved on the parent, covers them all, and one merge marks them all done.
+In Atelier, the children `atelier start` onto the parent's branch, and
+`atelier review request <parent>` briefs every started child's Done when.
 
-## Closeout
+## Closing a Mission
 
-Close against demonstrated outcomes, not issue count:
+A mission closes when all its work is merged and its validation items, if
+any, are done. Close against demonstrated outcomes, not issue count:
 
 1. Run the proof for each acceptance claim fresh, with independent validation
-   where the scaling rules call for it. Validate every open
-   [after-merge check](../references/tracker-records.md#after-merge-checks)
-   of the mission's merged items that can be validated now. Carry one only
-   when it failed, to its follow-up bug, or when it needs time and real use
-   beyond the mission, and name each carried check in the mission's close
-   report.
+   where the scaling rules call for it.
 2. Confirm all non-trivial changes have been independently reviewed.
 3. Confirm no debug residue, temporary breakage, or orphaned paths remain,
    and that branches and worktrees created for the work are removed or
    archived.
-4. Update the docs and tracker items or plan file the work affected.
+4. Confirm that work only possible after a merge or release, other than
+   validation items, is filed as
+   [loose ends](../references/atelier.md#loose-ends), outside the mission,
+   and update the docs and tracker items or plan file the work affected.
+5. Close it: `atelier issue transition <mission> close --reason
+   "<report>"`, then walk the human through `atelier debrief <mission>`.
 
-In the handoff, also report delivered and deferred outcomes, plan changes,
-paused questions, and workspace state, including every branch and worktree
-created during the work and whether it was removed, archived, or kept (and
-why).
+In the handoff, also report delivered and deferred outcomes, open loose ends,
+plan changes, paused questions, and workspace state, including every branch
+and worktree created during the work and whether it was removed, archived, or
+kept (and why).

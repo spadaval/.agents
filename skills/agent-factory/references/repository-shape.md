@@ -54,7 +54,7 @@ When a repository is large enough to split these concerns, typical homes are:
 | Product behavior and public contracts | `docs/product/` or equivalent |
 | Architecture: boundaries, ownership, dependency direction | `docs/architecture/` or equivalent |
 | Decisions and rationale | Atelier `decision` records, or `docs/adr/` without Atelier |
-| Standards and how claims are checked | Contributing, quality, or testing docs |
+| Standards and how claims are proven | Contributing, quality, or testing docs |
 
 Split a document when it starts serving conflicting audiences. Product docs
 say what users can expect, architecture docs say how the system is

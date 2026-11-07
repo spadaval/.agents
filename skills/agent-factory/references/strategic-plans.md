@@ -17,7 +17,7 @@ unless the repository's agent instructions name another place. Link the
 mission to the file with its strategy path; that link is canonical, so the
 strategy does not need to name the mission. Strategy edits are planning
 changes and may be committed to the base branch directly (see
-[Atelier](atelier.md#branches-review-and-integration)).
+[Atelier](atelier.md#planning-on-the-base)).
 
 ## Size and Altitude
 
@@ -58,7 +58,7 @@ Note any partial outcome that would still be worth shipping.
 
 # Success Criteria
 Optional. Claims about the whole mission that no single item proves and that
-the mission's work can make true and check at close (see
+the mission's work can make true and verify at close (see
 [Shaping a Mission](../procedures/plan.md#shaping-a-mission)). Observable
 claims, one `- <slug>: <claim>` bullet each, with a short
 kebab-case slug that names the claim (`- pipe-safe: ...`); older strategies
@@ -158,4 +158,4 @@ plan each one when evidence justifies it. See
 [Tracker Records](tracker-records.md) for what each record contains.
 
 Close the mission against its outcome and any success criteria, not the
-number of issues closed.
+number of issues done.

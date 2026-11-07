@@ -1,7 +1,7 @@
 # Review
 
 Use this subskill to review a diff, PR, or other change that someone else
-produced. You are the independent check the author cannot provide for
+produced. You are the independent review the author cannot provide for
 themselves. Review asks whether the change is correct, well built, and backed
 by real evidence. It does not re-run acceptance scenarios; that is `validate`.
 
@@ -14,28 +14,29 @@ by real evidence. It does not re-run acceptance scenarios; that is `validate`.
   surrounding code, docs, and ADRs to judge it. For non-trivial code, use
   [Good Code](../references/good-code.md).
 - Stay read-only unless you were asked to fix things. Recording your
-  findings and approval as review events under your own identity is part of
-  the review, not a change to the work.
+  findings and approval as review records under your own identity is part of
+  the review, not a change to the work. Approve only when no finding you
+  would recommend `FIX NOW` is open, unless the accountable agent deferred or
+  dismissed it; reviewing a fix may cover only its diff.
 - Report every finding you can support, ordered by impact. Cite files and
   lines, and give a failure scenario where one exists.
 - Ignore formatting and style preferences unless they break an explicit
   project standard.
 
-## What to Check
+## What to Look For
 
 Work through two questions in order. An elegant construction does not excuse
 a contract miss.
 
 1. **Does it do what it was supposed to?** Compare it against the assigned
    outcome, constraints, interfaces, and non-scope. Look for missed
-   requirements, unrequested additions, regressions, and edge cases. Check
+   requirements, unrequested additions, regressions, and edge cases. Confirm
    that the proof actually exercises the claims: are tests meaningful, could
-   they fail, and were they run after the final change? A Done when check
-   marked to run after merge must need the deployed or merged system, a
-   device or place no agent can reach, the human's judgment, or time and
-   real use, and its stand-in must run before merge. Record a finding for any
-   that could be checked before merge, or that lacks a reason or a stand-in.
-2. **Is it fit to integrate?** Check ownership and boundaries, duplicate
+   they fail, and were they run after the final change? Each ticked Done when
+   line must hold now. A line narrowed after the start (the review brief
+   shows it) needs a reason the plan accepts. Work that could only happen after the
+   merge belongs in a loose end, not in a ticked line.
+2. **Is it fit to integrate?** Look at ownership and boundaries, duplicate
    sources of truth, error handling, security, data integrity, concurrency,
    leftover residue, and stale docs.
 
@@ -68,7 +69,7 @@ Findings
   Recommendation: FIX NOW | DEFER | NO ACTION, with a reason.
 
 Open questions
-Residual risk and checks not run
+Residual risk and tests not run
 ```
 
 Your recommendations are advice. The accountable agent decides using

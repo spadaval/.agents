@@ -9,7 +9,7 @@ symptom disappear is not a diagnosis.
 
 1. **Pin down the symptom.** State the observed behavior, the expected
    behavior, and the impact. Read the complete error, trace, and logs, and
-   check recent changes.
+   recent changes.
 2. **Reproduce it.** Get a consistent failing reproduction, such as a test,
    script, or command. If you cannot, report what evidence is missing rather
    than guessing.

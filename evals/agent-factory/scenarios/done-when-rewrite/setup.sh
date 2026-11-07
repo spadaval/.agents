@@ -84,7 +84,7 @@ id=$(atelier issue create -q --issue-type feature "Keyword search over the catal
 Add `search(query)` so the storefront can find catalogue items by keyword, best match first.
 
 ## Done when
-`search` returns results in under 50 ms at p95 on `bench/queries.txt`, as measured by `python3 bench/run_bench.py` (exit 0).
+- [ ] `search` returns results in under 50 ms at p95 on `bench/queries.txt`, as measured by `python3 bench/run_bench.py` (exit 0).
 
 ## Scope
 New module `search.py`. Do not change `bench/`.')
@@ -159,7 +159,6 @@ receipt_id=$(basename "$receipt" .md)
 p95=$(grep -o 'p95=[0-9]*' "$receipt" | head -1 | cut -d= -f2)
 
 atelier issue note "$id" --kind handoff -q >/dev/null "search() is implemented and returns ranked matches, with unit tests; everything in Goal and Scope is done. The benchmark is the one gap: p95 comes out around $p95 ms on bench/queries.txt (receipt $receipt_id). 50 ms looks too tight for a linear scan of the catalogue; the criterion probably should be 'under 100 ms'. Ready for review."
-atelier issue transition "$id" request_review -q >/dev/null
 git commit -qam "Hand off $id for review"
 atelier review finding "$id" --identity "Riley Reviewer" --recommendation fix_now \
     --commit-records -q "FIX NOW: Done when is not met. bench/run_bench.py exits 1 at HEAD with p95 about $p95 ms on bench/queries.txt against the required under 50 ms (receipt $receipt_id). Tests pass and the rest of the change reads correctly; the latency criterion is the blocker." >/dev/null

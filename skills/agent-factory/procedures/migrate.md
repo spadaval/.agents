@@ -34,7 +34,7 @@ both shapes or backfill, switch reads, then drop the old shape.
 when the new design shares little with the old one and keeping things working
 during construction would cost more than it teaches. Build on the mission's
 integration branch, or on one dedicated branch if there is no mission. Things
-may be broken there until the rewrite lands, while the default branch stays
+may be broken there until the rewrite merges, while the default branch stays
 green the whole time. Record the choice and the reason in the plan, and merge only when the
 rewrite is complete and reviewed. Atelier's gated merge does not support a
 separate rewrite or integration branch yet (see

@@ -17,8 +17,8 @@ reason from the Constitution.
 ## Core Rules
 
 - **Prove claims with fresh evidence.** Before saying something works, is
-  fixed, or is done, run the check that proves that specific claim after your
-  last relevant change, and read its full output. A green suite that never
+  fixed, or is finished, run the check that proves that specific claim after
+  your last relevant change, and read its full output. A green suite that never
   exercises the claim, an earlier run, or another agent's report is not proof.
 - **Get non-trivial changes reviewed by someone other than their author.**
   Authors verify their own work by running it, but they do not review it. See
@@ -30,7 +30,7 @@ reason from the Constitution.
   component, abstraction, option, or fallback must serve a current need. Remove
   temporary code, obsolete paths, and shims unless compatibility is the
   explicit goal.
-- **Keep the default branch working and the repository tidy.** Land breaking
+- **Keep the default branch working and the repository tidy.** Merge breaking
   changes without breaking the default branch (see `migrate`). Create as few
   branches and worktrees as the work needs, and remove the ones created for
   your work once it is merged or recorded (see
@@ -70,11 +70,11 @@ skill says "create an issue", that fallback applies.
 ## Independent Review
 
 Every non-trivial change is reviewed by someone other than its author before
-it is considered done. That reviewer can be another agent or a human who did
+it merges. That reviewer can be another agent or a human who did
 not write it. Review may be batched per slice, per PR, or per integrated
 increment. An unreviewed change may sit on a working branch, but it does not
 merge into the repository's default or protected branch, a PR is not marked
-ready, and a mission does not close until review has happened.
+ready, and a mission does not close until its changes have been reviewed.
 
 - **What it covers:** anything committed to the repository: code, tests,
   configuration, schemas and data migrations, build and CI definitions,
@@ -84,17 +84,19 @@ ready, and a mission does not close until review has happened.
   catch its errors.
 - **Trivial changes are exempt:** changes whose correctness is fully evident
   from the diff. Examples are typo fixes, formatting, tool-driven renames,
-  status changes that add no content (such as start or defer), and
+  status changes that add no content (such as start or the backlog `defer`),
+  and
   patch-level dependency bumps with passing checks.
   Rewording a document is not trivial, because it changes what readers do. If
   you have to think about whether a change is trivial, it is not.
-- **Planning records:** records and strategy files may land on the base
-  branch before review, so that planning is visible to every branch (see
-  [Atelier](references/atelier.md#branches-review-and-integration)). A
-  non-trivial one is reviewed before the work it defines starts. Where a
-  human holds authority over the content, such as success criteria or a
-  decision, their approval covers its substance, so findings about the
-  substance go to them.
+- **Planning records:** records and strategy files may be committed on the
+  base branch before review, so that planning is visible from the base (see
+  [Atelier](references/atelier.md#planning-on-the-base)). A non-trivial one
+  is reviewed before the work it defines starts. The result that marks a
+  loose end or validation done is an observation, not a plan, and needs no
+  review. Where a human holds authority over the content, such as success
+  criteria or a decision, their approval covers its substance, so findings
+  about the substance go to them.
 - **Who reviews:** someone who did not write the change and does not carry
   the author's reasoning. A fresh subagent qualifies. A different model is a
   bonus, not a requirement. An orchestrator that has read the author's
@@ -107,8 +109,8 @@ ready, and a mission does not close until review has happened.
   the proof that was run. Do not give it the author's justifications or
   self-assessment; they carry the bias the review exists to avoid.
 - **Changes after review:** any non-trivial change made after review, whether
-  a fix to a finding, a new commit, or a conflict resolution, gets reviewed
-  too. The reviewer does not have to be the same one.
+  a fix to a finding, a new commit, a conflict resolution, or a rewritten
+  requirement in a tracker record, gets reviewed too. The reviewer does not have to be the same one.
 - **Disagreement:** an author who disputes a finding answers with a fact
   or a test, never with confidence or schedule, and someone other than the
   author weighs it (see
@@ -117,15 +119,16 @@ ready, and a mission does not close until review has happened.
   a draft PR, or as uncommitted edits), mark review as outstanding in the
   handoff, and tell the user plainly. Ask them to review it or arrange review.
   An earlier instruction to merge does not waive review. If the user, knowing
-  the change is unreviewed, still directs a merge, comply and record the
-  review as an open follow-up so it still happens. Never describe self-review
+  the change is unreviewed, still directs a merge, comply unless repository
+  policy forbids it (then say so), and record the review as an open
+  follow-up so it still happens. Never describe self-review
   as review.
 
 Validation is different. Running tests and scenarios is impartial evidence,
-and authors should do it themselves. The reviewer checks that the proof really
-exercises the claim. Use a separate `validate` assignment when a scenario is
-expensive or ambiguous enough that the choice of what to check needs an
-independent eye, and for the acceptance points in the scaling table above.
+and authors should do it themselves. The reviewer confirms that the proof
+really exercises the claim. Use a separate `validate` assignment when a
+scenario is expensive or ambiguous enough that the choice of what to test
+needs an independent eye, and for the acceptance points in the scaling table above.
 
 ## Handoff
 
@@ -141,23 +144,23 @@ Every assignment ends with a handoff. It contains:
    blockers, and recommended follow-up.
 
 Subskills name any additional fields they need. Leave out fields that do not
-apply. When the assignment closes a tracker item, the outcome, deviations,
-surprises, and open items go in its Close Reason as the implementer report,
-and decisions go in decision notes or records; the handoff points at them
-instead of repeating them (see
-[Tracker Records](references/tracker-records.md#close-reason-and-the-implementer-report)).
+apply. When the assignment finishes a tracker item, the outcome, deviations,
+surprises, and open items go in its Report, written before review is
+requested, and decisions go in decision notes or records; the handoff points
+at them instead of repeating them (see
+[Tracker Records](references/tracker-records.md#report)).
 
 ## Subskills
 
 | Subskill | Use for | Procedure |
 | --- | --- | --- |
-| `orchestrate` | Running a mission, increment, or multi-item workstream: delegating, integrating, replanning, closing | [orchestrate.md](procedures/orchestrate.md) |
+| `orchestrate` | Running a mission, increment, or multi-item workstream: delegating, integrating, replanning, closing a mission | [orchestrate.md](procedures/orchestrate.md) |
 | `plan` | Creating or revising strategy, and shaping increments and issues for new work | [plan.md](procedures/plan.md) |
 | `decide` | A consequential product or architecture choice with several credible paths | [decide.md](procedures/decide.md) |
 | `implement` | Building one bounded slice with proof | [implement.md](procedures/implement.md) |
 | `diagnose` | Finding the cause of a bug, failing check, regression, or unexplained behavior | [diagnose.md](procedures/diagnose.md) |
 | `review` | Independent review of code or other changes someone else produced | [review.md](procedures/review.md) |
-| `validate` | Independently checking scenarios or acceptance claims | [validate.md](procedures/validate.md) |
+| `validate` | Independently testing scenarios or acceptance claims | [validate.md](procedures/validate.md) |
 | `migrate` | Breaking changes: choosing atomic, expand-and-contract, or rewrite, and removing the old path | [migrate.md](procedures/migrate.md) |
 | `docs` | Work where documentation accuracy is the main deliverable | [docs.md](procedures/docs.md) |
 | `audit` | Evidence-backed findings about architecture or process, without fixing them | [audit.md](procedures/audit.md) |
@@ -180,9 +183,9 @@ Load these only when the work needs them.
 | [Strategic plans](references/strategic-plans.md) | Writing or changing a mission strategy |
 | [Submodel selection](references/submodel-selection.md) | Choosing models and reasoning effort for subagents |
 | [Branches and worktrees](references/branches-and-worktrees.md) | Deciding where to work, creating or cleaning up branches and worktrees, integrating |
-| [Tracker records](references/tracker-records.md) | Writing missions, increments, issues, validation items, decisions, evidence, or handoff notes |
+| [Tracker records](references/tracker-records.md) | Writing missions, increments, issues, loose ends, validation items, decisions, evidence, or handoff notes |
 | [Repository shape](references/repository-shape.md) | Installing Agent Factory or assessing repository readiness |
-| [Atelier](references/atelier.md) | Operating the tracker: orienting, records, evidence, review, and integration |
+| [Atelier](references/atelier.md) | Operating the tracker: the order of steps for an issue, records, loose ends, review, and merge |
 
 Maintainers changing this skill should read
 [maintainers/skill-evaluation.md](maintainers/skill-evaluation.md) first.

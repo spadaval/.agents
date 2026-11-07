@@ -11,7 +11,7 @@ or operability without designing or implementing fixes.
 - Look especially for half-finished work: old and new paths coexisting with no
   clear boundary, docs describing a target the code does not enforce,
   migrations that reached only some call sites, tests that preserve stale
-  assumptions, and tracker items closed while dependent cleanup has no owner.
+  assumptions, and tracker items done while dependent cleanup has no owner.
 - Suggest a fix only when it is obvious. Otherwise say what kind of work
   should follow.
 

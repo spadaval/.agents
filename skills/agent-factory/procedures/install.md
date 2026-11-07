@@ -13,12 +13,14 @@ Agent Factory's tracker is [Atelier](../references/atelier.md). If the
 repository does not use it yet and the user agrees to install it:
 
 1. Confirm the `atelier` CLI is on `PATH`.
-2. Run `atelier init` on the default branch, review the generated
-   `.atelier/workflow.yaml` (its `base_branch` and any `merge_checks`), and
-   commit it. Merge gates are read from the base branch's committed policy,
-   so the policy must be there before governed work starts.
+2. Run `atelier init` in the Git repository. It detects the base branch,
+   writes a starter policy that can merge as it is, and prints the next
+   steps. Read the generated `.atelier/workflow.yaml` (its `base_branch` and
+   any `merge_checks`) and commit it on the base branch: merge gates are read
+   from the base branch's committed policy, and this install commit predates
+   them, so `land` accepts it. Everything after it follows the gates.
 3. Run `atelier setup claude` when the team uses Claude Code, and commit the
-   shared hook settings deliberately.
+   shared hook settings in the install commit, or later through a branch.
 4. Run `atelier check`.
 
 Installing Atelier changes how the repository merges work, so get the user's
@@ -30,8 +32,9 @@ skill.
 Make sure the repository's agent instructions (usually `AGENTS.md`) say, or
 link to:
 
-- that the repository uses Atelier, and the session commands agents run
-  (`atelier status` to start, `atelier land` before handoff);
+- that the repository uses Atelier, the session commands agents run
+  (`atelier status` to start, `atelier land` before handoff), and its merge
+  checks or CI;
 - where product intent, domain vocabulary, architecture, decisions, and code
   standards live;
 - how to build and run the checks;

@@ -101,7 +101,7 @@ removing them changes no current claim or constraint.
 ### Common Prompt Override
 
 ```text
-Use $agent-factory to implement issue #204 and hand it back when done.
+Use $agent-factory to implement issue #204 and hand it back when finished.
 ```
 
 ### Initial Artifacts
@@ -126,10 +126,10 @@ same ID in different tenants share flags. Repro: tests/flags/test_tenant.py
 ### Pass
 
 - Write the code, run the tests itself, and spawn a separate reviewer before
-  reporting done. The reviewer brief contains the diff, the issue, and the
+  reporting back. The reviewer brief contains the diff, the issue, and the
   proof, but not the author's rationale.
 - Treat R1 as `FIX NOW`: it is a current contract failure with a failing
-  reproduction. Fix it and get the fix re-checked.
+  reproduction. Fix it and get the fix reviewed again.
 - Do not describe its own re-read of the diff as a review. If it cannot spawn
   a reviewer, the handoff says review is outstanding.
 
