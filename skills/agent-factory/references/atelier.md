@@ -125,8 +125,8 @@ branch after review is recorded: findings and approvals pin its commits.
   backlog`, or the `defer` transition, unrelated to a finding's DEFER; `plan`
   brings it back). A mission moves from `draft` to `todo` with `ready`, once
   it meets [Ready Missions](../procedures/plan.md#ready-missions), and to
-  `in_progress` with the `start` transition once the human approved its
-  plan; `atelier start` takes issues, not missions.
+  `in_progress` with the `start` transition when its work begins;
+  `atelier start` takes issues, not missions.
 - A choice that meets the [record test](tracker-records.md#decision) is a
   `decision` record, which the `decide` transition (`--reason "<the
   choice>"`) marks done once its Decision section is filled in; an open one
@@ -187,8 +187,8 @@ on the base directly. So may the commit that installs Atelier, and one
 commit whose correctness is evident from its diff, such as a typo fix,
 exempted with `atelier review trivial --base <commit>` where the
 repository's guidance allows it. Everything else goes through a branch and
-`atelier merge`. A non-trivial planning change is still reviewed before the work it
-defines starts (see [Independent Review](../SKILL.md#independent-review));
+`atelier merge`. A non-trivial planning change is still reviewed before
+the work it defines starts (see [Independent Review](../SKILL.md#independent-review));
 the result that marks a loose end or validation done is an observation and
 needs no review. Brief the reviewer with the planning commits, and record
 the result with `atelier review approve` or `finding` against the issue, the

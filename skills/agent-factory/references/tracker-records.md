@@ -218,10 +218,9 @@ decision record holds the question and the decision, and docs link to it,
 or to the ADR it produced, instead of restating its rationale. Where the
 repository keeps ADRs, a decision record may also produce one, a document
 such as `docs/adr/<n>.md` written for readers of the code; the record names
-it with `atelier issue update <id> --adr <path>`. A changed decision gets a new record linked to
-the old one with `atelier issue link <new> <old> --role supersedes`; a decided record cannot
-take the `supersede` transition (see
-[`decide`](../procedures/decide.md#authority-and-recording)).
+it with `atelier issue update <id> --adr <path>`. A changed decision gets a
+new record linked to the old one with `atelier issue link <new> <old> --role
+supersedes`; a decided record cannot take the `supersede` transition.
 
 ### Decision Notes
 
