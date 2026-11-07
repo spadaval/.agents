@@ -76,6 +76,8 @@ Before the close transition, record decisions you made as decision notes or
 records (see [Tracker Records](../references/tracker-records.md#decision-notes)), and
 write the implementer report in the item's Close Reason (see
 [Close Reason](../references/tracker-records.md#close-reason-and-the-implementer-report)).
+Its Open items name the item's open after-merge checks, each with its reason
+and the stand-in you ran.
 Also report the branch or commit, and any branch or worktree you created and
 its cleanup state. For
 an implementation candidate, report observed behavior, design concerns, and

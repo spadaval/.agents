@@ -116,9 +116,12 @@ change, with no reviewer identity: run the check, record its receipt, tick
 the box (`- [x] After merge ...`) and commit the record. If it fails, do not
 reopen the merged item: file a follow-up bug with `atelier issue create
 --discovered-from <item>`, and add `carried to <bug>` to the line, so the bug
-holds the check from then on. Atelier shows done work with an open
-after-merge check as awaiting validation and warns when its mission closes,
-but nothing refuses.
+holds the check from then on. Validate every check that can be validated
+now. Carry a check only when it failed, to its follow-up bug, or when it
+needs time and real use beyond the mission, and name each carried check in
+the mission's close report so the human sees it. Atelier shows done work
+with an open after-merge check as awaiting validation and warns when its
+mission closes, but nothing refuses.
 
 ### Close Reason and the Implementer Report
 
@@ -151,7 +154,9 @@ records rather than repeating them. `None.` if none.>
 
 ### Open items
 <What is left: follow-ups with their issue IDs, plus unverified claims,
-risks, skipped checks with reasons, and blockers. `None.` if none.>
+risks, skipped checks with reasons, blockers, and the item's open
+[after-merge checks](#after-merge-checks), each with its reason and the
+stand-in that ran. `None.` if none.>
 ```
 
 Write it in the record body, or in a file passed with `--reason-file`, then
