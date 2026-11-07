@@ -157,10 +157,12 @@ planning like any other: commit it straight to the base and have it
 reviewed as a planning change, recorded against the loose end (see
 [Planning on the Base](#planning-on-the-base)), even while the issue it
 waits on is in flight. The link is stored on the loose end, so the
-in-flight issue's record is not touched. It is never another issue's
-child and never advances a mission, so it never holds one open. Whatever
-part of it can run before merge, such as an emulator test, stays a Done when
-line of the item.
+in-flight issue's record is not touched. Leave the in-flight issue's own
+record alone on the base; rewrite or drop the Done when line the loose end
+replaces on its work branch, where the review brief shows the edit. It is
+never another issue's child and never advances a mission, so it never holds
+one open. Whatever part of it can run before merge, such as an emulator
+test, stays a Done when line of the item.
 
 Doing a loose end takes no branch, review or merge. Once what it waits on is
 merged, do it on the base, tick its line if it held, and mark it done with
