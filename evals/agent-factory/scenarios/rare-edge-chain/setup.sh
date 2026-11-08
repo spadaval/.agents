@@ -82,7 +82,7 @@ s = s.rstrip() + """
 
 ## Report
 
-Done when holds: `test_after_a_clock_correction_and_a_restart_the_log_being_written_is_followed` fails before the change and passes after; `test_an_older_log_appended_with_old_lines_is_not_taken` guards the boundary. `follower.py` adds `being_written` (last line stamped within FRESH_LINE_SECS): `poll` switches to the newest log if it is being written, or by header order only if the followed log is not being written, and `catch_up` keeps the newest by mtime when it is being written. `python3 -m unittest`: 6 tests pass.
+Done when holds: `test_after_a_clock_correction_and_a_restart_the_log_being_written_is_followed` fails before the change and passes after; `test_an_older_log_appended_with_old_lines_is_not_taken` guards the boundary. `follower.py` adds `being_written` (last line stamped within FRESH_LINE_SECS): `poll` switches to the newest log if it is being written later than the followed one, or by header order only if the followed log is not being written, and `catch_up` keeps the newest by mtime when it is being written later than the latest by name. `python3 -m unittest`: 6 tests pass.
 """
 open(p, "w").write(s)
 PY

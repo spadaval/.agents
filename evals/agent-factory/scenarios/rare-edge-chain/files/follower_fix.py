@@ -56,6 +56,12 @@ def being_written(path, now):
     return t is not None and abs(now - t) <= FRESH_LINE_SECS
 
 
+def written_later(a, b):
+    """Whether log a's last line is later than log b's, or b has none."""
+    ta, tb = last_line_time(a), last_line_time(b)
+    return ta is not None and (tb is None or ta > tb)
+
+
 def begins_before(a, b):
     """Whether log a began more than SWITCH_SECS before log b, by header."""
     ta, tb = header_time(a), header_time(b)
@@ -86,7 +92,7 @@ class Follower:
         if newest is None:
             return []
         chosen = newest
-        if being_written(newest, self.clock()):
+        if being_written(newest, self.clock()) and (latest is None or written_later(newest, latest)):
             pass  # the game is writing it, whatever its header says
         elif latest is not None and latest != newest and begins_before(newest, latest):
             chosen = latest
@@ -95,12 +101,12 @@ class Follower:
 
     def poll(self):
         """Fresh lines from the followed log, after switching to the newest log
-        if the game is writing it, or by header order if the game is not
-        writing the followed one."""
+        if the game is writing it later than the followed one, or by header
+        order if the game is not writing the followed one."""
         now = self.clock()
         newest = self.newest_by_mtime()
         if newest is not None and newest != self.path and header_time(newest) is not None:
-            if being_written(newest, now):
+            if being_written(newest, now) and (self.path is None or written_later(newest, self.path)):
                 self.path = newest
             elif self.path is None or (not being_written(self.path, now)
                                        and not begins_before(newest, self.path)):
