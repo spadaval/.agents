@@ -1,3 +1,5 @@
+> Frozen: Agent Factory moved to spadaval/atelier (`skills/agent-factory`); edit it there. This copy is deleted by `atelier-6oxt`.
+
 # Skill Evaluation
 
 This is maintainer guidance for changing Agent Factory. Runtime agents do not
