@@ -92,5 +92,5 @@ is `procedures/<name>.md`: `orchestrate` (run a mission or workstream), `plan`
 (shape strategy and issues), `decide` (a consequential choice), `implement`
 (build one slice, code or docs), `diagnose` (find a failure's cause), `review`
 (review someone else's change), `validate` (test claims independently),
-`migrate` (a breaking change), `audit` (findings on architecture or process),
-`garden` (keep a repository healthy) and `install` (connect or assess one).
+`migrate` (a breaking change), `audit` (findings on architecture or process) and
+`install` (connect or assess a repository).

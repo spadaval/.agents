@@ -37,6 +37,10 @@ A mission is one thing a person can hold in their head, plan against and finish:
   other repositories or people adopting a change, or on measuring behavior after
   it ships goes in its own backlog item that says when to pick it up, or in a
   loose end if it can only follow a merge or release, so the mission can close.
+- **Swept backlog first.** Before planning, read the backlog in the mission's
+  area. Fold in what belongs, and give whoever owns the plan one list of items
+  to decline, each superseded, moot or not worth its cost, with the reason.
+  Propose declining a planned item on the same grounds.
 - **Sized to finish:** one reviewer can judge it in one debrief, usually days to
   weeks of work. Split a larger one along the outcome's seams, not item count.
 - **Success criteria are optional.** Add one only for a claim about the whole
@@ -78,9 +82,8 @@ merge (anything later is a [loose
 end](../references/atelier.md#loose-ends-and-validation-items)); and Scope,
 Context (with the target environment when it affects risk) and Unknowns where
 they say something. Anything you cannot state concretely, such as "TBD", is an
-evidence boundary: make it a spike, a decision or a blocked issue. Propose
-declining an item whose cost outweighs its value to whoever owns the plan. Check
-that the ready issues together cover the increment's outcome and agree on their
+evidence boundary: make it a spike, a decision or a blocked issue. Check that
+the ready issues together cover the increment's outcome and agree on their
 interfaces, then have the planning reviewed.
 
 ## Strategic Revision
