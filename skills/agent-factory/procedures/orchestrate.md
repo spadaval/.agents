@@ -74,10 +74,14 @@ subsystem yourself.
 
 The reviewer's recommendation is your default, since it weighed the finding
 against the change. Fix trivial issues. For larger ones, decide based on how
-much they grow the change. Defer with `atelier review defer <id>`. One rule
-overrides the reviewer: a new finding on the fix of a low-severity finding is
-deferred unless it shows a regression that fix introduced. You record that
-defer, or a reviewer does if you wrote the fix.
+much they grow the change. Defer with `atelier review defer <id>`. A deferred
+finding fixed in passing stays deferred: move its follow-up under this item
+(`issue update --parent`) so the merge marks it done. `fix_now` means only that
+the work cannot merge without the fix; never record it to mark a fix or a
+scope choice. One rule overrides the reviewer: a new finding on the fix of a
+low-severity finding is deferred unless it is trivial or shows a regression
+that fix introduced. You record that defer, or a reviewer does if you wrote
+the fix.
 
 **Stop signals.** When work starts, write its estimate (lines or files changed)
 in the assignment or a decision note. A fix past about twice its estimate, a fix
