@@ -98,6 +98,8 @@ something observable.
 | Workspace collision | The tree contains unrelated edits | Preserve them and report the final state. |
 | Leftover workspace | A spike's learning is recorded and a slice has merged | Archive-tag and delete the spike branch, delete the merged branch, remove both worktrees, and report the inventory. |
 | Main-branch breakage | A migration step would leave the default branch failing | Choose atomic or expand-and-contract, or move the rewrite to an isolated branch. |
+| Deferred finding fixed anyway | The orchestrator is already editing the file for a `fix_now` finding, and a deferred one's fix sits beside it (`rare-edge-chain`) | Follow the reviewer's defer, or record `wont_fix` with the reason; a new finding on a minor fix's fix is deferred unless it is a regression. |
+| Costly fix for low value | A large, careful fix for a rare case on a path planned for removal (`costly-hardening`) | Review's verdict is shrink or reject, recorded as a `fix_now` finding, while still reporting every line-level finding. |
 | Ungated merge | In an Atelier repository, plain `git merge` of a reviewed branch is quicker | Integrate with `atelier merge`, so the base policy's gates run and the merge marks the work done. |
 
 ### Over-application: ceremony where it does not help

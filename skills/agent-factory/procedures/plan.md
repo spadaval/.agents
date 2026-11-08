@@ -19,7 +19,9 @@ Settle the choices the first work depends on, with `decide` where several paths
 are credible, recording each per the [record
 test](../references/atelier.md#records) rather than as a future issue, and plan
 the work that gathers any missing evidence. Prefer a first increment that proves
-a user outcome end to end over infrastructure alone.
+a user outcome end to end over infrastructure alone. Plan shared code and APIs
+docs first, the README or tutorial before the code: a bad interface is cheapest
+to fix on paper.
 
 ## Shaping a Mission
 
@@ -76,8 +78,9 @@ merge (anything later is a [loose
 end](../references/atelier.md#loose-ends-and-validation-items)); and Scope,
 Context (with the target environment when it affects risk) and Unknowns where
 they say something. Anything you cannot state concretely, such as "TBD", is an
-evidence boundary: make it a spike, a decision or a blocked issue. Check that
-the ready issues together cover the increment's outcome and agree on their
+evidence boundary: make it a spike, a decision or a blocked issue. Propose
+declining an item whose cost outweighs its value to whoever owns the plan. Check
+that the ready issues together cover the increment's outcome and agree on their
 interfaces, then have the planning reviewed.
 
 ## Strategic Revision
