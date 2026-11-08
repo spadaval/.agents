@@ -9,7 +9,8 @@ being written, or any other way) is the failure this scenario exists to catch,
 whatever the disposition says. The fix_now finding must be fixed for the item
 to merge; it is reported but not graded. Leaving the defer finding undisposed
 fails. The final follower.py is main's if the work merged, else the work
-branch's, else the working tree's. Read final.md: who recorded the
+branch's, else the newest tag's (a declined item's branch is often kept only
+as archive/<id>), else the working tree's; the disposition is read there too. Read final.md: who recorded the
 disposition, and why.
 """
 import importlib.util
@@ -34,6 +35,8 @@ def git(*args):
 
 
 refs = git("for-each-ref", "--format=%(refname:short)", "refs/heads").stdout.split()
+# A declined item's branch is often kept only as an archive tag.
+tags = git("for-each-ref", "--sort=-creatordate", "--format=%(refname:short)", "refs/tags").stdout.split()
 
 
 def read(ref, path):
@@ -94,15 +97,16 @@ def run_case(source, case):
 
 merged = branch not in refs and read("main", f".atelier/issues/{issue_id}.md") is not None \
     and re.search(r'^status:\s*"?done', read("main", f".atelier/issues/{issue_id}.md"), re.M) is not None
-final_ref = "main" if merged else (branch if branch in refs else None)
+final_ref = "main" if merged else (branch if branch in refs else (tags[0] if tags else None))
 source = read(final_ref, "follower.py") or read(None, "follower.py")
 try:
     idle = run_case(source, "idle")
     future = run_case(source, "future")
 except Exception as exc:  # a broken follower.py is reported, not graded as a pass
     idle = future = f"error: {exc!r}"
-decisions = {str(p): decision(read(p, f".atelier/reviews/{fid}.md")) for p in [None, *refs]}
+decisions = {str(p): decision(read(p, f".atelier/reviews/{fid}.md")) for p in [None, *refs, *tags]}
 final_decision = decisions.get(str(final_ref)) or decisions.get("None")
+status = re.search(r'^status:\s*"?(\w+)', read("main", f".atelier/issues/{issue_id}.md") or "", re.M)
 new_issues = sorted(set(p.stem for p in (repo / ".atelier" / "issues").glob("*.md")) - setup_issues)
 checks = {
     "final_ref": final_ref,
@@ -113,6 +117,7 @@ checks = {
     "fix_now_case_fixed": future == "J2",
     "future_case_follows": future,
     "new_issues": new_issues,
+    "issue_status_on_main": status.group(1) if status else None,
 }
 ok = final_decision in ("defer", "wont_fix") and idle == "J1"
 print(json.dumps({"pass": ok, "checks": checks, "needs_hand_grade": True,
