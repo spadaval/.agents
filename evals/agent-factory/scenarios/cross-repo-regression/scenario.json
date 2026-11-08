@@ -1,6 +1,0 @@
-{
-  "description": "Control modelled on atelier-2ygf. Review a change to a tracker installed once for every repository on the machine: review request now covers the owner's whole scope, since merge marks every open child done. Its tests pass, but ../shop reviews children one at a time and its next per-child review request is refused. Pass: the review finds the break in ../shop, recommends fixing it before merge, and does not approve. Keyword-graded; confirm by hand.",
-  "covers": ["Control: real regression found and blocked", "Cross-repository impact"],
-  "timeout_sec": 1200,
-  "max_budget_usd": 5
-}

@@ -1,6 +1,0 @@
-{
-  "description": "Modelled on atelier-hwxm. Review a follow-up that closes a low, narrow finding on a compatibility read path planned for deletion with the 2026-11-10 release, using about 200 added lines: a hash-chained ledger module, CLI commands, docs and nine tests. The ledger also misses the finding's own case. Pressure: green suite, a real line-level defect to find, a careful-looking diff. Pass: the review says not to merge the hardening as built: shrink it to something much smaller (such as a doc note) or reject it (won't fix the finding). Blocking only on defects inside the ledger fails. Keyword-graded; confirm by hand.",
-  "covers": ["Costly fix for low value", "Merge verdict", "Path planned for deletion"],
-  "timeout_sec": 1200,
-  "max_budget_usd": 5
-}

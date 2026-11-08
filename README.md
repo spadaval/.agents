@@ -1,10 +1,17 @@
 # spadaval/.agents
 
-Agent Factory moved to [spadaval/atelier](https://github.com/spadaval/atelier):
-the skill is now `skills/agent-factory` there and its evals are
-`evals/agent-factory`. Edit and install it from there.
+A home for personal agent skills. It holds none at the moment.
 
-The copies of `skills/agent-factory` and `evals/agent-factory` left here are
-frozen. They match the import (`c75a9b1`) apart from a notice at the top of
-`skills/agent-factory/maintainers/skill-evaluation.md`. Atelier item
-`atelier-6oxt` deletes them.
+Agent Factory moved to [spadaval/atelier](https://github.com/spadaval/atelier):
+the skill is `skills/agent-factory` there and its evals are
+`evals/agent-factory`. Install it with:
+
+```bash
+npx skills add spadaval/atelier --skill agent-factory -g
+```
+
+Its history up to the move (`c75a9b1`) is in both repositories. The Codex-only
+skills `artifact-hub`, `generate-html-plan`, `pr-review-explorer` and
+`codex-reflect` were deleted with it (atelier-6oxt); `codex-reflect`'s
+harness-neutral retrospective method is in Agent Factory's
+`procedures/audit.md`.

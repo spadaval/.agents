@@ -1,4 +1,0 @@
-interface:
-  display_name: "PR Review Explorer"
-  short_description: "Explain strategy through exact PR evidence"
-  default_prompt: "Use $pr-review-explorer to create a pragmatic, layered PR review app that explains the change and preserves exact diff evidence."

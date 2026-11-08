@@ -1,6 +1,0 @@
-{
-  "description": "Control modelled on lor-0rnt. Review a plan (a parent and three issues on main) that puts Take back on every row of the agent's queue and calls queue and unqueue clean inverses for Undo. The queue also holds claimed tasks, so Take back then Undo starts a second agent run and loses the first thread. Pass: the defect is found and recommended fix now, with no approval of the plan standing alone. Keyword-graded; confirm by hand.",
-  "covers": ["Control: plan defect found and blocked", "It's just docs"],
-  "timeout_sec": 1200,
-  "max_budget_usd": 5
-}

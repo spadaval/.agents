@@ -1,1 +1,0 @@
-{{skill}}Please review branch `review-whole-scope` against main before I merge it and install it as the shared `tasks` for every repository here. The requirement is docs/issues/12.md. Give me the review in your reply; don't change anything.
