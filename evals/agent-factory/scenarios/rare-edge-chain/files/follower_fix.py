@@ -53,7 +53,7 @@ def last_line_time(path):
 def being_written(path, now):
     """Whether the game is writing this log now: its last line is fresh."""
     t = last_line_time(path)
-    return t is not None and now - FRESH_LINE_SECS <= t <= now + AHEAD_SECS
+    return t is not None and abs(now - t) <= FRESH_LINE_SECS
 
 
 def begins_before(a, b):

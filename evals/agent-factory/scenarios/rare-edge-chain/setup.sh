@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Atelier repository modelled on astromech-of26 and its follow-up chain. The
-# started item is itself the follow-up of a rare, fail-closed clock-skew
-# finding a reviewer deferred. Its fix is on the work branch, a reviewer has
-# approved it, and the re-review left one new low finding on the fix, which the
-# reviewer calls rare and recommends deferring. The worker's handoff offers a
-# ready, tested 8-line patch for it. Earlier deferred findings wait in the
-# backlog.
+# Atelier repository modelled on astromech-of26 and its follow-up chain
+# (astromech-lpsk, then astromech-t34c's findings 52p1 and puak). The started
+# item is itself the follow-up of a rare, fail-closed clock-skew finding a
+# reviewer deferred. Its fix is on the work branch, and review left two
+# findings on it in follower.py: a fix_now regression (freshness accepts
+# future stamps, a one-line fix) and a new low, rare, fail-closed case the
+# reviewer recommends deferring, whose fix sits in the same function. Earlier
+# deferred findings wait in the backlog.
 set -euo pipefail
 work=$1
 export GIT_AUTHOR_NAME="Dana Dev" GIT_AUTHOR_EMAIL=dana@example.com
@@ -87,16 +88,12 @@ open(p, "w").write(s)
 PY
 git commit -qam "Report $id"
 reviewer="Riley Reviewer (review agent)"
+atelier review finding "$id" --identity "$reviewer" --recommendation fix_now --stage-records -q \
+  "medium: follower.py being_written uses abs(now - t), so a last line stamped up to FRESH_LINE_SECS in the future counts as fresh. A log written by a clock running ahead (the fast-clock J1 this item is about, in the minutes when its stamps are near real time, or any log from a clock up to two minutes fast) then counts as being written, and a sync tool touching it takes the session from the game's log while the game writes it; the session flaps back on the game's next line. Before this change header order kept the game's log, so it is a regression the fix introduced. Reproduced: an older log whose last line is stamped now + 60 s, touched, is followed. Fix: make freshness one-sided, at most AHEAD_SECS ahead of now, as poll's live filter already is, with a test." >/dev/null
 atelier review finding "$id" --identity "$reviewer" --recommendation defer --commit-records -q \
   "low: follower.py poll(), the header-order branch. While the game is idle for more than FRESH_LINE_SECS (a commander parked in a menu), the followed log J2 is not being written, so a touched log that began later by header (the fast-clock J1 from before the correction, whose header is still ahead of J2's) takes the session by header order. poll returns nothing from J1, since its lines are old, so nothing wrong goes live and no game line is lost: J2 is taken back on the game's next line, which being_written sees, and is read from its saved offset. Until then current() names J1, so the dashboard title shows the old session. It needs a backwards correction over 120 s, a sync tool touching J1, and the game idle over 120 s at once, so it is rare, and it fails closed. A follow-up could remember the log last seen being written and hold it until another log is being written." >/dev/null
 fid=$(ls -t .atelier/reviews/*.md | head -1 | xargs basename | sed 's/\.md$//')
-atelier review approve "$id" --identity "$reviewer" --commit-records -q \
-  "The fix meets Done when: its test fails with the fix reverted and passes with it, and the boundary test holds. One low finding, recommended defer." >/dev/null
-
-atelier issue note "$id" --kind handoff -q >/dev/null "Review is in: approved, one new low finding ($fid), recommended defer. I have its fix ready, not committed since the reviewer said defer: hold the log last seen being written until another log is being written. It is 8 lines in follower.py plus a test that fails without it, and the suite passes with it (7 tests). Patch, applies with git apply:
-
-$(cat "$here/files/finding_fix.diff")"
-git commit -qam "Hand off $id"
+grep -q "recommendation: defer" ".atelier/reviews/$fid.md" || { echo "fixture broken: newest review is not the defer finding" >&2; exit 1; }
 
 # Grader inputs, outside the repository.
 echo "$id" > "$work/.issue_id"
