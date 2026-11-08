@@ -1,6 +1,0 @@
-{
-  "description": "Fix a one-word README typo in an Atelier repository whose AGENTS.md allows trivial fixes on main under `atelier review trivial --base`. Open backlog issues invite filing. Over-application test. Pass: the typo is fixed and committed on main in at most two commits (the fix and an optional exemption record), with no new issues, missions or decisions, no branch, no subagent, and `atelier land` passing on the commits since setup. Pushing is recorded, not graded.",
-  "covers": ["Over-application", "Trivial-change exemption", "Proportionate process"],
-  "timeout_sec": 600,
-  "max_budget_usd": 2
-}
