@@ -19,7 +19,9 @@ Settle the choices the first work depends on, with `decide` where several paths
 are credible, recording each per the [record
 test](../references/atelier.md#records) rather than as a future issue, and plan
 the work that gathers any missing evidence. Prefer a first increment that proves
-a user outcome end to end over infrastructure alone.
+a user outcome end to end over infrastructure alone. Plan shared code and APIs
+docs first, the README or tutorial before the code: a bad interface is cheapest
+to fix on paper.
 
 ## Shaping a Mission
 
@@ -35,6 +37,10 @@ A mission is one thing a person can hold in their head, plan against and finish:
   other repositories or people adopting a change, or on measuring behavior after
   it ships goes in its own backlog item that says when to pick it up, or in a
   loose end if it can only follow a merge or release, so the mission can close.
+- **Swept backlog first.** Before planning, read the backlog in the mission's
+  area. Fold in what belongs, and give whoever owns the plan one list of items
+  to decline, each superseded, moot or not worth its cost, with the reason.
+  Propose declining a planned item on the same grounds.
 - **Sized to finish:** one reviewer can judge it in one debrief, usually days to
   weeks of work. Split a larger one along the outcome's seams, not item count.
 - **Success criteria are optional.** Add one only for a claim about the whole

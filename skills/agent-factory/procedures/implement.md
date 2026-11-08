@@ -9,7 +9,14 @@ Read the assignment and enough surrounding code, docs and decisions to do it
 safely, and be clear on its scope and expected proof. If it is really a
 diagnosis, a migration or a planning problem, say so and route it. For
 non-trivial code, know where the responsibility and state should live before you
-write it.
+write it. If the assignment gives no estimate, write one, the size in lines or
+files changed, as a decision note.
+
+If you pass about twice the estimate, stop and report what is done, what is left
+and why it grew, instead of pushing through: the estimate was wrong, and whoever
+owns the plan decides whether the rest is worth it. Anyone may propose not doing
+work, or less of it, when its cost outweighs its value; say why, and let the
+plan's owner decide.
 
 ## Building and Proving
 
@@ -41,8 +48,10 @@ only follow a merge or release.
 
 ## Review
 
-Get review as [Independent Review](../SKILL.md#independent-review) says; under
-an orchestrator, report it as outstanding. Fix each `FIX NOW` finding that
+Before review, prove the change in the running app with the repository's verify
+skill where one exists, and include its evidence with your proof. Get review as
+[Independent Review](../SKILL.md#independent-review) says; under an
+orchestrator, report it as outstanding. Fix each `FIX NOW` finding that
 stands under that section's Findings rule, one at a time, and rerun its proof.
 Do not silently drop a finding or widen scope to address it.
 

@@ -34,12 +34,11 @@ Say which subskill you are using, and why, before you start it.
 
 ## Scale
 
-Small work (one agent, one session) needs no issue or plan, only a clear commit
-and PR description, multi-step work uses tracker issues, and a mission adds a
-strategy and increments (`plan`). The tracker is
-[Atelier](references/atelier.md); without it, keep the plan, follow-ups and
-decisions in a plan file or the PR, and offer to install Atelier for a mission
-without stopping work for it.
+Small work (one agent, one session) needs only a clear commit and PR
+description, multi-step work uses tracker issues, and a mission adds a strategy
+and increments (`plan`). The tracker is [Atelier](references/atelier.md);
+without it, keep the plan, follow-ups and decisions in a plan file or the PR,
+and offer to install Atelier for a mission without stopping work for it.
 
 ## Independent Review
 
@@ -64,12 +63,13 @@ records](references/atelier.md#planning-on-the-base) follow their own rule.
   reviewer meets in the diff it weighs as claims.
 - **After review:** a finding's fix is reviewed again, however small, as is any
   non-trivial conflict resolution or rewritten requirement, by any reviewer.
-- **Findings:** the accountable agent decides each with [`review`'s
-  recommendations](procedures/review.md#recommendations), but an author never
-  decides findings on its own work, whose blind spots it shares. An author that
-  is also the accountable agent fixes every finding recommended `FIX NOW`, or
-  sends its rebuttal (a fact or a test) to a reviewer, who decides and records
-  it. An open `FIX NOW` blocks the merge.
+- **Findings:** each ends fixed, deferred, won't-fix or no action ([`review`'s
+  recommendations](procedures/review.md#recommendations)). The accountable agent
+  decides and records each, but an author never decides findings on its own
+  work, whose blind spots it shares: one that is also the accountable agent
+  fixes each recommended `FIX NOW` or sends a rebuttal (a fact or a test) to a
+  reviewer, who decides it and records it and the rest. An open `FIX NOW`
+  blocks the merge.
 - **No reviewer:** keep it unmerged, report review outstanding (your own reread
   is not review) and ask the user to review or arrange it. A prior request to
   merge does not waive this; a user who knowingly directs an unreviewed merge is
