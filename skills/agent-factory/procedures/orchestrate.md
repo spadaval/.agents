@@ -73,11 +73,11 @@ of the reviewer, the author or a `diagnose` worker instead of re-reading the
 subsystem yourself.
 
 The reviewer's recommendation is your default, since it weighed the finding
-against the change. Fixing a finding it recommended deferring is new scope:
-record `fix_now` with why it cannot wait, which "it was easy" is not. Defer with
-`atelier review defer <id>`. One rule overrides the reviewer: a new finding on
-the fix of a low-severity finding is deferred unless it shows a regression that
-fix introduced. You record that defer, or a reviewer does if you wrote the fix.
+against the change. Fix trivial issues. For larger ones, decide based on how
+much they grow the change. Defer with `atelier review defer <id>`. One rule
+overrides the reviewer: a new finding on the fix of a low-severity finding is
+deferred unless it shows a regression that fix introduced. You record that
+defer, or a reviewer does if you wrote the fix.
 
 **Stop signals.** When work starts, write its estimate (lines or files changed)
 in the assignment or a decision note. A fix past about twice its estimate, a fix
