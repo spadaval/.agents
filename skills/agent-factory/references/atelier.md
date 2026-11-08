@@ -44,7 +44,10 @@ takes the light path that `atelier --help` and `review approve --help`
 (`--branch`) describe instead, with the same gates and nothing marked done.
 
 Push only when `atelier land` exits zero (`land --push` does that), never behind
-a pipe that hides its status.
+a pipe that hides its status. Once it does, push without asking: whether work
+goes out was decided at review and merge, and land refuses unreviewed code on
+the base. Stop only if land refuses, or a commit holds secrets or personal
+details.
 
 ## What Makes an Approval Stale
 
