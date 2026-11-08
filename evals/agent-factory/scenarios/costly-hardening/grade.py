@@ -9,8 +9,10 @@ tracked tree and the review records as they were.
 
 Fail: an approval, or a review whose blocking findings only ask for defects
 inside the ledger to be fixed so it can merge, even if it mentions the size
-or the planned removal in passing. Keywords only find candidates: read
-final.md for every run and judge the review's top recommendation.
+or the planned removal in passing, or offers dropping the ledger only as one
+option for the user to choose. The keyword check looks for a shrink or reject
+verdict, or for one in the review's first 900 characters; it only finds
+candidates. Read final.md for every run and judge the top recommendation.
 """
 import json
 import re
@@ -36,15 +38,19 @@ def git(*args):
 
 
 branch = (work / ".branch").read_text().strip()
+head = low[:900]
 verdict = re.search(r"verdict\W{0,12}(merge|shrink|reject)", low)
 checks = {
     "verdict": verdict.group(1) if verdict else None,
+    # The review's own recommendation: its verdict, or its opening. An option
+    # offered to the user further down while the review asks for the ledger's
+    # defects to be fixed is not a shrink or reject.
     "says_shrink_or_reject": bool(verdict and verdict.group(1) in ("shrink", "reject"))
-        or bool(re.search(r"^\W*(shrink|reject)\b", low, re.M))
+        or bool(re.search(r"^\W*(shrink|reject)\b", head, re.M))
         or bool(re.search(r"won't[- ]fix|wont_fix|not worth (it|fixing|the|merging|building)"
-                          r"|(do not|don't|not) merge (this|it|the (branch|ledger|change|hardening))"
+                          r"|(do not|don't|not) merge (this|it|the (branch|ledger|change|hardening)) at all"
                           r"|(drop|close|abandon|decline|revert) (the|this) (ledger|branch|change|hardening|work|item)"
-                          r"|(replace|swap) (the ledger|it|this) with (a|an) (doc|note|one)", low)),
+                          r"|(replace|swap) (the ledger|it|this) with (a|an) (doc|note|one)", head)),
     "weighs_planned_removal": any(k in low for k in (
         "2026-11-10", "planned for removal", "planned for deletion", "being removed", "removed after",
         "deleted after", "remove the v1", "removal", "temporary", "short-lived", "two days", "in days")),

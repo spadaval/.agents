@@ -1,0 +1,53 @@
+--- follower.py
++++ follower.py
+@@ -67,6 +67,7 @@
+         self.folder = Path(folder)
+         self.clock = clock
+         self.path = None
++        self.writing = None  # the log last seen being written
+         self.offsets = {}
+ 
+     def logs(self):
+@@ -91,6 +92,8 @@
+         elif latest is not None and latest != newest and begins_before(newest, latest):
+             chosen = latest
+         self.path = chosen
++        if being_written(chosen, self.clock()):
++            self.writing = chosen
+         return self._read(chosen)
+ 
+     def poll(self):
+@@ -103,10 +106,13 @@
+             if being_written(newest, now):
+                 self.path = newest
+             elif self.path is None or (not being_written(self.path, now)
++                                       and self.path != self.writing
+                                        and not begins_before(newest, self.path)):
+                 self.path = newest
+         if self.path is None:
+             return []
++        if being_written(self.path, now):
++            self.writing = self.path
+         return [l for l in self._read(self.path)
+                 if (t := line_time(l)) is not None and now - FRESH_LINE_SECS <= t <= now + AHEAD_SECS]
+ 
+--- test_follower.py
++++ test_follower.py
+@@ -88,6 +88,17 @@
+         self.assertEqual(f.poll(), [])
+         self.assertEqual(f.current(), game.name)
+ 
++    def test_a_quiet_game_keeps_the_session_from_a_touched_later_log(self):
++        t0 = NOW - 4000
++        j1 = self.log(t0 + 3600, [t0 + 3610], mtime=t0 + 10)
++        j2 = self.log(t0 + 20, [NOW - 5], mtime=NOW - 5)
++        f = Follower(self.dir, self.clock)
++        f.catch_up()
++        self.clock.t = NOW + 300
++        os.utime(j1, (self.clock.t, self.clock.t))
++        self.assertEqual(f.poll(), [])
++        self.assertEqual(f.current(), j2.name)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
