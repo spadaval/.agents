@@ -77,9 +77,7 @@ against the change. Fixing a finding it recommended deferring is new scope:
 record `fix_now` with why it cannot wait, which "it was easy" is not. Defer with
 `atelier review defer <id>`. One rule overrides the reviewer: a new finding on
 the fix of a low-severity finding is deferred unless it shows a regression that
-fix introduced, since each fix of a minor problem draws minor findings of its
-own and the chain soon costs more than the first finding was worth. You record
-that defer, or a reviewer does when you wrote the fix.
+fix introduced. You record that defer, or a reviewer does if you wrote the fix.
 
 **Stop signals.** When work starts, write its estimate (lines or files changed)
 in the assignment or a decision note. A fix past about twice its estimate, a fix

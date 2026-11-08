@@ -20,9 +20,7 @@ re-running acceptance scenarios is `validate`.
 
 ## Verdict
 
-A correct change can still cost more than the problem it removes, and a costly
-fix draws findings of its own. So first size the whole change against the
-outcome it serves:
+First size the whole change against the outcome it serves:
 
 - **Complexity:** *low*, held in one sitting, no new moving part; *medium*, a
   new moving part or several owners; *high*, new state, a subsystem or a
@@ -37,10 +35,11 @@ outcome it serves:
 Then say **merge** if the value is worth the rest, **shrink** if a much smaller
 change gets most of it (name that change), or **reject** if the cost outweighs
 it (name the outcome served and why). Record a shrink or reject as a `fix_now`
-finding opening `Shrink:` or `Reject:`; merge then waits for the smaller change
-and a fresh approval or, for a reject that stands, the item's decline. The
-accountable agent, never the author, may override either: `no_action` if the
-verdict is wrong, `wont_fix` if its point stands but merging is worth it.
+finding opening `Shrink:` or `Reject:`, its severity the change's risk; merge
+then waits for the smaller change and a fresh approval or, for a reject that
+stands, the item's decline. The accountable agent, never the author, may
+override either: `no_action` if the verdict is wrong, `wont_fix` if its point
+stands but merging is worth it (high severity makes that the human's call).
 
 ## What to Look For
 
@@ -98,7 +97,7 @@ alternative, and the smallest proof that tells them apart decides.
 
 ## Output
 
-Use this shape, even where a brief asks for severity labels or another one:
+Use this shape, even where a brief asks for another one:
 
 ```text
 Verdict:  merge | shrink | reject, with the outcome it serves and why
@@ -107,11 +106,12 @@ Contract: pass | fail | unable to assess, with one line of explanation
 Fitness:  pass | fail | unable to assess, with one line of explanation
 
 Findings
-- R1 path:line: problem, impact, and suggested fix.
+- R1 path:line: severity, problem, impact, and suggested fix.
   Recommendation: FIX NOW | DEFER | WON'T FIX | NO ACTION, with a reason.
 
 Open questions
 Residual risk and tests not run
 ```
 
-With no findings, say so and still name any residual risk.
+A finding's severity is the harm if it is left, sized low, medium or high as
+Risk is. With no findings, say so and still name any residual risk.
